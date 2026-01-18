@@ -1,0 +1,320 @@
+@extends('layouts.main')
+
+@section('title', 'StudyAbroad - Belajar & Kerja di Jepang')
+
+@section('nav-home', 'text-brand-pink font-semibold')
+
+@section('hero')
+<header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
+  <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Latar Belakang Jepang" />
+    <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
+  </div>
+
+  <div class="container max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 items-center">
+    <div class="pt-4 md:pt-10">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-2">
+        <span class="relative inline-block">
+          <span class="absolute -left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 border-2 border-white"></span>
+          {!! $home_contents['hero_title']->content ?? 'Program Resmi' !!}
+        </span>
+        <br />
+        <span class="text-brand-pink">{!! $home_contents['hero_subtitle']->content ?? 'Belajar & Kerja' !!} di <br />
+        Jepang <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" /></span>
+      </h1>
+
+      <div class="bg-white p-3 rounded-2xl md:rounded-full shadow-soft flex flex-col md:flex-row gap-4 md:gap-2 max-w-lg mt-8 mb-6 border border-gray-100 items-stretch md:items-center">
+        <div class="flex-1 px-2 md:px-4 border-b md:border-b-0 md:border-r border-gray-100 pb-2 md:pb-0">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1 md:mb-0">Kategori</label>
+          <select class="w-full bg-transparent text-sm font-bold text-gray-700 outline-none appearance-none cursor-pointer py-1">
+            <option>Kampus</option>
+            <option>Magang</option>
+          </select>
+        </div>
+        <div class="flex-1 px-2 md:px-4 pb-2 md:pb-0">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1 md:mb-0">Jenjang</label>
+          <select class="w-full bg-transparent text-sm font-bold text-gray-700 outline-none appearance-none cursor-pointer py-1">
+            <option>Tingkat</option>
+            <option>N5 - N1</option>
+          </select>
+        </div>
+        <button class="bg-brand-pink text-white px-8 py-3 rounded-xl md:rounded-full text-sm font-bold shadow-md hover:bg-pink-600 transition w-full md:w-auto">Terjemahkan</button>
+      </div>
+
+      <p class="text-gray-500 mb-8 max-w-md leading-relaxed text-sm font-medium">{!! $home_contents['hero_description']->content ?? 'Raih beasiswa pendidikan dan karier di Jepang dengan mentor yang sudah berpengalaman, jaringan luas, dan sertifikat pelatihan yang terakreditasi.' !!}</p>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+        <a href="{{ $home_contents['button_link']->link ?? url('daftar') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
+          {!! $home_contents['button_text']->content ?? 'Daftar Sekarang' !!} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+        <button onclick="window.open('{{ $videos->first()->url ?? '#' }}', '_blank')" class="text-brand-pink font-bold px-6 py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent">
+          <div class="w-8 h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
+            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          </div>
+          Lihat Video
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div class="flex -space-x-3">
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=32" alt="" />
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=47" alt="" />
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=12" alt="" />
+          <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
+        </div>
+        <div class="text-sm">
+          <span class="text-brand-pink font-bold text-lg">1,200+</span>
+          <p class="text-xs text-gray-500 font-medium">siswa telah bergabung & bekerja</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative h-full flex items-end justify-center md:justify-end mt-10 md:mt-0">
+      <img src="{{ asset('template/img/image5.png') }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
+    </div>
+  </div>
+
+  <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10"></div>
+</header>
+@endsection
+
+@section('content')
+<section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
+  <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10">
+    <div class="md:w-1/3">
+      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+      <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">{!! $home_contents['section_title']->content ?? 'Jepang Menanti<br />Anda' !!}</h2>
+    </div>
+    <div class="md:w-2/3">
+      <p class="text-gray-500 leading-relaxed mb-6 font-medium text-sm md:text-base">
+        {!! $home_contents['section_description']->content ?? 'Pilihan universitas dan sekolah bahasa terbaik menanti. Kami bekerja sama dengan lembaga pendidikan resmi yang terdaftar, memberikan jaminan kualitas dan legalitas. Peluang karier global menanti Anda dengan standar gaji internasional yang kompetitif.' !!}
+      </p>
+      <button class="bg-brand-yellow text-gray-900 px-8 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">{!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span></button>
+    </div>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-12 md:mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-brand-pink mb-3">Pilihan Program Masa Depan</h2>
+      <p class="text-gray-500 text-sm font-medium">Kami menyediakan profesionalitas serta studi gelar atau bahasa.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      @forelse($program_masa_depan as $program)
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden">
+          <img src="{{ $program->gambar ? asset('uploads/program/'.$program->gambar) : 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=500&q=60' }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+        </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">{{ $program->judul }}</h3>
+          <ul class="space-y-3">
+            @if($program->lokasi)
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📍</span> {{ $program->lokasi }}</li>
+            @endif
+            @if($program->durasi)
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> {{ $program->durasi }}</li>
+            @endif
+            @if($program->visa)
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🎓</span> {{ $program->visa }}</li>
+            @endif
+            @if($program->gaji)
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">💴</span> {{ $program->gaji }}</li>
+            @endif
+            @if($program->sertifikat)
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📜</span> {{ $program->sertifikat }}</li>
+            @endif
+          </ul>
+        </div>
+      </div>
+      @empty
+      <!-- Default data jika belum ada di database -->
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden">
+          <img src="{{ asset('template/img/program-default.jpg') }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+        </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Studi Program Sekolah (Bahasa)</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📍</span> Tokyo, Osaka, Kyoto</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Durasi 1-2 Tahun</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🎓</span> Visa Pelajar</li>
+          </ul>
+        </div>
+      </div>
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+        </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Tokutei Ginou (Skill Spesifik)</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📍</span> Seluruh Jepang</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Kontrak 5 Tahun</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">💴</span> Gaji Standar Jepang</li>
+          </ul>
+        </div>
+      </div>
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+        </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Internship / Magang</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🏭</span> Industri Manufaktur</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Durasi 3 Tahun</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📜</span> Sertifikat JITCO</li>
+          </ul>
+        </div>
+      </div>
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+        </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Kursus Bahasa Jepang</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🏫</span> Online / Offline</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📚</span> JLPT N5 - N1</li>
+            <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">✅</span> Garansi Lulus</li>
+          </ul>
+        </div>
+      </div>
+      @endforelse
+    </div>
+
+    <div class="text-center mt-12">
+      <button class="bg-brand-yellow text-gray-900 px-10 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition inline-flex items-center">Lihat Semua Program <span class="ml-2">></span></button>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+      <div class="max-w-xl">
+        <h2 class="text-3xl font-bold text-brand-pink mb-4">Beberapa Pilihan Industri</h2>
+        <p class="text-gray-500 font-medium text-sm">Kami membantu menempatkan ke berbagai sektor industri pemberi kerja (Perusahaan) yang terpercaya di Jepang.</p>
+      </div>
+      <div class="hidden md:flex space-x-3 mt-6 md:mt-0">
+        <button class="w-12 h-12 rounded-full border border-pink-200 text-brand-pink flex items-center justify-center hover:bg-brand-pink hover:text-white transition shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <button class="w-12 h-12 rounded-full border border-pink-200 text-brand-pink flex items-center justify-center hover:bg-brand-pink hover:text-white transition shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex gap-6 md:gap-8 overflow-x-auto pb-10 justify-start md:justify-between px-4 no-scrollbar">
+      @forelse($industri as $item)
+      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <img src="{{ $item->gambar ? asset('uploads/industri/'.$item->gambar) : 'https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60' }}" class="w-full h-full object-cover" />
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
+          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">{{ $item->nama }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
+        </div>
+      </div>
+      @empty
+      <!-- Default data jika belum ada di database -->
+      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <img src="https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover" />
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
+          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Kesehatan<br /><span class="text-xs font-normal text-gray-300">Caregiver</span></span>
+        </div>
+      </div>
+      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover" />
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
+          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Konstruksi<br /><span class="text-xs font-normal text-gray-300">Bangunan</span></span>
+        </div>
+      </div>
+      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover" />
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
+          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Pertanian<br /><span class="text-xs font-normal text-gray-300">Agrikultur</span></span>
+        </div>
+      </div>
+      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover" />
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
+          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Manufaktur<br /><span class="text-xs font-normal text-gray-300">Pabrik</span></span>
+        </div>
+      </div>
+      @endforelse
+    </div>
+  </div>
+</section>
+
+<section class="py-16 md:py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-brand-pink text-center mb-16">Alur Pendaftaran</h2>
+
+    <div class="flex flex-col md:flex-row justify-between items-start text-center relative px-4">
+      <div class="hidden md:block absolute top-10 left-0 w-full h-[2px] bg-gray-100 -z-0"></div>
+
+      <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
+        <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
+          <span class="text-2xl">📄</span>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-2">1. Konsultasi & Daftar</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Diskusi pilihan program & isi formulir.</p>
+      </div>
+
+      <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
+        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
+          <span class="text-2xl">🔍</span>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-2">2. Seleksi & Interview</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Tes potensi & wawancara user.</p>
+      </div>
+
+      <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
+        <div class="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
+          <span class="text-2xl">📝</span>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-2">3. Pelatihan Bahasa</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Belajar intensif 3-6 bulan.</p>
+      </div>
+
+      <div class="flex flex-col items-center w-full md:w-1/4 relative z-10">
+        <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
+          <span class="text-2xl">✈️</span>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-2">4. Terbang ke Jepang</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Visa turun & berangkat kerja.</p>
+      </div>
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="{{ url('daftar') }}" class="bg-brand-yellow text-gray-900 px-10 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition inline-block">Mulai Pendaftaran ></a>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex justify-between items-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-brand-pink">Kisah Sukses</h2>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-8 items-center justify-center">
+      <div class="w-full md:w-2/3 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        <div class="w-full md:w-2/5 relative">
+          <div class="absolute inset-0 bg-orange-500 mix-blend-multiply opacity-20 z-10"></div>
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-64 md:h-full object-cover" />
+        </div>
+        <div class="w-full md:w-3/5 p-8 flex flex-col justify-center">
+          <div class="flex text-yellow-400 mb-4 text-sm">★★★★★</div>
+          <p class="text-gray-600 mb-6 italic leading-relaxed text-sm">"Saya sangat terbantu dengan program ini. Mentornya sabar membimbing dari nol sampai saya bisa N3 dalam 6 bulan."</p>
+          <div>
+            <h4 class="font-bold text-gray-900 text-lg">Anisa Rahmawati</h4>
+            <p class="text-xs text-brand-pink font-semibold uppercase tracking-wide">Engineering Staff, Nagoya</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+@endsection
