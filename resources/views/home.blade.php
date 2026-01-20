@@ -198,8 +198,12 @@ $content = $translations[$language] ?? $translations['id'];
       
       @forelse($program_masa_depan as $item)
       <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
-        <div class="h-48 relative overflow-hidden">
-          <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
+        <div class="h-48 relative overflow-hidden bg-gray-50">
+          @if(!empty($item->gambar))
+            <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
+          @else
+            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" />
+          @endif
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
         <div class="p-6">
@@ -298,11 +302,7 @@ $content = $translations[$language] ?? $translations['id'];
       
       @forelse($industri as $item)
       <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
-        @if(!empty($item->gambar))
-          <img src="{{ $item->gambar }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
-        @else
-          <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" alt="Default industry image" class="w-full h-full object-cover" />
-        @endif
+        <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
         <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
           <span class="text-white font-bold text-base md:text-lg text-center leading-tight">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
         </div>
@@ -399,20 +399,11 @@ $content = $translations[$language] ?? $translations['id'];
       @forelse($kisah_sukses as $item)
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
         <div class="relative">
-          <div class="aspect-w-16 aspect-h-12 overflow-hidden">
-            {{-- Fallback images yang berbeda berdasarkan nama --}}
-            @if($item->nama == 'Anisa Rahmawati')
-              <img src="https://images.unsplash.com/photo-1494790106753-9e7f7d7f6d6?auto=format&fit=crop&w=500&q=80" alt="Anisa Rahmawati" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-            @elseif($item->nama == 'Budi Santoso')
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="Budi Santoso" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-            @elseif($item->nama == 'Siti Nurhaliza')
-              <img src="https://images.unsplash.com/photo-1573497019923-4c8c5b0e5cf?auto=format&fit=crop&w=500&q=80" alt="Siti Nurhaliza" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-            @elseif($item->nama == 'Ahmad Fauzi')
-              <img src="https://images.unsplash.com/photo-1592928985038-b273a1c0b85b?auto=format&fit=crop&w=500&q=80" alt="Ahmad Fauzi" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-            @elseif($item->nama == 'Maya Putri')
-              <img src="https://images.unsplash.com/photo-1438761681033-6471a4ab5fa5?auto=format&fit=crop&w=500&q=80" alt="Maya Putri" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+          <div class="h-48 overflow-hidden bg-gray-50">
+            @if(!empty($item->foto))
+              <img src="{{ asset($item->foto) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
             @else
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Default testimonial" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+              <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" alt="Default testimonial" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" />
             @endif
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>

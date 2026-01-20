@@ -38,6 +38,9 @@ class TrainingCenter extends Controller
             ->orderBy('id_berita', 'DESC')
             ->limit(2)
             ->get();
+        
+        // Ambil data video untuk training center (jika ada)
+        $videos = DB::table('video')->orderBy('id_video', 'DESC')->get();
 
         $data = array(
             'title' => 'Training Center - ' . $site_config->namaweb,
@@ -45,7 +48,8 @@ class TrainingCenter extends Controller
             'keywords' => 'Training Center, Pelatihan Bahasa Jepang, JLPT',
             'site_config' => $site_config,
             'programs' => $programs,
-            'testimoni_training' => $testimoni_training
+            'testimoni_training' => $testimoni_training,
+            'videos' => $videos
         );
         
         return view('training-center', $data);

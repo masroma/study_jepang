@@ -90,15 +90,15 @@
           <p class="text-gray-500 font-medium text-sm">Hubungi kami melalui berbagai cara yang tersedia.</p>
         </div>
 
-        <div class="space-y-6 mb-8">
-          <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:shadow-xl transition">
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                <span class="text-2xl">📍</span>
+        <div class="space-y-5 mb-10">
+          <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-6 md:p-7 border border-gray-50 hover:border-pink-100 hover:-translate-y-1 group">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-pink-50 to-pink-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                <span class="text-3xl">📍</span>
               </div>
-              <div>
-                <h3 class="font-bold text-gray-800 mb-2">Alamat Kantor</h3>
-                <p class="text-sm text-gray-500 font-medium leading-relaxed">
+              <div class="flex-grow">
+                <h3 class="font-bold text-gray-800 mb-2 text-base">Alamat Kantor</h3>
+                <p class="text-sm text-gray-600 font-medium leading-relaxed">
                   Jl. Sudirman No. 123<br />
                   Jakarta Selatan 12190<br />
                   Indonesia
@@ -107,44 +107,44 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:shadow-xl transition">
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                <span class="text-2xl">📞</span>
+          <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-6 md:p-7 border border-gray-50 hover:border-blue-100 hover:-translate-y-1 group">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                <span class="text-3xl">📞</span>
               </div>
-              <div>
-                <h3 class="font-bold text-gray-800 mb-2">Telepon</h3>
-                <p class="text-sm text-gray-500 font-medium">
-                  <a href="tel:+6281234567890" class="hover:text-brand-pink transition">+62 812 3456 7890</a><br />
-                  <a href="tel:+6281234567891" class="hover:text-brand-pink transition">+62 812 3456 7891</a>
+              <div class="flex-grow">
+                <h3 class="font-bold text-gray-800 mb-2 text-base">Telepon</h3>
+                <p class="text-sm text-gray-600 font-medium space-y-1">
+                  <a href="tel:+6281234567890" class="block hover:text-brand-pink transition">+62 812 3456 7890</a>
+                  <a href="tel:+6281234567891" class="block hover:text-brand-pink transition">+62 812 3456 7891</a>
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:shadow-xl transition">
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                <span class="text-2xl">✉️</span>
+          <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-6 md:p-7 border border-gray-50 hover:border-yellow-100 hover:-translate-y-1 group">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                <span class="text-3xl">✉️</span>
               </div>
-              <div>
-                <h3 class="font-bold text-gray-800 mb-2">Email</h3>
-                <p class="text-sm text-gray-500 font-medium">
-                  <a href="mailto:info@studyabroad.id" class="hover:text-brand-pink transition">info@studyabroad.id</a><br />
-                  <a href="mailto:cs@studyabroad.id" class="hover:text-brand-pink transition">cs@studyabroad.id</a>
+              <div class="flex-grow">
+                <h3 class="font-bold text-gray-800 mb-2 text-base">Email</h3>
+                <p class="text-sm text-gray-600 font-medium space-y-1">
+                  <a href="mailto:info@studyabroad.id" class="block hover:text-brand-pink transition">info@studyabroad.id</a>
+                  <a href="mailto:cs@studyabroad.id" class="block hover:text-brand-pink transition">cs@studyabroad.id</a>
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:shadow-xl transition">
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                <span class="text-2xl">🕒</span>
+          <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-6 md:p-7 border border-gray-50 hover:border-green-100 hover:-translate-y-1 group">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                <span class="text-3xl">🕒</span>
               </div>
-              <div>
-                <h3 class="font-bold text-gray-800 mb-2">Jam Operasional</h3>
-                <p class="text-sm text-gray-500 font-medium leading-relaxed">
+              <div class="flex-grow">
+                <h3 class="font-bold text-gray-800 mb-2 text-base">Jam Operasional</h3>
+                <p class="text-sm text-gray-600 font-medium leading-relaxed">
                   Senin - Jumat: 09:00 - 18:00 WIB<br />
                   Sabtu: 09:00 - 15:00 WIB<br />
                   Minggu: Tutup

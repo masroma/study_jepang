@@ -48,9 +48,9 @@
 
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
           <a href="{{ url('/') }}" class="@yield('nav-home', 'hover:text-brand-pink transition')">Home</a>
-          <a href="{{ url('training-center') }}" class="@yield('nav-training', 'hover:text-brand-pink transition')">Training Center</a>
-          <a href="{{ url('kisah-sukses') }}" class="@yield('nav-kisah', 'hover:text-brand-pink transition')">Kisah Sukses</a>
-          <a href="{{ url('berita') }}" class="@yield('nav-blog', 'hover:text-brand-pink transition')">Blog</a>
+          <a href="{{ url('training-center') }}" class="@yield('nav-training-center', 'hover:text-brand-pink transition')">Training Center</a>
+          <a href="{{ url('kisah-sukses') }}" class="@yield('nav-kisah-sukses', 'hover:text-brand-pink transition')">Kisah Sukses</a>
+          <a href="{{ url('blog') }}" class="@yield('nav-blog', 'hover:text-brand-pink transition')">Blog</a>
           <a href="{{ url('kontak') }}" class="@yield('nav-kontak', 'hover:text-brand-pink transition')">Kontak Kami</a>
         </div>
 
@@ -100,7 +100,7 @@
             <li><a href="{{ url('/') }}" class="hover:text-brand-pink transition">Beranda</a></li>
             <li><a href="{{ url('training-center') }}" class="hover:text-brand-pink transition">Training Center</a></li>
             <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
-            <li><a href="{{ url('berita') }}" class="hover:text-brand-pink transition">Blog</a></li>
+            <li><a href="{{ url('blog') }}" class="hover:text-brand-pink transition">Blog</a></li>
           </ul>
         </div>
         <div>
@@ -147,5 +147,5 @@
       langSelect.value = savedLang;
     }
   });
-  </script>
+</script>
 </html>

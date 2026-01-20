@@ -46,7 +46,10 @@ Route::get('kisah-sukses', 'App\Http\Controllers\KisahSuksesController@index');
 // Training Center
 Route::get('training-center', 'App\Http\Controllers\TrainingCenter@index');
 // Blog
-Route::get('blog', 'App\Http\Controllers\Blog@index');
+Route::get('blog', 'App\Http\Controllers\Blog@index')->name('blog.index');
+Route::get('blog/detail/{slug}', 'App\Http\Controllers\Blog@detail')->name('blog.detail');
+Route::get('blog/kategori/{kategori}', 'App\Http\Controllers\Blog@byCategory')->name('blog.category');
+Route::get('blog/search', 'App\Http\Controllers\Blog@search')->name('blog.search');
 // Kontak
 Route::get('kontak', 'App\Http\Controllers\Home@kontak');
 Route::post('kontak/kirim', 'App\Http\Controllers\Home@kirim_pesan');

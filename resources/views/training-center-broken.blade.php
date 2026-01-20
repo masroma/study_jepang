@@ -34,7 +34,6 @@
           </div>
           Lihat Video
         </button>
-        @endif
       </div>
     </div>
   </div>
@@ -78,29 +77,24 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       @forelse($programs as $program)
-      <div class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-50 hover:border-gray-100 overflow-hidden cursor-pointer hover:-translate-y-2">
-        <div class="h-52 overflow-hidden bg-gray-100 relative">
+      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-48 overflow-hidden bg-gray-50">
           @if(!empty($program->gambar))
-            <img src="{{ asset($program->gambar) }}" alt="{{ $program->judul_berita ?? $program->judul_agenda }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <img src="{{ asset($program->gambar) }}" alt="{{ $program->judul_berita ?? $program->judul_agenda }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" />
           @else
-            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-cover bg-gray-100 group-hover:scale-110 transition-transform duration-500" />
+            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain bg-gray-50 group-hover:scale-110 transition duration-500" />
           @endif
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
-        <div class="p-6 md:p-7 flex flex-col justify-between h-64">
-          <div>
-            <h3 class="font-bold text-gray-800 text-base md:text-lg mb-3 leading-snug group-hover:text-brand-pink transition-colors">{{ $program->judul_berita ?? $program->judul_agenda }}</h3>
-            <p class="text-xs md:text-sm text-gray-600 font-medium mb-4 line-clamp-3">{{ Str::limit(strip_tags($program->isi ?? $program->isi_agenda), 100) }}</p>
-          </div>
-          <div class="border-t border-gray-100 pt-4">
-            @if(isset($program->slug_berita))
-              <a href="{{ url('berita/read/' . $program->slug_berita) }}" class="text-brand-pink font-bold text-sm hover:text-pink-600 transition inline-flex items-center group/link">Pelajari Lebih Lanjut <span class="ml-1 transform group-hover/link:translate-x-1 transition-transform">→</span></a>
-            @elseif(isset($program->slug_agenda))
-              <a href="{{ url('agenda/detail/' . $program->slug_agenda) }}" class="text-brand-pink font-bold text-sm hover:text-pink-600 transition inline-flex items-center group/link">Lihat Detail Agenda <span class="ml-1 transform group-hover/link:translate-x-1 transition-transform">→</span></a>
-            @else
-              <span class="text-gray-400 text-sm italic">Detail tidak tersedia</span>
-            @endif
-          </div>
+        <div class="p-6">
+          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">{{ $program->judul_berita ?? $program->judul_agenda }}</h3>
+          <p class="text-xs text-gray-500 font-medium mb-4">{{ Str::limit(strip_tags($program->isi ?? $program->isi_agenda), 100) }}</p>
+          @if(isset($program->slug_berita))
+            <a href="{{ url('berita/read/' . $program->slug_berita) }}" class="text-brand-pink font-bold text-sm hover:underline">Pelajari Lebih Lanjut →</a>
+          @elseif(isset($program->slug_agenda))
+            <a href="{{ url('agenda/detail/' . $program->slug_agenda) }}" class="text-brand-pink font-bold text-sm hover:underline">Lihat Detail Agenda →</a>
+          @else
+            <span class="text-gray-500 text-sm">Detail tidak tersedia</span>
+          @endif
         </div>
       </div>
       @empty
@@ -276,7 +270,6 @@
     </div>
   </div>
 </div>
-@endif
 
 <script>
 function openVideoModal(videoUrl) {
