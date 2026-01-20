@@ -43,18 +43,7 @@
     <nav class="absolute top-0 left-0 w-full z-50 pt-4 px-4 md:pt-6 md:px-12">
       <div class="flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center space-x-3">
-          @php
-            $site_config = DB::table('konfigurasi')->first();
-          @endphp
-          @if($site_config && $site_config->logo)
-            <a href="{{ url('/') }}" class="flex items-center">
-              <img src="{{ asset('assets/upload/image/'.$site_config->logo) }}" alt="{{ $site_config->namaweb ?? 'StudyAbroad' }}" class="h-16 md:h-20 w-auto" />
-            </a>
-          @else
-            <div class="text-xl md:text-2xl font-extrabold text-brand-pink tracking-tight">
-              <a href="{{ url('/') }}">StudyAbroad</a>
-            </div>
-          @endif
+          <div class="text-xl md:text-2xl font-extrabold text-brand-pink tracking-tight">StudyAbroad</div>
         </div>
 
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
@@ -67,9 +56,26 @@
 
         <div class="flex items-center space-x-2 md:space-x-3">
           <div class="hidden sm:flex items-center space-x-1 bg-white px-2 py-1 rounded-full shadow-sm">
-            <img src="https://flagcdn.com/w40/id.png" class="w-5 h-auto rounded-sm" alt="ID" />
-            <span class="text-xs font-bold text-gray-500">ID</span>
-            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <select class="text-xs font-bold text-gray-500 outline-none bg-transparent cursor-pointer" onchange="changeLanguage(this.value)">
+              <option value="id" selected>
+                <div class="flex items-center">
+                  <img src="https://flagcdn.com/w40/id.png" class="w-5 h-auto rounded-sm" alt="ID" />
+                  <span class="ml-1">ID</span>
+                </div>
+              </option>
+              <option value="en">
+                <div class="flex items-center">
+                  <img src="https://flagcdn.com/w40/us.png" class="w-5 h-auto rounded-sm" alt="EN" />
+                  <span class="ml-1">EN</span>
+                </div>
+              </option>
+              <option value="jp">
+                <div class="flex items-center">
+                  <img src="https://flagcdn.com/w40/jp.png" class="w-5 h-auto rounded-sm" alt="JP" />
+                  <span class="ml-1">JP</span>
+                </div>
+              </option>
+            </select>
           </div>
 
           <a href="{{ url('login') }}" class="text-sm font-bold text-gray-600 hover:text-brand-pink px-2 md:px-3">Masuk</a>
@@ -85,13 +91,7 @@
     <footer class="bg-white pt-16 pb-10 border-t border-gray-100">
       <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
         <div class="col-span-1 md:col-span-2">
-          @if($site_config && $site_config->logo)
-            <div class="mb-6">
-              <img src="{{ asset('assets/upload/image/'.$site_config->logo) }}" alt="{{ $site_config->namaweb ?? 'StudyAbroad' }}" class="h-16 w-auto" />
-            </div>
-          @else
-            <div class="text-2xl font-extrabold text-brand-pink mb-6">StudyAbroad</div>
-          @endif
+          <div class="text-2xl font-extrabold text-brand-pink mb-6">StudyAbroad</div>
           <p class="text-gray-500 text-sm leading-relaxed max-w-sm mb-6 font-medium">{{ $site_config->deskripsi ?? 'Lembaga resmi pelatihan bahasa dan kerja ke Jepang. Terakreditasi dan memiliki jaringan luas.' }}</p>
         </div>
         <div>
@@ -125,4 +125,27 @@
       </div>
     </a>
   </body>
+  
+  <script>
+  function changeLanguage(lang) {
+    console.log('Language changed to:', lang);
+    
+    // Save language preference to localStorage
+    localStorage.setItem('selectedLanguage', lang);
+    
+    // Reload page with language parameter
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.set('lang', lang);
+    window.location.href = currentUrl.toString();
+  }
+  
+  // Set initial language from localStorage or default
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem('selectedLanguage') || 'id';
+    const langSelect = document.querySelector('select[onchange="changeLanguage(this.value)"]');
+    if (langSelect) {
+      langSelect.value = savedLang;
+    }
+  });
+  </script>
 </html>

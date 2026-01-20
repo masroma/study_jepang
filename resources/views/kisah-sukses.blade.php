@@ -71,7 +71,7 @@
           @if($kisah->foto)
             <img src="{{ asset('uploads/kisah-sukses/'.$kisah->foto) }}" class="w-full h-64 object-cover" />
           @else
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-64 object-cover" />
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-64 object-cover" alt="Testimonial" />
           @endif
         </div>
         <div class="p-8 flex flex-col justify-center">
@@ -278,7 +278,7 @@
             @if($kisah->foto)
               <img src="{{ asset('uploads/kisah-sukses/'.$kisah->foto) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             @else
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Testimonial" />
             @endif
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div class="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">

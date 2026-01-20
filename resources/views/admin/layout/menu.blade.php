@@ -74,6 +74,18 @@
             </ul>
           </li>
 
+          <!-- VIDEO -->
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-video"></i>
+              <p>Video<i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item"><a href="{{ asset('admin/video') }}" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Data Video</p></a></li>
+              <li class="nav-item"><a href="{{ asset('admin/video/tambah') }}" class="nav-link"><i class="fa fa-plus nav-icon"></i><p>Tambah Video</p></a></li>
+            </ul>
+          </li>
+
           <!-- KONTAK KAMI -->
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
