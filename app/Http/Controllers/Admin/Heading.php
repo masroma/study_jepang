@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Image;
+use Illuminate\Support\Facades\Storage;
 
 class Heading extends Controller
 {
@@ -34,15 +35,15 @@ class Heading extends Controller
         $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
         $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
         $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-        $destinationPath        = './assets/upload/image/thumbs';
-        $img = Image::make($image->getRealPath(),array(
-            'width'     => 150,
-            'height'    => 150,
-            'grayscale' => false
-        ));
-        $img->save($destinationPath.'/'.$input['nama_file']);
-        $destinationPath = './assets/upload/image';
-        $image->move($destinationPath, $input['nama_file']);
+        
+        // Upload original image to S3
+        $s3Path = 'assets/upload/image/' . $input['nama_file'];
+        Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+        
+        // Create thumbnail and upload to S3
+        $img = Image::make($image->getRealPath())->resize(150, 150);
+        $thumbnailPath = 'assets/upload/image/thumbs/' . $input['nama_file'];
+        Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
         // END UPLOAD
         DB::table('heading')->insert([
             'judul_heading' => $request->judul_heading,
@@ -69,15 +70,15 @@ class Heading extends Controller
             $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
             $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-            $destinationPath        = './assets/upload/image/thumbs';
-            $img = Image::make($image->getRealPath(),array(
-                'width'     => 150,
-                'height'    => 150,
-                'grayscale' => false
-            ));
-            $img->save($destinationPath.'/'.$input['nama_file']);
-            $destinationPath = './assets/upload/image';
-            $image->move($destinationPath, $input['nama_file']);
+            
+            // Upload original image to S3
+            $s3Path = 'assets/upload/image/' . $input['nama_file'];
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            
+            // Create thumbnail and upload to S3
+            $img = Image::make($image->getRealPath())->resize(150, 150);
+            $thumbnailPath = 'assets/upload/image/thumbs/' . $input['nama_file'];
+            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             // END UPLOAD
             $slug_heading = Str::slug($request->judul_heading, '-');
             DB::table('heading')->where('id_heading',$request->id_heading)->update([

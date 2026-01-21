@@ -9,6 +9,7 @@ use Illuminate\Pagination\Paginator;
 use Image;
 use App\Models\Berita_model;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class Berita extends Controller
 {
@@ -210,11 +211,15 @@ class Berita extends Controller
             $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
             $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-            $destinationPath        = './assets/upload/image/thumbs/';
+            
+            // Upload original image to S3
+            $s3Path = 'assets/upload/image/' . $input['nama_file'];
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            
+            // Create thumbnail and upload to S3
             $img = Image::make($image->getRealPath())->resize(150, 150);
-            $img->save($destinationPath.'/'.$input['nama_file']);
-            $destinationPath = './assets/upload/image/';
-            $image->move($destinationPath, $input['nama_file']);
+            $thumbnailPath = 'assets/upload/image/thumbs/' . $input['nama_file'];
+            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             // END UPLOAD
             $slug_berita = Str::slug($request->judul_berita, '-');
             DB::table('berita')->insert([

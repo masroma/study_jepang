@@ -91,14 +91,8 @@ class ProgramMasaDepanController extends Controller
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/program');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/program/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $request->merge(['gambar' => $imageName]);
         }
 
@@ -129,20 +123,14 @@ class ProgramMasaDepanController extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($program->gambar && file_exists(public_path('uploads/program/' . $program->gambar))) {
-                unlink(public_path('uploads/program/' . $program->gambar));
+            if ($program->gambar && Storage::disk('s3')->exists('uploads/program/' . $program->gambar)) {
+                Storage::disk('s3')->delete('uploads/program/' . $program->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/program');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/program/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -157,8 +145,8 @@ class ProgramMasaDepanController extends Controller
         $program = ProgramMasaDepan::findOrFail($id_program);
         
         // Hapus gambar
-        if ($program->gambar && file_exists(public_path('uploads/program/' . $program->gambar))) {
-            unlink(public_path('uploads/program/' . $program->gambar));
+        if ($program->gambar && Storage::disk('s3')->exists('uploads/program/' . $program->gambar)) {
+            Storage::disk('s3')->delete('uploads/program/' . $program->gambar);
         }
         
         $program->delete();

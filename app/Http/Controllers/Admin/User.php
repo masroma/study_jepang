@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Image;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Controller
 {
@@ -66,15 +67,15 @@ class User extends Controller
             $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
             $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-            $destinationPath        = './assets/upload/user/thumbs/';
-            $img = Image::make($image->getRealPath(),array(
-                'width'     => 150,
-                'height'    => 150,
-                'grayscale' => false
-            ));
-            $img->save($destinationPath.'/'.$input['nama_file']);
-            $destinationPath = './assets/upload/user/';
-            $image->move($destinationPath, $input['nama_file']);
+            
+            // Upload original image to S3
+            $s3Path = 'assets/upload/user/' . $input['nama_file'];
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            
+            // Create thumbnail and upload to S3
+            $img = Image::make($image->getRealPath())->resize(150, 150);
+            $thumbnailPath = 'assets/upload/user/thumbs/' . $input['nama_file'];
+            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             // END UPLOAD
             DB::table('users')->insert([
                 'nama'          => $request->nama,
@@ -114,15 +115,15 @@ class User extends Controller
             $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
             $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-            $destinationPath        = './assets/upload/user/thumbs/';
-            $img = Image::make($image->getRealPath(),array(
-                'width'     => 150,
-                'height'    => 150,
-                'grayscale' => false
-            ));
-            $img->save($destinationPath.'/'.$input['nama_file']);
-            $destinationPath = './assets/upload/user/';
-            $image->move($destinationPath, $input['nama_file']);
+            
+            // Upload original image to S3
+            $s3Path = 'assets/upload/user/' . $input['nama_file'];
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            
+            // Create thumbnail and upload to S3
+            $img = Image::make($image->getRealPath())->resize(150, 150);
+            $thumbnailPath = 'assets/upload/user/thumbs/' . $input['nama_file'];
+            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             // END UPLOAD
             $slug_user = Str::slug($request->nama, '-');
             DB::table('users')->where('id_user',$request->id_user)->update([

@@ -81,6 +81,10 @@ Route::get('video', 'App\Http\Controllers\Video@index');
 Route::get('video/detail/{par1}', 'App\Http\Controllers\Video@detail');
 Route::get('webinar', 'App\Http\Controllers\Video@index');
 Route::get('webinar/detail/{par1}/{par2}', 'App\Http\Controllers\Video@detail');
+// loker
+Route::get('loker', 'App\Http\Controllers\Loker@index');
+Route::get('loker/detail/{slug_loker}', 'App\Http\Controllers\Loker@detail');
+Route::post('loker/proses_pendaftaran', 'App\Http\Controllers\Loker@proses_pendaftaran');
 // Proyek
 // Route::get('proyek', 'App\Http\Controllers\Proyek@index');
 // Route::get('proyek/kategori/{par1}', 'App\Http\Controllers\Proyek@kategori');
@@ -330,5 +334,22 @@ Route::get('admin/kisah-sukses/edit/{par1}', 'App\Http\Controllers\Admin\KisahSu
 Route::get('admin/kisah-sukses/delete/{par1}', 'App\Http\Controllers\Admin\KisahSuksesController@delete');
 Route::post('admin/kisah-sukses/tambah_proses', 'App\Http\Controllers\Admin\KisahSuksesController@tambah_proses');
 Route::post('admin/kisah-sukses/edit_proses/{par1}', 'App\Http\Controllers\Admin\KisahSuksesController@edit_proses');
+// loker
+Route::get('admin/loker', 'App\Http\Controllers\Admin\Loker@index');
+Route::get('admin/loker/cari', 'App\Http\Controllers\Admin\Loker@cari');
+Route::get('admin/loker/status_loker/{par1}', 'App\Http\Controllers\Admin\Loker@status_loker');
+Route::get('admin/loker/tambah', 'App\Http\Controllers\Admin\Loker@tambah');
+Route::get('admin/loker/edit/{par1}', 'App\Http\Controllers\Admin\Loker@edit');
+Route::get('admin/loker/delete/{par1}', 'App\Http\Controllers\Admin\Loker@delete');
+Route::post('admin/loker/tambah_proses', 'App\Http\Controllers\Admin\Loker@tambah_proses');
+Route::post('admin/loker/edit_proses', 'App\Http\Controllers\Admin\Loker@edit_proses');
+Route::post('admin/loker/proses', 'App\Http\Controllers\Admin\Loker@proses');
+// pendaftaran loker
+Route::get('admin/pendaftaran-loker', 'App\Http\Controllers\Admin\PendaftaranLoker@index');
+Route::get('admin/pendaftaran-loker/cari', 'App\Http\Controllers\Admin\PendaftaranLoker@cari');
+Route::get('admin/pendaftaran-loker/status_pendaftaran/{par1}', 'App\Http\Controllers\Admin\PendaftaranLoker@status_pendaftaran');
+Route::get('admin/pendaftaran-loker/detail/{par1}', 'App\Http\Controllers\Admin\PendaftaranLoker@detail');
+Route::get('admin/pendaftaran-loker/delete/{par1}', 'App\Http\Controllers\Admin\PendaftaranLoker@delete');
+Route::post('admin/pendaftaran-loker/proses', 'App\Http\Controllers\Admin\PendaftaranLoker@proses');
 
 /* END BACK END*/

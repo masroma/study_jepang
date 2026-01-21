@@ -13,6 +13,7 @@ $currentRoute = request()->path();
       <a href="{{ url('training-center') }}" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
       <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
       <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>
+      <a href="{{ url('loker') }}" class="{{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Lowongan Kerja</a>
       <a href="{{ url('kontak') }}" class="{{ $currentRoute == 'kontak' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kontak Kami</a>
     </div>
 

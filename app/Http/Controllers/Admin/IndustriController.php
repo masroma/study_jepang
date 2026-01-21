@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Industri;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class IndustriController extends Controller
 {
@@ -86,14 +87,8 @@ class IndustriController extends Controller
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/industri');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/industri/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $request->merge(['gambar' => $imageName]);
         }
 
@@ -120,20 +115,14 @@ class IndustriController extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($industry->gambar && file_exists(public_path('uploads/industri/' . $industry->gambar))) {
-                unlink(public_path('uploads/industri/' . $industry->gambar));
+            if ($industry->gambar && Storage::disk('s3')->exists('uploads/industri/' . $industry->gambar)) {
+                Storage::disk('s3')->delete('uploads/industri/' . $industry->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/industri');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/industri/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -148,8 +137,8 @@ class IndustriController extends Controller
         $industry = Industri::findOrFail($id_industri);
         
         // Hapus gambar
-        if ($industry->gambar && file_exists(public_path('uploads/industri/' . $industry->gambar))) {
-            unlink(public_path('uploads/industri/' . $industry->gambar));
+        if ($industry->gambar && Storage::disk('s3')->exists('uploads/industri/' . $industry->gambar)) {
+            Storage::disk('s3')->delete('uploads/industri/' . $industry->gambar);
         }
         
         $industry->delete();

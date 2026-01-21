@@ -134,6 +134,19 @@
             </ul>
           </li>
 
+          <!-- LOKER -->
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-briefcase"></i>
+              <p>Lowongan Kerja<i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item"><a href="{{ asset('admin/loker') }}" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Data Lowongan</p></a></li>
+              <li class="nav-item"><a href="{{ asset('admin/loker/tambah') }}" class="nav-link"><i class="fa fa-plus nav-icon"></i><p>Tambah Lowongan</p></a></li>
+              <li class="nav-item"><a href="{{ asset('admin/pendaftaran-loker') }}" class="nav-link"><i class="fas fa-users nav-icon"></i><p>Pendaftar</p></a></li>
+            </ul>
+          </li>
+
           <!-- Website Content -->
           <li class="batas"><hr> <span class="infoku"><i class="fa fa-certificate"></i> Profil &amp; Layanan</span></li>
           <li class="batas"><hr></li>

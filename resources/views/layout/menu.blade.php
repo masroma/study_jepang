@@ -46,6 +46,7 @@ $nav_materi  = $myprofil->nav_materi();
       </li>
       <li class="nav-item"> <a class="nav-link" href="{{ asset('video') }}">Video</a> </li>
       <li class="nav-item"> <a class="nav-link" href="{{ asset('galeri') }}">Galeri</a> </li>
+      <li class="nav-item"> <a class="nav-link" href="{{ asset('loker') }}">Lowongan Kerja</a> </li>
       <li class="nav-item"> <a class="nav-link" href="{{ asset('kontak') }}">Kontak</a> </li>
    </ul>
 </div>

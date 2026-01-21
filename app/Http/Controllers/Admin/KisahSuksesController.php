@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\KisahSukses;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class KisahSuksesController extends Controller
 {
@@ -93,14 +94,8 @@ class KisahSuksesController extends Controller
         if ($request->hasFile('foto')) {
             $image = $request->file('foto');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/kisah-sukses');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/kisah-sukses/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         }
 
         // Upload video
@@ -108,14 +103,8 @@ class KisahSuksesController extends Controller
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
             $videoName = time() . '_video.' . $video->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/kisah-sukses/videos');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $video->move($path, $videoName);
+            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
         }
 
         // Remove file fields from request to avoid conflicts
@@ -162,40 +151,28 @@ class KisahSuksesController extends Controller
         // Upload foto baru
         if ($request->hasFile('foto')) {
             // Hapus foto lama
-            if ($kisah->foto && file_exists(public_path('uploads/kisah-sukses/' . $kisah->foto))) {
-                unlink(public_path('uploads/kisah-sukses/' . $kisah->foto));
+            if ($kisah->foto && Storage::disk('s3')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
+                Storage::disk('s3')->delete('uploads/kisah-sukses/' . $kisah->foto);
             }
 
             $image = $request->file('foto');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/kisah-sukses');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $image->move($path, $imageName);
+            $s3Path = 'uploads/kisah-sukses/' . $imageName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['foto'] = $imageName;
         }
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
             // Hapus video lama
-            if ($kisah->video_file && file_exists(public_path('uploads/kisah-sukses/videos/' . $kisah->video_file))) {
-                unlink(public_path('uploads/kisah-sukses/videos/' . $kisah->video_file));
+            if ($kisah->video_file && Storage::disk('s3')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
+                Storage::disk('s3')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
             }
 
             $video = $request->file('video_file');
             $videoName = time() . '_video.' . $video->getClientOriginalExtension();
-            
-            // Buat folder jika belum ada
-            $path = public_path('uploads/kisah-sukses/videos');
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-            
-            $video->move($path, $videoName);
+            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
             $data['video_file'] = $videoName;
         }
 
@@ -212,13 +189,13 @@ class KisahSuksesController extends Controller
         $kisah = KisahSukses::findOrFail($id_kisah);
         
         // Hapus foto
-        if ($kisah->foto && file_exists(public_path('uploads/kisah-sukses/' . $kisah->foto))) {
-            unlink(public_path('uploads/kisah-sukses/' . $kisah->foto));
+        if ($kisah->foto && Storage::disk('s3')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
+            Storage::disk('s3')->delete('uploads/kisah-sukses/' . $kisah->foto);
         }
         
         // Hapus video file
-        if ($kisah->video_file && file_exists(public_path('uploads/kisah-sukses/videos/' . $kisah->video_file))) {
-            unlink(public_path('uploads/kisah-sukses/videos/' . $kisah->video_file));
+        if ($kisah->video_file && Storage::disk('s3')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
+            Storage::disk('s3')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
         }
         
         $kisah->delete();

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Image;
 use App\Models\Download_model;
+use Illuminate\Support\Facades\Storage;
 
 class Download extends Controller
 {
@@ -122,8 +123,11 @@ class Download extends Controller
         DB::table('download')->where('id_download',$download->id_download)->update([
             'hits'      => $hits
         ]);
-        $pathToFile           = './public/upload/file/'.$download->gambar;
-        return response()->download($pathToFile, $download->gambar);
+        $s3Path = 'assets/upload/file/' . $download->gambar;
+        if (Storage::disk('s3')->exists($s3Path)) {
+            return Storage::disk('s3')->download($s3Path, $download->gambar);
+        }
+        return redirect()->back()->with(['warning' => 'File tidak ditemukan']);
     }
 
     // edit
@@ -155,8 +159,8 @@ class Download extends Controller
         $filenamewithextension  = $request->file('gambar')->getClientOriginalName();
         $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
         $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
-        $destinationPath = './assets/upload/file';
-        $image->move($destinationPath, $input['nama_file']);
+        $s3Path = 'assets/upload/file/' . $input['nama_file'];
+        Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         // END UPLOAD
         DB::table('download')->insert([
             'id_kategori_download'  => $request->id_kategori_download,
