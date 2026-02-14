@@ -9,14 +9,17 @@ $currentRoute = request()->path();
       <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
         <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
         <div class="hidden md:flex flex-col items-start justify-center">
-          <span class="text-xl text-gray-900">MEGHANTARA</span>
-          <span class="text-sm font-medium text-gray-500">GLOBAL GROUP</span>
+          <span class="text-base font-semibold text-gray-900">MEGHANTARA</span>
+          <span class="text-xs font-medium text-gray-500">GLOBAL GROUP</span>
         </div>
       </a>
     </div>
 
     <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
       <a href="{{ url('/') }}" class="{{ $currentRoute == '/' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Home</a>
+      <a href="{{ url('tentang-kami') }}" class="{{ in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Tentang Kami</a>
+      <a href="{{ url('produk') }}" class="{{ in_array($currentRoute, ['produk', 'product', 'komoditas']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Produk</a>
+      <a href="{{ url('layanan') }}" class="{{ in_array($currentRoute, ['layanan', 'service']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Layanan</a>
       <a href="{{ url('training-center') }}" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
       <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
       <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>

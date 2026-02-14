@@ -89,17 +89,21 @@
           <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
             <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
             <div class="hidden md:flex flex-col items-start justify-center">
-              <span class="brand-main-text">MEGAHNTARA</span>
-              <span class="brand-sub-text">GLOBAL GROUP</span>
+              <span class="text-base font-semibold text-gray-900">MEGHANTARA</span>
+              <span class="text-xs font-medium text-gray-500">GLOBAL GROUP</span>
             </div>
           </a>
         </div>
 
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
           <a href="{{ url('/') }}" class="@yield('nav-home', 'hover:text-brand-pink transition')">Home</a>
+          <a href="{{ url('tentang-kami') }}" class="@yield('nav-about', 'hover:text-brand-pink transition')">Tentang Kami</a>
+          <a href="{{ url('produk') }}" class="@yield('nav-product', 'hover:text-brand-pink transition')">Produk</a>
+          <a href="{{ url('layanan') }}" class="@yield('nav-service', 'hover:text-brand-pink transition')">Layanan</a>
           <a href="{{ url('training-center') }}" class="@yield('nav-training-center', 'hover:text-brand-pink transition')">Training Center</a>
           <a href="{{ url('kisah-sukses') }}" class="@yield('nav-kisah-sukses', 'hover:text-brand-pink transition')">Kisah Sukses</a>
           <a href="{{ url('blog') }}" class="@yield('nav-blog', 'hover:text-brand-pink transition')">Blog</a>
+          <a href="{{ url('loker') }}" class="@yield('nav-loker', 'hover:text-brand-pink transition')">Lowongan Kerja</a>
           <a href="{{ url('kontak') }}" class="@yield('nav-kontak', 'hover:text-brand-pink transition')">Kontak Kami</a>
         </div>
 
@@ -147,6 +151,9 @@
           <h4 class="font-bold text-gray-800 mb-6">Menu</h4>
           <ul class="space-y-3 text-sm text-gray-500 font-medium">
             <li><a href="{{ url('/') }}" class="hover:text-brand-pink transition">Beranda</a></li>
+            <li><a href="{{ url('tentang-kami') }}" class="hover:text-brand-pink transition">Tentang Kami</a></li>
+            <li><a href="{{ url('produk') }}" class="hover:text-brand-pink transition">Produk</a></li>
+            <li><a href="{{ url('layanan') }}" class="hover:text-brand-pink transition">Layanan</a></li>
             <li><a href="{{ url('training-center') }}" class="hover:text-brand-pink transition">Training Center</a></li>
             <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
             <li><a href="{{ url('blog') }}" class="hover:text-brand-pink transition">Blog</a></li>

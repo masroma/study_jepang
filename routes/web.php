@@ -85,6 +85,17 @@ Route::get('webinar/detail/{par1}/{par2}', 'App\Http\Controllers\Video@detail');
 Route::get('loker', 'App\Http\Controllers\Loker@index');
 Route::get('loker/detail/{slug_loker}', 'App\Http\Controllers\Loker@detail');
 Route::post('loker/proses_pendaftaran', 'App\Http\Controllers\Loker@proses_pendaftaran');
+// Company Profile / About Us
+Route::get('tentang-kami', 'App\Http\Controllers\CompanyProfile@index');
+Route::get('about-us', 'App\Http\Controllers\CompanyProfile@index');
+Route::get('company-profile', 'App\Http\Controllers\CompanyProfile@index');
+// Product / Komoditas
+Route::get('produk', 'App\Http\Controllers\Product@index');
+Route::get('product', 'App\Http\Controllers\Product@index');
+Route::get('komoditas', 'App\Http\Controllers\Product@index');
+// Service / Layanan
+Route::get('layanan', 'App\Http\Controllers\Service@index');
+Route::get('service', 'App\Http\Controllers\Service@index');
 // Proyek
 // Route::get('proyek', 'App\Http\Controllers\Proyek@index');
 // Route::get('proyek/kategori/{par1}', 'App\Http\Controllers\Proyek@kategori');
