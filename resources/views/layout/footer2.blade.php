@@ -106,7 +106,7 @@ $site       = DB::table('konfigurasi')->first();
         &copy; Copyright <strong><span><?php echo $site->namaweb ?></span></strong>. All Rights Reserved
       </div>
       <div class="credits">
-        Developed by <a href="https://jemari-edu.web.id/">Jemari Edu</a>
+        Developed by <a href="https://jemari-edu.web.id/">Meganthara Group</a>
       </div>
     </div>
   </footer><!-- End Footer -->

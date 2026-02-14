@@ -167,7 +167,7 @@
       <div class="w-8 h-8 bg-red-600 rounded-full mb-4 shadow-sm mx-auto"></div>
       <h2 class="text-3xl md:text-4xl font-bold text-brand-pink mb-4">Siap Mulai Perjalananmu ke Jepang?</h2>
       <p class="text-gray-600 mb-8 font-medium text-sm md:text-base max-w-2xl mx-auto">
-        Konsultasikan impianmu bersama kami. Tim profesional Jemari Edu siap membantu dari persiapan, pelatihan bahasa, hingga penempatan kerja di Jepang.
+        Konsultasikan impianmu bersama kami. Tim profesional Meganthara Group siap membantu dari persiapan, pelatihan bahasa, hingga penempatan kerja di Jepang.
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
         <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-pink-600 transition w-full sm:w-auto">

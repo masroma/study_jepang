@@ -107,6 +107,7 @@
           </a>
         </div>
 
+        <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
           @php
             $currentRoute = request()->path();
@@ -134,15 +135,16 @@
               </div>
             </div>
           </div>
-          <a href="{{ url('training-center') }}" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
+          <a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
           <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
           <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>
           <a href="{{ url('loker') }}" class="{{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Lowongan Kerja</a>
           <a href="{{ url('kontak') }}" class="{{ $currentRoute == 'kontak' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kontak Kami</a>
         </div>
 
-        <div class="flex items-center space-x-2 md:space-x-3">
-          <div class="hidden sm:flex items-center space-x-1 bg-white px-2 py-1 rounded-full shadow-sm">
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center space-x-3">
+          <div class="flex items-center space-x-1 bg-white px-2 py-1 rounded-full shadow-sm">
             <select class="text-xs font-bold text-gray-500 outline-none bg-transparent cursor-pointer" onchange="changeLanguage(this.value)">
               <option value="id" selected>
                 <div class="flex items-center">
@@ -165,10 +167,92 @@
             </select>
           </div>
 
-          <a href="{{ url('login') }}" class="text-sm font-bold text-gray-600 hover:text-brand-pink px-2 md:px-3">Masuk</a>
-          <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-4 py-2 md:px-5 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg hover:bg-pink-600 transition">Daftar</a>
+          <a href="{{ url('login') }}" class="text-sm font-bold text-gray-600 hover:text-brand-pink px-3">Masuk</a>
+          <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-pink-600 transition">Daftar</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition" aria-label="Toggle menu">
+          <svg id="menu-icon" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 text-gray-700 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="md:hidden fixed inset-0 top-0 bg-white z-40 transform translate-x-full transition-transform duration-300 ease-in-out pt-20">
+        <div class="h-full overflow-y-auto px-4 pb-6">
+          @php
+            $currentRoute = request()->path();
+            $isPerusahaanActive = in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile', 'produk', 'product', 'komoditas', 'layanan', 'service']);
+          @endphp
+          
+          <div class="space-y-1">
+            <a href="{{ url('/') }}" class="block px-4 py-3 text-base font-medium {{ $currentRoute == '/' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Home
+            </a>
+            
+            <!-- Perusahaan Dropdown Mobile -->
+            <div class="relative">
+              <button id="mobile-perusahaan-toggle" class="w-full flex items-center justify-between px-4 py-3 text-base font-medium {{ $isPerusahaanActive ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+                <span>Perusahaan</span>
+                <svg id="mobile-perusahaan-arrow" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div id="mobile-perusahaan-menu" class="hidden pl-4 mt-1 space-y-1">
+                <a href="{{ url('tentang-kami') }}" class="block px-4 py-2 text-sm {{ in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile']) ? 'text-brand-pink bg-brand-pink/10 font-semibold' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition">
+                  Tentang Kami
+                </a>
+                <a href="{{ url('produk') }}" class="block px-4 py-2 text-sm {{ in_array($currentRoute, ['produk', 'product', 'komoditas']) ? 'text-brand-pink bg-brand-pink/10 font-semibold' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition">
+                  Produk
+                </a>
+                <a href="{{ url('layanan') }}" class="block px-4 py-2 text-sm {{ in_array($currentRoute, ['layanan', 'service']) ? 'text-brand-pink bg-brand-pink/10 font-semibold' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition">
+                  Layanan
+                </a>
+              </div>
+            </div>
+
+            <a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'training-center' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Training Center
+            </a>
+            <a href="{{ url('kisah-sukses') }}" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Kisah Sukses
+            </a>
+            <a href="{{ url('berita') }}" class="block px-4 py-3 text-base font-medium {{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Blog
+            </a>
+            <a href="{{ url('loker') }}" class="block px-4 py-3 text-base font-medium {{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Lowongan Kerja
+            </a>
+            <a href="{{ url('kontak') }}" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'kontak' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+              Kontak Kami
+            </a>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-gray-200 space-y-3">
+            <div class="flex items-center justify-center space-x-1 bg-gray-50 px-3 py-2 rounded-full">
+              <select class="text-xs font-bold text-gray-500 outline-none bg-transparent cursor-pointer w-full" onchange="changeLanguage(this.value)">
+                <option value="id" selected>🇮🇩 ID</option>
+                <option value="en">🇺🇸 EN</option>
+                <option value="jp">🇯🇵 JP</option>
+              </select>
+            </div>
+            <a href="{{ url('login') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+              Masuk
+            </a>
+            <a href="{{ url('daftar') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-white bg-brand-pink rounded-lg hover:bg-pink-600 transition shadow-lg">
+              Daftar
+            </a>
+          </div>
         </div>
       </div>
+
+      <!-- Mobile Menu Overlay -->
+      <div id="mobile-menu-overlay" class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
     </nav>
 
     @yield('hero')
@@ -178,7 +262,13 @@
     <footer class="bg-white pt-16 pb-10 border-t border-gray-100">
       <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
         <div class="col-span-1 md:col-span-2">
-          <div class="text-2xl font-extrabold text-brand-pink mb-6">StudyAbroad</div>
+          <a href="{{ url('/') }}" class="flex items-center space-x-3 group mb-6">
+            <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
+            <div class="flex flex-col items-start justify-center">
+              <span class="text-base font-semibold text-gray-900">MEGHANTARA</span>
+              <span class="text-xs font-medium text-gray-500">GLOBAL GROUP</span>
+            </div>
+          </a>
           <p class="text-gray-500 text-sm leading-relaxed max-w-sm mb-6 font-medium">{{ $site_config->deskripsi ?? 'Lembaga resmi pelatihan bahasa dan kerja ke Jepang. Terakreditasi dan memiliki jaringan luas.' }}</p>
         </div>
         <div>
@@ -188,7 +278,7 @@
             <li><a href="{{ url('tentang-kami') }}" class="hover:text-brand-pink transition">Tentang Kami</a></li>
             <li><a href="{{ url('produk') }}" class="hover:text-brand-pink transition">Produk</a></li>
             <li><a href="{{ url('layanan') }}" class="hover:text-brand-pink transition">Layanan</a></li>
-            <li><a href="{{ url('training-center') }}" class="hover:text-brand-pink transition">Training Center</a></li>
+            <li><a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
             <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
             <li><a href="{{ url('blog') }}" class="hover:text-brand-pink transition">Blog</a></li>
           </ul>
@@ -196,8 +286,15 @@
         <div>
           <h4 class="font-bold text-gray-800 mb-6">Hubungi Kami</h4>
           <ul class="space-y-3 text-sm text-gray-500 font-medium">
-            <li class="flex items-start"><span class="mr-2">📍</span> Jakarta Selatan</li>
-            <li class="flex items-center"><span class="mr-2">📞</span> +62 812 3456 7890</li>
+            @if($site_config->alamat ?? null)
+            <li class="flex items-start"><span class="mr-2">📍</span> {{ $site_config->alamat }}</li>
+            @endif
+            @if($site_config->telepon ?? null)
+            <li class="flex items-center"><span class="mr-2">📞</span> {{ $site_config->telepon }}</li>
+            @endif
+            @if($site_config->email ?? null)
+            <li class="flex items-center"><span class="mr-2">✉️</span> {{ $site_config->email }}</li>
+            @endif
           </ul>
         </div>
       </div>
@@ -205,7 +302,13 @@
     </footer>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/6281234567890?text=Halo%20StudyAbroad,%20saya%20ingin%20bertanya%20tentang%20program%20belajar%20dan%20kerja%20di%20Jepang" target="_blank" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group">
+    @php
+    $waNumber = $site_config->whatsapp ?? $site_config->hp ?? $site_config->telepon ?? '6281234567890';
+    $waNumber = preg_replace('/[^0-9]/', '', $waNumber); // Hapus semua karakter non-numeric
+    $waMessage = urlencode('Halo ' . ($site_config->namaweb ?? 'Admin') . ', saya ingin bertanya tentang program belajar dan kerja di Jepang');
+    @endphp
+    @if($waNumber)
+    <a href="https://wa.me/{{ $waNumber }}?text={{ $waMessage }}" target="_blank" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group">
       <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
       </svg>
@@ -214,6 +317,7 @@
         <div class="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
       </div>
     </a>
+    @endif
 
     @stack('scripts')
   </body>
@@ -238,6 +342,78 @@
     if (langSelect) {
       langSelect.value = savedLang;
     }
+
+    // Mobile Menu Toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const mobilePerusahaanToggle = document.getElementById('mobile-perusahaan-toggle');
+    const mobilePerusahaanMenu = document.getElementById('mobile-perusahaan-menu');
+    const mobilePerusahaanArrow = document.getElementById('mobile-perusahaan-arrow');
+
+    function toggleMobileMenu() {
+      const isOpen = !mobileMenu.classList.contains('translate-x-full');
+      
+      if (isOpen) {
+        // Close menu
+        mobileMenu.classList.add('translate-x-full');
+        mobileMenuOverlay.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        document.body.style.overflow = '';
+      } else {
+        // Open menu
+        mobileMenu.classList.remove('translate-x-full');
+        mobileMenuOverlay.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeMobileMenu() {
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // Toggle menu button
+    if (mobileMenuButton) {
+      mobileMenuButton.addEventListener('click', toggleMobileMenu);
+    }
+
+    // Close menu when clicking overlay
+    if (mobileMenuOverlay) {
+      mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // Close menu when clicking menu links
+    const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+    mobileMenuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        setTimeout(closeMobileMenu, 100);
+      });
+    });
+
+    // Toggle Perusahaan submenu
+    if (mobilePerusahaanToggle && mobilePerusahaanMenu) {
+      mobilePerusahaanToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobilePerusahaanMenu.classList.toggle('hidden');
+        mobilePerusahaanArrow.classList.toggle('rotate-180');
+      });
+    }
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !mobileMenu.classList.contains('translate-x-full')) {
+        closeMobileMenu();
+      }
+    });
   });
 </script>
 </html>

@@ -84,8 +84,15 @@ $defaultPersonImages = [
     'https://i.pravatar.cc/100?img=12'
 ];
 
-// Get hero sliders or use default
-$sliders = $hero_sliders ?? collect();
+// ============================================
+// SLIDER HOMEPAGE: HARUS dari tabel 'hero_sliders'
+// ============================================
+// Data ini diambil dari controller: $hero_sliders = HeroSlider::publish()->ordered()->get()
+// JANGAN menggunakan $slider (dari tabel galeri) karena strukturnya berbeda
+// Pastikan controller mengirim $hero_sliders, bukan $slider
+$sliders = isset($hero_sliders) && is_object($hero_sliders) && $hero_sliders->count() > 0 
+    ? $hero_sliders 
+    : collect();
 $hasSliders = $sliders->count() > 0;
 
 // If no sliders, create one default slider
@@ -115,7 +122,7 @@ if (!$hasSliders) {
 }
 @endphp
 
-<header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg overflow-hidden">
+<header class="relative w-full min-h-[700px] sm:min-h-[750px] md:min-h-[800px] hero-bg overflow-hidden mt-0 pt-12 sm:pt-16 md:pt-96">
   <!-- Hero Slider Container -->
   <div class="hero-slider relative w-full h-full">
     @foreach($sliders as $index => $slide)
@@ -125,8 +132,19 @@ if (!$hasSliders) {
       $country = $slide->{'country_' . $language} ?? $slide->country_id ?? '';
       $description = $slide->{'description_' . $language} ?? $slide->description_id ?? '';
       $buttonText = $slide->{'button_text_' . $language} ?? $slide->button_text_id ?? '';
-      $bgImage = $slide->background_image ? asset($slide->background_image) : asset('template/img/image6.png');
-      $personImage = $slide->person_image ? asset($slide->person_image) : asset('template/img/image5.png');
+    
+    
+      // Ambil gambar dari kolom person_image di database
+      // Format: base URL (APP_URL) + person_image
+      // Contoh: https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud + /assets/upload/image/hero/1771078612_699083d4bd1b8.png
+      $personImage = !empty($slide->person_image) ? 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$slide->person_image : asset('template/img/image5.png');
+      
+      $image = $personImage;
+      $bgImage = !empty($slide->background_image) ? 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$slide->background_image : asset('template/img/image6.png');
+
+     
+     
+      // Inisialisasi person_images untuk avatar kecil
       $personImages = $slide->person_images ?? $defaultPersonImages;
       if (is_string($personImages)) {
         $personImages = json_decode($personImages, true) ?? $defaultPersonImages;
@@ -134,89 +152,74 @@ if (!$hasSliders) {
       if (empty($personImages) || !is_array($personImages)) {
         $personImages = $defaultPersonImages;
       }
+      // Convert paths to URLs for person_images
+      if (is_array($personImages) && !empty($personImages)) {
+        $personImages = array_map(function($img) {
+          // If it's a URL (starts with http), return as is
+          if (is_string($img) && (strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0)) {
+            return $img;
+          }
+          // If it's a local path, convert to full URL
+          if (is_string($img) && !empty($img)) {
+            return 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$img;
+          }
+          return $img;
+        }, $personImages);
+      }
+     
     @endphp
-    <div class="hero-slide absolute inset-0 w-full h-full flex items-center pt-24 md:pt-20 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-slide="{{ $index }}">
+    <div class="hero-slide absolute inset-0 w-full h-full flex items-start md:items-center pt-0 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-slide="{{ $index }}">
       <!-- Background -->
+    
       <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <img src="{{ $bgImage }}" class="w-full h-full object-cover opacity-60" alt="Background" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" />
-        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/90 md:via-white/80 to-transparent"></div>
       </div>
 
       <!-- Content -->
-      <div class="container max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 items-center">
-        <div class="pt-4 md:pt-10">
-          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-2">
+      <div class="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-10 relative z-10 items-start md:items-center py-4 sm:py-8 md:py-0">
+        <div class="pt-0 md:pt-4 order-2 md:order-1">
+          <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold leading-tight text-gray-900 mb-2 sm:mb-2">
             <span class="relative inline-block">
-              <span class="absolute -left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 border-2 border-white"></span>
+              <span class="absolute -left-4 sm:-left-6 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border-2 border-white"></span>
               {{ $title }}
             </span>
             <br />
-            <span class="text-brand-pink">{{ $subtitle }}</span> di <br />
-            {{ $country }} <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
+            <span class="text-lg sm:text-xl md:text-2xl font-normal text-brand-pink">{{ $subtitle }}</span> <span class="inline-block w-6 h-6 sm:w-8 sm:h-8 align-middle ml-1 sm:ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
           </h1>
 
-          <div class="bg-white p-6 rounded-2xl md:rounded-full shadow-soft max-w-lg mt-8 mb-6 border border-gray-100">
-            <div class="grid grid-cols-3 gap-4 md:gap-6">
-              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-green-500/25 transition-all duration-300">
-                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                  </svg>
-                </div>
-                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Safe' : ($language == 'jp' ? '安全' : 'Aman') }}</span>
-                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Guaranteed' : ($language == 'jp' ? '保証' : 'Terjamin') }}</span>
-              </div>
-              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
-                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                  </svg>
-                </div>
-                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Trusted' : ($language == 'jp' ? '信頼' : 'Terpercaya') }}</span>
-                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? '1000+ Users' : ($language == 'jp' ? '1000+ユーザー' : '1000+ Pengguna') }}</span>
-              </div>
-              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300">
-                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                </div>
-                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Legal' : ($language == 'jp' ? '合法' : 'Legal') }}</span>
-                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Official' : ($language == 'jp' ? '公式' : 'Resmi') }}</span>
-              </div>
-            </div>
-          </div>
+       
 
-          <p class="text-gray-500 mb-8 max-w-md leading-relaxed text-sm font-medium">{{ $description }}</p>
+          <p class="text-gray-500 mb-4 sm:mb-6 max-w-md leading-relaxed text-xs sm:text-sm font-medium">{{ $description }}</p>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-            <a href="{{ $slide->button_link ?? url('daftar') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
+            <a href="{{ $slide->button_link ?? url('daftar') }}" class="bg-brand-pink text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
               {{ $buttonText }} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
-            <button onclick="openVideoModal('{{ $slide->video_link ?? ($videos->first()->video ?? '#') }}')" class="text-brand-pink font-bold px-6 py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent">
-              <div class="w-8 h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
-                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            <button onclick="openVideoModal('{{ $slide->video_link ?? ($videos->first()->video ?? '#') }}')" class="text-brand-pink font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent text-sm sm:text-base">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
+                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               </div>
               Lihat Video
             </button>
           </div>
 
-          <div class="flex items-center space-x-3">
-            <div class="flex -space-x-3">
+          <div class="flex items-center space-x-2 sm:space-x-3">
+            <div class="flex -space-x-2 sm:-space-x-3">
               @foreach(array_slice($personImages, 0, 3) as $personImg)
-              <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="{{ $personImg }}" alt="" loading="lazy" />
+              <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm" src="{{ $personImg }}" alt="" loading="lazy" />
               @endforeach
-              <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
+              <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
             </div>
-            <div class="text-sm">
-              <span class="text-brand-pink font-bold text-lg">1,200+</span>
+            <div class="text-xs sm:text-sm">
+              <span class="text-brand-pink font-bold text-base sm:text-lg">1,200+</span>
               <p class="text-xs text-gray-500 font-medium">{{ $content['social_proof'] }}</p>
             </div>
           </div>
-        </div>
+          </div>
 
-        <div class="relative h-full flex items-end justify-center md:justify-end mt-10 md:mt-0">
-          <img src="{{ $personImage }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
+          <div class="relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
+            <img src="{{ $image }}" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
         </div>
       </div>
     </div>
@@ -225,24 +228,24 @@ if (!$hasSliders) {
 
   <!-- Slider Navigation -->
   @if($sliders->count() > 1)
-  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+  <div class="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
     @foreach($sliders as $index => $slide)
-    <button class="hero-slider-dot w-3 h-3 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-brand-pink w-8' : 'bg-gray-300 hover:bg-gray-400' }}" data-slide="{{ $index }}" aria-label="Go to slide {{ $index + 1 }}"></button>
+    <button class="hero-slider-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-brand-pink w-6 sm:w-8' : 'bg-gray-300 hover:bg-gray-400' }}" data-slide="{{ $index }}" aria-label="Go to slide {{ $index + 1 }}"></button>
     @endforeach
   </div>
-  <button class="hero-slider-prev absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300" aria-label="Previous slide">
-    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <button class="hero-slider-prev absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-2 sm:p-3 shadow-lg transition-all duration-300" aria-label="Previous slide">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
     </svg>
   </button>
-  <button class="hero-slider-next absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300" aria-label="Next slide">
-    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <button class="hero-slider-next absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-2 sm:p-3 shadow-lg transition-all duration-300" aria-label="Next slide">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
     </svg>
   </button>
   @endif
 
-  <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10"></div>
+  <div class="absolute bottom-0 w-full h-16 sm:h-24 bg-gradient-to-t from-white to-transparent z-10"></div>
 </header>
 
 @push('scripts')
@@ -326,30 +329,30 @@ document.addEventListener('DOMContentLoaded', function() {
 @endsection
 
 @section('content')
-<section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
-  <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10">
-    <div class="md:w-1/3">
-      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-      <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">{{ $content['jepang_title'] }}</h2>
+<section class="py-12 sm:py-16 md:py-20 max-w-7xl mx-auto px-4 sm:px-6">
+  <div class="flex flex-col md:flex-row items-start justify-between gap-6 sm:gap-8 md:gap-10">
+    <div class="w-full md:w-1/3">
+      <div class="w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full mb-3 sm:mb-4 shadow-sm"></div>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-pink leading-tight">{{ $content['jepang_title'] }}</h2>
     </div>
-    <div class="md:w-2/3">
-      <p class="text-gray-500 leading-relaxed mb-6 font-medium text-sm md:text-base">{{ $content['jepang_subtitle'] }}</p>
-      <button class="bg-brand-yellow text-gray-900 px-8 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">{!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span></button>
+    <div class="w-full md:w-2/3">
+      <p class="text-gray-500 leading-relaxed mb-5 sm:mb-6 font-medium text-sm sm:text-base">{{ $content['jepang_subtitle'] }}</p>
+      <button class="bg-brand-yellow text-gray-900 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">{!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span></button>
     </div>
   </div>
 </section>
 
-<section class="py-16">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="text-center mb-12 md:mb-16">
-      <h2 class="text-2xl md:text-3xl font-bold text-brand-pink mb-3">{{ $content['program_title'] }}</h2>
-      <p class="text-gray-500 text-sm font-medium">{{ $content['program_subtitle'] }}</p>
+<section class="py-12 sm:py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center mb-8 sm:mb-12 md:mb-16">
+      <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-brand-pink mb-2 sm:mb-3">{{ $content['program_title'] }}</h2>
+      <p class="text-gray-500 text-xs sm:text-sm font-medium px-4">{{ $content['program_subtitle'] }}</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
       @forelse($program_masa_depan as $item)
-      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
-        <div class="h-48 relative overflow-hidden bg-gray-50">
+      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
+        <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-50">
           @if(!empty($item->gambar))
             <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
           @else
@@ -357,9 +360,9 @@ document.addEventListener('DOMContentLoaded', function() {
           @endif
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-gray-800 mb-2 group-hover:text-brand-pink transition">{{ $item->judul ?? 'Program Title' }}</h3>
-          <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $item->deskripsi ?? 'Program description' }}</p>
+        <div class="p-4 sm:p-6">
+          <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-2 group-hover:text-brand-pink transition">{{ $item->judul ?? 'Program Title' }}</h3>
+          <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{{ $item->deskripsi ?? 'Program description' }}</p>
           <div class="flex items-center justify-between">
             <span class="text-xs text-brand-pink font-semibold">{{ $item->lokasi ?? 'Location' }}</span>
             <span class="text-xs text-gray-500">{{ $item->durasi ?? 'Duration' }}</span>
@@ -367,56 +370,56 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       @empty
-      <div class="col-span-full text-center py-12">
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 max-w-md mx-auto">
-          <div class="text-yellow-600 mb-4">
-            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="col-span-full text-center py-8 sm:py-12">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
+          <div class="text-yellow-600 mb-3 sm:mb-4">
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-yellow-800 mb-2">Program Sedang Disiapkan</h3>
-          <p class="text-yellow-700 text-sm">Program-program terbaik kami sedang dalam persiapan untuk membantu Anda meraih impian di Jepang.</p>
-          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Studi Program Sekolah (Bahasa)</h3>
-          <ul class="space-y-3">
+          <h3 class="text-base sm:text-lg font-semibold text-yellow-800 mb-2">Program Sedang Disiapkan</h3>
+          <p class="text-yellow-700 text-xs sm:text-sm px-2">Program-program terbaik kami sedang dalam persiapan untuk membantu Anda meraih impian di Jepang.</p>
+          <h3 class="font-bold text-gray-800 text-sm sm:text-base md:text-lg mb-3 sm:mb-4 leading-snug mt-4">Studi Program Sekolah (Bahasa)</h3>
+          <ul class="space-y-2 sm:space-y-3">
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📍</span> Tokyo, Osaka, Kyoto</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Durasi 1-2 Tahun</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🎓</span> Visa Pelajar</li>
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
-        <div class="h-48 overflow-hidden">
+      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Tokutei Ginou (Skill Spesifik)</h3>
-          <ul class="space-y-3">
+        <div class="p-4 sm:p-6">
+          <h3 class="font-bold text-gray-800 text-sm sm:text-base md:text-lg mb-3 sm:mb-4 leading-snug">Tokutei Ginou (Skill Spesifik)</h3>
+          <ul class="space-y-2 sm:space-y-3">
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📍</span> Seluruh Jepang</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Kontrak 5 Tahun</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">💴</span> Gaji Standar Jepang</li>
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
-        <div class="h-48 overflow-hidden">
+      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Internship / Magang</h3>
-          <ul class="space-y-3">
+        <div class="p-4 sm:p-6">
+          <h3 class="font-bold text-gray-800 text-sm sm:text-base md:text-lg mb-3 sm:mb-4 leading-snug">Internship / Magang</h3>
+          <ul class="space-y-2 sm:space-y-3">
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🏭</span> Industri Manufaktur</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">⏱️</span> Durasi 3 Tahun</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📜</span> Sertifikat JITCO</li>
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
-        <div class="h-48 overflow-hidden">
+      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+        <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-gray-800 text-lg mb-4 leading-snug">Kursus Bahasa Jepang</h3>
-          <ul class="space-y-3">
+        <div class="p-4 sm:p-6">
+          <h3 class="font-bold text-gray-800 text-sm sm:text-base md:text-lg mb-3 sm:mb-4 leading-snug">Kursus Bahasa Jepang</h3>
+          <ul class="space-y-2 sm:space-y-3">
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">🏫</span> Online / Offline</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">📚</span> JLPT N5 - N1</li>
             <li class="flex items-start text-xs font-medium text-gray-500"><span class="text-brand-pink mr-2">✅</span> Garansi Lulus</li>
@@ -426,47 +429,47 @@ document.addEventListener('DOMContentLoaded', function() {
       @endforelse
     </div>
 
-    <div class="text-center mt-12">
-      <button class="bg-brand-yellow text-gray-900 px-10 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition inline-flex items-center">Lihat Semua Program <span class="ml-2">></span></button>
+    <div class="text-center mt-8 sm:mt-12">
+      <button class="bg-brand-yellow text-gray-900 px-8 sm:px-10 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition inline-flex items-center">Lihat Semua Program <span class="ml-2">></span></button>
     </div>
   </div>
 </section>
 
-<section class="py-20 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-12">
-      <div class="max-w-xl">
-        <h2 class="text-3xl font-bold text-brand-pink mb-4">{{ $content['industri_title'] }}</h2>
-        <p class="text-gray-500 font-medium text-sm">{{ $content['industri_subtitle'] }}</p>
+<section class="py-12 sm:py-16 md:py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-8 sm:mb-12">
+      <div class="max-w-xl w-full">
+        <h2 class="text-2xl sm:text-3xl font-bold text-brand-pink mb-3 sm:mb-4">{{ $content['industri_title'] }}</h2>
+        <p class="text-gray-500 font-medium text-xs sm:text-sm">{{ $content['industri_subtitle'] }}</p>
       </div>
     </div>
 
-    <div class="flex gap-6 md:gap-8 overflow-x-auto pb-10 justify-start md:justify-between px-4 no-scrollbar">
+    <div class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-6 sm:pb-10 justify-start md:justify-between px-2 sm:px-4 no-scrollbar">
       @forelse($industri as $item)
-      <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+      <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
         <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
-        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
-          <span class="text-white font-bold text-base md:text-lg text-center leading-tight">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
+          <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
         </div>
       </div>
       @empty
-      <div class="flex gap-6 md:gap-8 justify-start md:justify-between px-4">
-        <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+      <div class="flex gap-4 sm:gap-6 md:gap-8 justify-start md:justify-between px-2 sm:px-4">
+        <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
           <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" alt="Manufacturing" class="w-full h-full object-cover" />
-          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
-            <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Manufacturing<br /><span class="text-xs font-normal text-gray-300">Automotive & Electronics</span></span>
+          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
+            <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">Manufacturing<br /><span class="text-xs font-normal text-gray-300">Automotive & Electronics</span></span>
           </div>
         </div>
-        <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
           <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=60" alt="Hospitality" class="w-full h-full object-cover" />
-          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
-            <span class="text-white font-bold text-base md:text-lg text-center leading-tight">Hospitality<br /><span class="text-xs font-normal text-gray-300">Hotel & Tourism</span></span>
+          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
+            <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">Hospitality<br /><span class="text-xs font-normal text-gray-300">Hotel & Tourism</span></span>
           </div>
         </div>
-        <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+        <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
           <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=500&q=60" alt="IT & Technology" class="w-full h-full object-cover" />
-          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
-            <span class="text-white font-bold text-base md:text-lg text-center leading-tight">IT & Technology<br /><span class="text-xs font-normal text-gray-300">Software & Startup</span></span>
+          <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
+            <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">IT & Technology<br /><span class="text-xs font-normal text-gray-300">Software & Startup</span></span>
           </div>
         </div>
       </div>
@@ -475,64 +478,64 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>
 
-<section class="py-16 md:py-20 bg-white">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-3xl font-bold text-brand-pink text-center mb-16">Alur Pendaftaran</h2>
+<section class="py-12 sm:py-16 md:py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <h2 class="text-2xl sm:text-3xl font-bold text-brand-pink text-center mb-10 sm:mb-12 md:mb-16">Alur Pendaftaran</h2>
 
-    <div class="flex flex-col md:flex-row justify-between items-start text-center relative px-4">
+    <div class="flex flex-col md:flex-row justify-between items-start text-center relative px-2 sm:px-4">
       <div class="hidden md:block absolute top-10 left-0 w-full h-[2px] bg-gray-100 -z-0"></div>
 
       <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
-        <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
-          <span class="text-2xl">📄</span>
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-red-50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-sm ring-4 sm:ring-8 ring-white">
+          <span class="text-xl sm:text-2xl">📄</span>
         </div>
-        <h4 class="font-bold text-gray-800 mb-2">1. Konsultasi & Daftar</h4>
-        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Diskusi pilihan program & isi formulir.</p>
+        <h4 class="font-bold text-sm sm:text-base text-gray-800 mb-2">1. Konsultasi & Daftar</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto px-2">Diskusi pilihan program & isi formulir.</p>
       </div>
 
       <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
-        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
-          <span class="text-2xl">🔍</span>
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-sm ring-4 sm:ring-8 ring-white">
+          <span class="text-xl sm:text-2xl">🔍</span>
         </div>
-        <h4 class="font-bold text-gray-800 mb-2">2. Seleksi & Interview</h4>
-        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Tes potensi & wawancara user.</p>
+        <h4 class="font-bold text-sm sm:text-base text-gray-800 mb-2">2. Seleksi & Interview</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto px-2">Tes potensi & wawancara user.</p>
       </div>
 
       <div class="flex flex-col items-center w-full md:w-1/4 relative z-10 mb-8 md:mb-0">
-        <div class="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
-          <span class="text-2xl">📝</span>
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-purple-50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-sm ring-4 sm:ring-8 ring-white">
+          <span class="text-xl sm:text-2xl">📝</span>
         </div>
-        <h4 class="font-bold text-gray-800 mb-2">3. Pelatihan Bahasa</h4>
-        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Belajar intensif 3-6 bulan.</p>
+        <h4 class="font-bold text-sm sm:text-base text-gray-800 mb-2">3. Pelatihan Bahasa</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto px-2">Belajar intensif 3-6 bulan.</p>
       </div>
 
       <div class="flex flex-col items-center w-full md:w-1/4 relative z-10">
-        <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 shadow-sm ring-8 ring-white">
-          <span class="text-2xl">✈️</span>
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-sm ring-4 sm:ring-8 ring-white">
+          <span class="text-xl sm:text-2xl">✈️</span>
         </div>
-        <h4 class="font-bold text-gray-800 mb-2">4. Terbang ke Jepang</h4>
-        <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Visa turun & berangkat kerja.</p>
+        <h4 class="font-bold text-sm sm:text-base text-gray-800 mb-2">4. Terbang ke Jepang</h4>
+        <p class="text-xs text-gray-500 max-w-[200px] mx-auto px-2">Visa turun & berangkat kerja.</p>
       </div>
     </div>
 
-    <div class="text-center mt-12">
-      <a href="{{ url('daftar') }}" class="bg-brand-yellow text-gray-900 px-10 py-3 rounded-full font-bold text-sm shadow-md hover:bg-yellow-300 transition inline-block">Mulai Pendaftaran ></a>
+    <div class="text-center mt-8 sm:mt-12">
+      <a href="{{ url('daftar') }}" class="bg-brand-yellow text-gray-900 px-8 sm:px-10 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition inline-block">Mulai Pendaftaran ></a>
     </div>
   </div>
 </section>
 
-<section class="py-20 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex justify-between items-center mb-12">
-      <h2 class="text-2xl md:text-3xl font-bold text-brand-pink">{{ $content['kisah_title'] ?? 'Kisah Sukses' }}</h2>
-      <a href="{{ url('kisah-sukses') }}" class="text-brand-pink hover:text-brand-pink/80 font-medium text-sm transition">Lihat Semua →</a>
+<section class="py-12 sm:py-16 md:py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4">
+      <h2 class="text-2xl sm:text-2xl md:text-3xl font-bold text-brand-pink">{{ $content['kisah_title'] ?? 'Kisah Sukses' }}</h2>
+      <a href="{{ url('kisah-sukses') }}" class="text-brand-pink hover:text-brand-pink/80 font-medium text-xs sm:text-sm transition">Lihat Semua →</a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       @forelse($kisah_sukses as $item)
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
+      <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
         <div class="relative">
-          <div class="h-48 overflow-hidden bg-gray-50">
+          <div class="h-40 sm:h-48 overflow-hidden bg-gray-50">
             @if(!empty($item->foto))
               <img src="{{ asset($item->foto) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
             @else
@@ -540,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
             @endif
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+          <div class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1">
             <div class="flex text-yellow-400 text-xs">
               @for($i = 0; $i < ($item->rating ?? 5); $i++)
                 <span class="text-yellow-400">★</span>
@@ -552,21 +555,21 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
         
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-3">
+        <div class="p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
             <div>
-              <h4 class="font-bold text-gray-900 text-lg">{{ $item->nama ?? 'Nama Alumni' }}</h4>
+              <h4 class="font-bold text-gray-900 text-base sm:text-lg">{{ $item->nama ?? 'Nama Alumni' }}</h4>
               <p class="text-xs text-brand-pink font-semibold uppercase tracking-wide">{{ $item->pekerjaan ?? 'Profesi' }}</p>
             </div>
-            <div class="text-right">
+            <div class="text-left sm:text-right">
               <p class="text-xs text-gray-500 font-medium">{{ $item->lokasi ?? 'Lokasi' }}</p>
               <p class="text-xs text-gray-400">{{ $item->tahun ?? date('Y') }}</p>
             </div>
           </div>
           
-          <p class="text-gray-600 italic leading-relaxed text-sm mb-4 line-clamp-3">{{ $item->testimoni ?? 'Testimoni alumni' }}</p>
+          <p class="text-gray-600 italic leading-relaxed text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3">{{ $item->testimoni ?? 'Testimoni alumni' }}</p>
           
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between flex-wrap gap-2">
             <span class="text-xs bg-brand-pink/10 text-brand-pink px-2 py-1 rounded-full font-medium">{{ $item->program ?? 'Program' }}</span>
             @if(!empty($item->video_url))
               <button onclick="window.open('{{ $item->video_url }}', '_blank')" class="text-brand-pink hover:text-brand-pink/80 text-xs font-medium transition flex items-center">
@@ -581,16 +584,16 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       @empty
-      <div class="col-span-full text-center py-12">
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 max-w-md mx-auto">
-          <div class="text-yellow-600 mb-4">
-            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="col-span-full text-center py-8 sm:py-12">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
+          <div class="text-yellow-600 mb-3 sm:mb-4">
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-3.397 3.397 3.397 0 00-1.455-1.96 3.397 3.397 0 00-3.189 0H4a3 3 0 00-3 3v2H2"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6.188-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-yellow-800 mb-2">Kisah Sukses Sedang Disiapkan</h3>
-          <p class="text-yellow-700 text-sm">Alumni-alumni sukses kami akan segera ditampilkan untuk memberikan inspirasi bagi Anda yang ingin meraih impian di Jepang.</p>
+          <h3 class="text-base sm:text-lg font-semibold text-yellow-800 mb-2">Kisah Sukses Sedang Disiapkan</h3>
+          <p class="text-yellow-700 text-xs sm:text-sm px-2">Alumni-alumni sukses kami akan segera ditampilkan untuk memberikan inspirasi bagi Anda yang ingin meraih impian di Jepang.</p>
         </div>
       </div>
       @endforelse
@@ -599,17 +602,17 @@ document.addEventListener('DOMContentLoaded', function() {
 </section>
 
 <!-- Video Modal -->
-<div id="videoModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg max-w-4xl w-full">
-    <div class="flex justify-between items-center p-4 border-b">
-      <h3 class="text-lg font-semibold text-gray-900">Video</h3>
+<div id="videoModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+  <div class="bg-white rounded-lg max-w-4xl w-full mx-2 sm:mx-4">
+    <div class="flex justify-between items-center p-3 sm:p-4 border-b">
+      <h3 class="text-base sm:text-lg font-semibold text-gray-900">Video</h3>
       <button onclick="closeVideoModal()" class="text-gray-400 hover:text-gray-600 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
-    <div class="p-4">
+    <div class="p-2 sm:p-4">
       <div id="videoContainer" style="position: relative; padding-bottom: 56.25%; height: 0;">
         <!-- Video akan dimuat di sini -->
       </div>

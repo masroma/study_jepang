@@ -1,6 +1,6 @@
 @php
     // Normalisasi nomor WhatsApp dari konfigurasi (hanya digit)
-    $waNumber = isset($site_config->telepon) ? preg_replace('/\D+/', '', $site_config->telepon) : '';
+    $waNumber = isset($site_config->whatsapp) ? preg_replace('/[^0-9]/', '', $site_config->whatsapp) : (isset($site_config->hp) ? preg_replace('/[^0-9]/', '', $site_config->hp) : (isset($site_config->telepon) ? preg_replace('/[^0-9]/', '', $site_config->telepon) : ''));
 @endphp
 <!DOCTYPE html>
 <html lang="id">

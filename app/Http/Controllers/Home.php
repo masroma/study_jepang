@@ -33,6 +33,8 @@ class Home extends Controller
             return DB::table('video')->orderBy('id_video', 'DESC')->limit(1)->get();
         });
         
+        // NOTE: $slider dari tabel 'galeri' - TIDAK DIGUNAKAN di home.blade.php
+        // View menggunakan $hero_sliders dari tabel 'hero_sliders' (lihat baris 76-81)
         $slider  = cache()->remember('home_slider', 3600, function() {
             return DB::table('galeri')
                         ->where('jenis_galeri', 'Homepage')
@@ -72,7 +74,8 @@ class Home extends Controller
             return KisahSukses::publish()->ordered()->limit(6)->get();
         });
 
-        // Load hero sliders
+        // Load hero sliders - INI YANG DIGUNAKAN di home.blade.php untuk slider homepage
+        // Data diambil dari tabel 'hero_sliders', BUKAN dari tabel 'galeri'
         $hero_sliders = cache()->remember('home_hero_sliders', 3600, function() {
             if (Schema::hasTable('hero_sliders')) {
                 return HeroSlider::publish()->ordered()->get();
@@ -94,11 +97,13 @@ class Home extends Controller
             $home_contents = collect(); // kosong tapi aman
         }
 
+        
+        
         $data = [
             'title'         => $site_config->namaweb . ' - ' . $site_config->tagline,
             'deskripsi'     => $site_config->namaweb . ' - ' . $site_config->tagline,
             'keywords'      => $site_config->namaweb . ' - ' . $site_config->tagline,
-            'slider'        => $slider,
+            'slider'        => $slider, // Dari tabel 'galeri' - TIDAK DIGUNAKAN di home.blade.php
             'site_config'   => $site_config,
             'berita'        => $berita,
             'beritas'       => $berita,
@@ -108,6 +113,7 @@ class Home extends Controller
             'program_masa_depan' => $program_masa_depan,
             'industri'      => $industri,
             'kisah_sukses'  => $kisah_sukses,
+            // INI YANG DIGUNAKAN untuk slider homepage - dari tabel 'hero_sliders'
             'hero_sliders'  => $hero_sliders,
             'content'       => 'home/index_tailwind'
         ];

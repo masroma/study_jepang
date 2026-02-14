@@ -1,4 +1,4 @@
-# Perubahan Halaman Blog - Jemari Edu
+# Perubahan Halaman Blog - meghantara
 
 ## 📋 Ringkasan Perubahan
 
@@ -9,9 +9,9 @@ Halaman blog telah diperbarui dengan konten yang lebih lengkap dan layout yang l
 ## ✨ Perubahan Konten Artikel
 
 ### 1. **Artikel Utama (6 Cards)**
-Semua artikel telah diisi dengan konten spesifik sesuai tema Jemari Edu:
+Semua artikel telah diisi dengan konten spesifik sesuai tema meghantara:
 
-- **Metode Efektif Belajar Bahasa Jepang di Jemari Edu** (Pendidikan)
+- **Metode Efektif Belajar Bahasa Jepang di meghantara** (Pendidikan)
   - Fokus: Program pembelajaran kurikulum internasional, instruktur berpengalaman, target JLPT
 
 - **Prosedur Lengkap Visa Kerja Tokutei Ginou di Jepang** (Panduan)
@@ -35,7 +35,7 @@ Semua artikel telah diisi dengan konten spesifik sesuai tema Jemari Edu:
 
 ### 1. **Header Section**
 - ✅ Deskripsi lebih deskriptif dan menarik
-- ✅ Highlight benefit membaca blog Jemari Edu
+- ✅ Highlight benefit membaca blog meghantara
 
 ### 2. **Artikel Cards**
 - ✅ Gambar berkualitas tinggi dari Unsplash

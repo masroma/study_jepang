@@ -48,12 +48,13 @@
             </button>
           </div>
         </th>
-        <th width="15%">TANGGAL</th>
-        <th width="15%">NAMA</th>
-        <th width="15%">EMAIL</th>
-        <th width="15%">TELEPON</th>
-        <th width="20%">LOWONGAN</th>
-        <th width="10%">STATUS</th>
+        <th width="10%">TANGGAL</th>
+        <th width="12%">NAMA</th>
+        <th width="12%">EMAIL</th>
+        <th width="10%">TELEPON</th>
+        <th width="10%">WHATSAPP</th>
+        <th width="18%">LOWONGAN</th>
+        <th width="8%">STATUS</th>
         <th width="20%">ACTION</th>
       </tr>
     </thead>
@@ -71,6 +72,15 @@
         <td>{{ $pendaftaran_item->nama }}</td>
         <td>{{ $pendaftaran_item->email }}</td>
         <td>{{ $pendaftaran_item->telepon }}</td>
+        <td>
+          @if($pendaftaran_item->whatsapp)
+          <a href="https://wa.me/{{ str_replace(['+', '-', ' ', '(', ')'], '', $pendaftaran_item->whatsapp) }}" target="_blank" class="btn btn-success btn-xs">
+            <i class="fa fa-whatsapp"></i> {{ $pendaftaran_item->whatsapp }}
+          </a>
+          @else
+          <span class="text-muted">-</span>
+          @endif
+        </td>
         <td>
           <strong>{{ $pendaftaran_item->judul_loker }}</strong><br>
           <small>{{ $pendaftaran_item->posisi }}</small>

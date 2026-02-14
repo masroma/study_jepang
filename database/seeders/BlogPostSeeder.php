@@ -16,7 +16,7 @@ class BlogPostSeeder extends Seeder
         DB::table('blog_posts')->insert([
             // 1. Tips & Trik
             [
-                'judul' => 'Metode Efektif Belajar Bahasa Jepang di Jemari Edu',
+                'judul' => 'Metode Efektif Belajar Bahasa Jepang di Meganthara Group',
                 'slug' => 'metode-efektif-belajar-bahasa-jepang',
                 'konten' => 'Program pembelajaran bahasa Jepang kami dirancang dengan kurikulum internasional yang telah terbukti efektif. Dengan instruktur berpengalaman, kami membantu Anda mencapai target JLPT dari level N5 hingga N1. 
 
@@ -27,11 +27,11 @@ Metode pembelajaran kami menggabungkan:
 - Persiapan ujian JLPT yang terstruktur
 - Akses ke materi digital yang lengkap
 
-Ribuan siswa telah berhasil mencapai target mereka bersama Jemari Edu. Bergabunglah dengan komunitas pembelajar kami hari ini!',
+Ribuan siswa telah berhasil mencapai target mereka bersama Meganthara Group. Bergabunglah dengan komunitas pembelajar kami hari ini!',
                 'deskripsi_singkat' => 'Program pembelajaran bahasa Jepang kami dirancang dengan kurikulum internasional. Instruktur berpengalaman siap membantu Anda mencapai target JLPT dari N5 hingga N1.',
                 'kategori' => 'Pendidikan',
                 'gambar' => 'https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Tim Jemari Edu',
+                'penulis' => 'Tim Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 18),
                 'status' => 'publish',
                 'views' => 245,
@@ -74,7 +74,7 @@ Kami siap membantu Anda di setiap tahap prosesnya!',
                 'deskripsi_singkat' => 'Pelajari persyaratan visa kerja terampil (Tokutei Ginou), dokumen yang dibutuhkan, dan proses aplikasi dari awal hingga keberangkatan ke Jepang bersama kami.',
                 'kategori' => 'Panduan',
                 'gambar' => 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Konsultan Visa Jemari Edu',
+                'penulis' => 'Konsultan Visa Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 16),
                 'status' => 'publish',
                 'views' => 512,
@@ -119,7 +119,7 @@ Dengan pemahaman budaya kerja Jepang yang baik, Anda akan dapat beradaptasi deng
                 'deskripsi_singkat' => 'Pahami budaya kerja Jepang, mulai dari hormat kepada atasan, konsep ocha-nomu, hingga pentingnya harmoni dalam bekerja di perusahaan Jepang.',
                 'kategori' => 'Budaya',
                 'gambar' => 'https://images.unsplash.com/photo-1493804714600-bb3c7c9351a2?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Mentor Jemari Edu',
+                'penulis' => 'Mentor Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 14),
                 'status' => 'publish',
                 'views' => 389,
@@ -171,7 +171,7 @@ Dengan komitmen penuh dan bimbingan mentor profesional kami, kesuksesan JLPT N3 
                 'deskripsi_singkat' => 'Program intensif kami telah membantu ribuan siswa lulus JLPT dengan metode pembelajaran yang terbukti efektif dan didukung instruktur profesional.',
                 'kategori' => 'Tips & Trik',
                 'gambar' => 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Koordinator JLPT Jemari Edu',
+                'penulis' => 'Koordinator JLPT Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 12),
                 'status' => 'publish',
                 'views' => 678,
@@ -223,11 +223,11 @@ Year 2-3: Increased responsibility
 Year 3-5: Leadership opportunities
 Year 5+: Senior management options
 
-Jemari Edu memiliki partnership dengan puluhan perusahaan manufaktur terkemuka di Jepang. Mari bersama kami wujudkan karier Anda di Jepang!',
+Meganthara Group memiliki partnership dengan puluhan perusahaan manufaktur terkemuka di Jepang. Mari bersama kami wujudkan karier Anda di Jepang!',
                 'deskripsi_singkat' => 'Jelajahi peluang kerja di sektor manufaktur, elektronik, otomotif, dan industri terkemuka lainnya dengan gaji kompetitif dan lingkungan kerja modern.',
                 'kategori' => 'Karier',
                 'gambar' => 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Placement Officer Jemari Edu',
+                'penulis' => 'Placement Officer Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 10),
                 'status' => 'publish',
                 'views' => 823,
@@ -296,7 +296,7 @@ Dengan perencanaan yang baik, hidup di Jepang menjadi pengalaman yang menyenangk
                 'deskripsi_singkat' => 'Informasi praktis mencari tempat tinggal, biaya hidup bulanan di berbagai kota Jepang, tips menghemat, dan panduan adaptasi hidup baru Anda.',
                 'kategori' => 'Lifestyle',
                 'gambar' => 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Alumni Mentor Jemari Edu',
+                'penulis' => 'Alumni Mentor Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 8),
                 'status' => 'publish',
                 'views' => 1042,
@@ -307,7 +307,7 @@ Dengan perencanaan yang baik, hidup di Jepang menjadi pengalaman yang menyenangk
             [
                 'judul' => 'Program Beasiswa Studi Bahasa Jepang di Universitas Terkemuka',
                 'slug' => 'program-beasiswa-studi-jepang-universitas',
-                'konten' => 'Jemari Edu memiliki kerjasama dengan universitas terkemuka di Jepang yang menawarkan program beasiswa untuk pelajar internasional.
+                'konten' => 'Meganthara Group memiliki kerjasama dengan universitas terkemuka di Jepang yang menawarkan program beasiswa untuk pelajar internasional.
 
 UNIVERSITAS PARTNER KAMI:
 
@@ -338,7 +338,7 @@ PERSYARATAN BEASISWA:
 - Kesehatan prima
 
 PROSES APLIKASI:
-1. Pendaftaran awal (form Jemari Edu)
+1. Pendaftaran awal (form Meganthara Group)
 2. Assessment dan interview
 3. Submission ke universitas
 4. Waiting list period (2-3 bulan)
@@ -352,7 +352,7 @@ BIAYA YANG DITANGGUNG BEASISWA:
 ✓ Material pembelajaran
 ✓ Beberapa beasiswa mencakup flight ticket
 
-BANTUAN JEMARI EDU:
+BANTUAN meghantara:
 - Mempersiapkan dokumen aplikasi
 - Interview practice
 - Language training sebelum berangkat
@@ -361,10 +361,10 @@ BANTUAN JEMARI EDU:
 - Ongoing support selama studi
 
 Jadilah bagian dari ribuan alumni kami yang sukses! Daftar sekarang untuk konsultasi beasiswa gratis.',
-                'deskripsi_singkat' => 'Jemari Edu memiliki kerjasama dengan universitas terkemuka di Jepang. Dapatkan kesempatan beasiswa penuh untuk studi bahasa dan budaya Jepang.',
+                'deskripsi_singkat' => 'Meganthara Group memiliki kerjasama dengan universitas terkemuka di Jepang. Dapatkan kesempatan beasiswa penuh untuk studi bahasa dan budaya Jepang.',
                 'kategori' => 'Pendidikan',
                 'gambar' => 'https://images.unsplash.com/photo-1591157675276-91d4c6a83d47?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Education Coordinator Jemari Edu',
+                'penulis' => 'Education Coordinator Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 6),
                 'status' => 'publish',
                 'views' => 456,
@@ -433,7 +433,7 @@ Sektor kesehatan adalah investasi terbaik untuk karir jangka panjang Anda di Jep
                 'deskripsi_singkat' => 'Jepang membutuhkan caregiver terampil. Pelajari peluang karier di sektor kesehatan, gaji kompetitif, dan program training profesional kami.',
                 'kategori' => 'Karier',
                 'gambar' => 'https://images.unsplash.com/photo-1631217314831-c6227db76b6e?auto=format&fit=crop&w=500&q=60',
-                'penulis' => 'Healthcare Consultant Jemari Edu',
+                'penulis' => 'Healthcare Consultant Meganthara Group',
                 'tanggal_publish' => Carbon::createFromDate(2025, 1, 4),
                 'status' => 'publish',
                 'views' => 567,

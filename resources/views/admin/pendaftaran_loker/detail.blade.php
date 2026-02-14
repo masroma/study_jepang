@@ -30,6 +30,18 @@
             <td>{{ $pendaftaran->telepon }}</td>
           </tr>
           <tr>
+            <th>WhatsApp</th>
+            <td>
+              @if($pendaftaran->whatsapp)
+              <a href="https://wa.me/{{ str_replace(['+', '-', ' ', '(', ')'], '', $pendaftaran->whatsapp) }}" target="_blank" class="btn btn-success btn-sm">
+                <i class="fa fa-whatsapp"></i> {{ $pendaftaran->whatsapp }}
+              </a>
+              @else
+              <span class="text-muted">-</span>
+              @endif
+            </td>
+          </tr>
+          <tr>
             <th>Alamat</th>
             <td>{{ $pendaftaran->alamat ?? '-' }}</td>
           </tr>

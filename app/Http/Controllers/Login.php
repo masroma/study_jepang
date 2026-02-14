@@ -29,8 +29,9 @@ class Login extends Controller
             $request->session()->put('id_user', $user->id_user);
             $request->session()->put('nama', $user->nama);
             $request->session()->put('username', $user->username);
+            $request->session()->put('email', $user->email ?? $user->username);
             $request->session()->put('akses_level', $user->akses_level);
-            return redirect('admin/dasbor')->with(['sukses' => 'Anda berhasil login']);
+            return redirect('admin/v2')->with(['sukses' => 'Anda berhasil login']);
         }else{
             return redirect('login')->with(['warning' => 'Mohon maaf, Username atau password salah']);
         }

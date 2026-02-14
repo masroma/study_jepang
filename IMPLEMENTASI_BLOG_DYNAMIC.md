@@ -1,4 +1,4 @@
-# 📚 Implementasi Blog Dynamic - Jemari Edu
+# 📚 Implementasi Blog Dynamic - meghantara
 
 ## ✅ Apa yang Telah Dilakukan
 
@@ -36,7 +36,7 @@ Saya telah mengimplementasikan sistem blog yang **fully dynamic** dengan data da
 
 ### **3. Seeder (Dummy Data)**
 📄 **File:** `database/seeders/BlogPostSeeder.php`
-- 8 artikel dummy dengan konten lengkap yang relevan dengan tema Jemari Edu:
+- 8 artikel dummy dengan konten lengkap yang relevan dengan tema meghantara:
   1. **Metode Efektif Belajar Bahasa Jepang** (Pendidikan)
   2. **Prosedur Visa Kerja Tokutei Ginou** (Panduan)
   3. **Etika & Budaya Kerja Jepang** (Budaya)
@@ -213,13 +213,13 @@ Total Artikel: **8 buah**
 Setiap artikel memiliki struktur seperti:
 ```php
 [
-    'judul' => 'Metode Efektif Belajar Bahasa Jepang di Jemari Edu',
+    'judul' => 'Metode Efektif Belajar Bahasa Jepang di meghantara',
     'slug' => 'metode-efektif-belajar-bahasa-jepang',
     'konten' => '[Isi artikel yang panjang dan detail]',
     'deskripsi_singkat' => '[Preview singkat untuk list]',
     'kategori' => 'Pendidikan',
     'gambar' => 'https://images.unsplash.com/...',
-    'penulis' => 'Tim Jemari Edu',
+    'penulis' => 'Tim meghantara',
     'tanggal_publish' => '2025-01-18',
     'status' => 'publish',
     'views' => 245

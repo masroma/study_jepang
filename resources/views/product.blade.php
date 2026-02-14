@@ -32,173 +32,76 @@
 @endsection
 
 @section('content')
-<!-- Hasil Pertanian -->
+<!-- Katalog Produk -->
 <section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
   <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 mb-12">
     <div class="md:w-1/3">
       <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-      <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">Hasil<br />Pertanian</h2>
+      <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">Katalog<br />Produk</h2>
     </div>
     <div class="md:w-2/3">
       <p class="text-gray-500 leading-relaxed font-medium text-sm md:text-base">
-        Produk pertanian premium dari Indonesia dengan kualitas terbaik untuk pasar internasional.
+        Produk dan komoditas berkualitas tinggi dengan standar internasional untuk pasar global.
       </p>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    @foreach($produk['hasil_pertanian'] as $item)
+  @if($produk->count() > 0)
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+    @foreach($produk as $item)
     <div class="bg-white rounded-2xl shadow-soft overflow-hidden border border-gray-100 hover:shadow-xl transition">
-      <div class="h-64 overflow-hidden bg-gray-50">
+      <div class="h-48 overflow-hidden bg-gray-50">
         <img src="{{ $item['gambar'] }}" class="w-full h-full object-cover hover:scale-110 transition duration-500" alt="{{ $item['nama'] }}" />
       </div>
-      <div class="p-6">
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ $item['nama'] }}</h3>
+      <div class="p-5">
+        <div class="mb-2">
+          <span class="text-xs font-semibold text-brand-pink bg-pink-50 px-2 py-1 rounded-full">{{ $item['kategori'] }}</span>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-3 line-clamp-2">{{ $item['nama'] }}</h3>
         
-        <div class="mb-6">
-          <h4 class="text-sm font-semibold text-gray-500 mb-3">Spesifikasi:</h4>
-          <div class="space-y-2">
-            @foreach($item['spesifikasi'] as $key => $value)
+        <div class="mb-4">
+          <h4 class="text-xs font-semibold text-gray-500 mb-2">Spesifikasi:</h4>
+          <div class="space-y-1">
+            @foreach(array_slice($item['spesifikasi'], 0, 3) as $key => $value)
             <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600 font-medium">{{ $key }}:</span>
-              <span class="text-sm font-bold text-gray-900">{{ $value }}</span>
+              <span class="text-xs text-gray-600 font-medium">{{ $key }}:</span>
+              <span class="text-xs font-bold text-gray-900 text-right">{{ Str::limit($value, 15) }}</span>
             </div>
             @endforeach
+            @if(count($item['spesifikasi']) > 3)
+            <div class="text-xs text-gray-400">+{{ count($item['spesifikasi']) - 3 }} lainnya</div>
+            @endif
           </div>
         </div>
 
-        <div class="border-t border-gray-100 pt-4">
-          <div class="flex justify-between items-center mb-3">
-            <span class="text-sm font-semibold text-gray-500">MOQ:</span>
-            <span class="text-sm font-bold text-brand-pink">{{ $item['moq'] }}</span>
+        <div class="border-t border-gray-100 pt-3 mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-gray-500">MOQ:</span>
+            <span class="text-xs font-bold text-brand-pink text-right">{{ Str::limit($item['moq'], 20) }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm font-semibold text-gray-500">Harga:</span>
-            <span class="text-sm font-bold text-gray-900">{{ $item['harga'] }}</span>
+            <span class="text-xs font-semibold text-gray-500">Harga:</span>
+            <span class="text-xs font-bold text-gray-900">{{ $item['harga'] }}</span>
           </div>
         </div>
 
-        <a href="{{ url('kontak') }}" class="mt-6 block w-full bg-brand-pink text-white text-center px-6 py-3 rounded-full font-bold hover:bg-pink-600 transition shadow-lg">
+        <a href="{{ url('produk/request-quotation?produk=' . urlencode($item['nama'])) }}" class="block w-full bg-brand-pink text-white text-center px-4 py-2 rounded-full font-bold hover:bg-pink-600 transition shadow-lg text-sm">
           Request Quotation
         </a>
       </div>
     </div>
     @endforeach
   </div>
-</section>
 
-<!-- Seafood -->
-<section class="py-16 bg-white">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 mb-12">
-      <div class="md:w-1/3">
-        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-        <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">Seafood</h2>
-      </div>
-      <div class="md:w-2/3">
-        <p class="text-gray-500 leading-relaxed font-medium text-sm md:text-base">
-          Produk seafood segar dan beku dengan sertifikasi internasional untuk keamanan dan kualitas.
-        </p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      @foreach($produk['seafood'] as $item)
-      <div class="bg-white rounded-2xl shadow-soft overflow-hidden border border-gray-100 hover:shadow-xl transition">
-        <div class="h-64 overflow-hidden bg-gray-50">
-          <img src="{{ $item['gambar'] }}" class="w-full h-full object-cover hover:scale-110 transition duration-500" alt="{{ $item['nama'] }}" />
-        </div>
-        <div class="p-6">
-          <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ $item['nama'] }}</h3>
-          
-          <div class="mb-6">
-            <h4 class="text-sm font-semibold text-gray-500 mb-3">Spesifikasi:</h4>
-            <div class="space-y-2">
-              @foreach($item['spesifikasi'] as $key => $value)
-              <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-600 font-medium">{{ $key }}:</span>
-                <span class="text-sm font-bold text-gray-900">{{ $value }}</span>
-              </div>
-              @endforeach
-            </div>
-          </div>
-
-          <div class="border-t border-gray-100 pt-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-sm font-semibold text-gray-500">MOQ:</span>
-              <span class="text-sm font-bold text-brand-pink">{{ $item['moq'] }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm font-semibold text-gray-500">Harga:</span>
-              <span class="text-sm font-bold text-gray-900">{{ $item['harga'] }}</span>
-            </div>
-          </div>
-
-          <a href="{{ url('kontak') }}" class="mt-6 block w-full bg-brand-pink text-white text-center px-6 py-3 rounded-full font-bold hover:bg-pink-600 transition shadow-lg">
-            Request Quotation
-          </a>
-        </div>
-      </div>
-      @endforeach
-    </div>
+  <!-- Pagination -->
+  <div class="mt-12">
+    {{ $produk->links('pagination::bootstrap-4') }}
   </div>
-</section>
-
-<!-- Manufaktur -->
-<section class="py-16 md:py-20">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 mb-12">
-      <div class="md:w-1/3">
-        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-        <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight">Manufaktur</h2>
-      </div>
-      <div class="md:w-2/3">
-        <p class="text-gray-500 leading-relaxed font-medium text-sm md:text-base">
-          Produk manufaktur berkualitas dengan desain modern dan ramah lingkungan.
-        </p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      @foreach($produk['manufaktur'] as $item)
-      <div class="bg-white rounded-2xl shadow-soft overflow-hidden border border-gray-100 hover:shadow-xl transition">
-        <div class="h-64 overflow-hidden bg-gray-50">
-          <img src="{{ $item['gambar'] }}" class="w-full h-full object-cover hover:scale-110 transition duration-500" alt="{{ $item['nama'] }}" />
-        </div>
-        <div class="p-6">
-          <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ $item['nama'] }}</h3>
-          
-          <div class="mb-6">
-            <h4 class="text-sm font-semibold text-gray-500 mb-3">Spesifikasi:</h4>
-            <div class="space-y-2">
-              @foreach($item['spesifikasi'] as $key => $value)
-              <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-600 font-medium">{{ $key }}:</span>
-                <span class="text-sm font-bold text-gray-900">{{ $value }}</span>
-              </div>
-              @endforeach
-            </div>
-          </div>
-
-          <div class="border-t border-gray-100 pt-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-sm font-semibold text-gray-500">MOQ:</span>
-              <span class="text-sm font-bold text-brand-pink">{{ $item['moq'] }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm font-semibold text-gray-500">Harga:</span>
-              <span class="text-sm font-bold text-gray-900">{{ $item['harga'] }}</span>
-            </div>
-          </div>
-
-          <a href="{{ url('kontak') }}" class="mt-6 block w-full bg-brand-pink text-white text-center px-6 py-3 rounded-full font-bold hover:bg-pink-600 transition shadow-lg">
-            Request Quotation
-          </a>
-        </div>
-      </div>
-      @endforeach
-    </div>
+  @else
+  <div class="text-center py-12">
+    <p class="text-gray-500 text-lg mb-4">Produk tidak ditemukan</p>
   </div>
+  @endif
 </section>
 
 <!-- CTA Section -->

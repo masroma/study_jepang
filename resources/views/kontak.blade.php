@@ -115,8 +115,12 @@
               <div class="flex-grow">
                 <h3 class="font-bold text-gray-800 mb-2 text-base">Telepon</h3>
                 <p class="text-sm text-gray-600 font-medium space-y-1">
-                  <a href="tel:+6281234567890" class="block hover:text-brand-pink transition">+62 812 3456 7890</a>
-                  <a href="tel:+6281234567891" class="block hover:text-brand-pink transition">+62 812 3456 7891</a>
+                  @if($site_config->telepon ?? null)
+                  <a href="tel:{{ preg_replace('/[^0-9+]/', '', $site_config->telepon) }}" class="block hover:text-brand-pink transition">{{ $site_config->telepon }}</a>
+                  @endif
+                  @if($site_config->hp ?? null)
+                  <a href="tel:{{ preg_replace('/[^0-9+]/', '', $site_config->hp) }}" class="block hover:text-brand-pink transition">{{ $site_config->hp }}</a>
+                  @endif
                 </p>
               </div>
             </div>
@@ -213,7 +217,14 @@
         </div>
         <h3 class="font-bold text-gray-800 mb-2">Telepon Langsung</h3>
         <p class="text-sm text-gray-600 font-medium mb-4">Hubungi kami sekarang</p>
-        <a href="tel:+6281234567890" class="text-brand-pink font-bold text-lg hover:underline">+62 812 3456 7890</a>
+        @php
+        $telNumber = $site_config->telepon ?? $site_config->hp ?? null;
+        @endphp
+        @if($telNumber)
+        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $telNumber) }}" class="text-brand-pink font-bold text-lg hover:underline">{{ $telNumber }}</a>
+        @else
+        <p class="text-gray-400">Belum diatur</p>
+        @endif
       </div>
 
       <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 text-center shadow-soft hover:shadow-xl transition">
@@ -222,7 +233,15 @@
         </div>
         <h3 class="font-bold text-gray-800 mb-2">WhatsApp</h3>
         <p class="text-sm text-gray-600 font-medium mb-4">Chat dengan kami</p>
-        <a href="https://wa.me/6281234567890" target="_blank" class="bg-green-500 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-green-600 transition inline-block">Chat Sekarang</a>
+        @php
+        $waNumber = $site_config->whatsapp ?? $site_config->hp ?? $site_config->telepon ?? null;
+        $waNumber = $waNumber ? preg_replace('/[^0-9]/', '', $waNumber) : null;
+        @endphp
+        @if($waNumber)
+        <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode('Halo ' . ($site_config->namaweb ?? 'Admin') . ', saya ingin bertanya') }}" target="_blank" class="bg-green-500 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-green-600 transition inline-block">Chat Sekarang</a>
+        @else
+        <p class="text-gray-400">Belum diatur</p>
+        @endif
       </div>
 
       <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-8 text-center shadow-soft hover:shadow-xl transition">

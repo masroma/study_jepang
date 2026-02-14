@@ -22,11 +22,10 @@ class Loker extends Controller
             'deskripsi'     => 'Lowongan Kerja untuk menjadi Instruktur di ' . $site_config->namaweb,
             'keywords'      => 'lowongan kerja, instruktur, karir',
             'site_config'   => $site_config,
-            'loker'         => $loker,
-            'content'       => 'loker/index'
+            'loker'         => $loker
         ];
 
-        return view('layout/wrapper', $data);
+        return view('loker.index', $data);
     }
 
     // Detail - Detail lowongan dan form pendaftaran
@@ -59,11 +58,10 @@ class Loker extends Controller
             'keywords'      => $loker->judul_loker . ', ' . $loker->posisi,
             'site_config'   => $site_config,
             'loker'         => $loker,
-            'loker_lain'    => $loker_lain,
-            'content'       => 'loker/detail'
+            'loker_lain'    => $loker_lain
         ];
 
-        return view('layout/wrapper', $data);
+        return view('loker.detail', $data);
     }
 
     // Proses Pendaftaran
@@ -74,6 +72,7 @@ class Loker extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'telepon' => 'required|string|max:20',
+            'whatsapp' => 'required|string|max:20',
             'cv_file' => 'required|mimes:pdf,doc,docx|max:5120', // max 5MB
         ]);
 
@@ -100,6 +99,7 @@ class Loker extends Controller
             'nama' => $request->nama,
             'email' => $request->email,
             'telepon' => $request->telepon,
+            'whatsapp' => $request->whatsapp,
             'alamat' => $request->alamat,
             'pendidikan_terakhir' => $request->pendidikan_terakhir,
             'pengalaman' => $request->pengalaman,

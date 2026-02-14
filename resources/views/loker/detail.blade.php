@@ -153,6 +153,17 @@
             </div>
 
             <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="whatsapp">
+                WhatsApp <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="whatsapp" id="whatsapp" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-pink" value="{{ old('whatsapp') }}" placeholder="Contoh: 081234567890" required>
+              <p class="text-gray-500 text-xs mt-1">Nomor WhatsApp aktif untuk komunikasi</p>
+              @error('whatsapp')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+
+            <div class="mb-4">
               <label class="block text-gray-700 text-sm font-bold mb-2" for="alamat">
                 Alamat
               </label>

@@ -1,19 +1,23 @@
 @php
-$waNumber = isset($site_config->telepon) ? preg_replace('/\D+/', '', $site_config->telepon) : '';
+$waNumber = isset($site_config->whatsapp) ? preg_replace('/[^0-9]/', '', $site_config->whatsapp) : (isset($site_config->hp) ? preg_replace('/[^0-9]/', '', $site_config->hp) : (isset($site_config->telepon) ? preg_replace('/[^0-9]/', '', $site_config->telepon) : ''));
 @endphp
 <footer class="bg-white pt-16 pb-10 border-t border-gray-100">
   <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
     <div class="col-span-1 md:col-span-2">
-      <div class="text-2xl font-extrabold text-brand-pink mb-6">
-        <a href="{{ url('/') }}">{{ $site_config->nama_singkat ?? $site_config->namaweb }}</a>
-      </div>
+      <a href="{{ url('/') }}" class="flex items-center space-x-3 group mb-6">
+        <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
+        <div class="flex flex-col items-start justify-center">
+          <span class="text-base font-semibold text-gray-900">MEGHANTARA</span>
+          <span class="text-xs font-medium text-gray-500">GLOBAL GROUP</span>
+        </div>
+      </a>
       <p class="text-gray-500 text-sm leading-relaxed max-w-sm mb-6 font-medium">{{ $site_config->deskripsi ?? 'Lembaga resmi pelatihan bahasa dan kerja ke Jepang. Terakreditasi dan memiliki jaringan luas.' }}</p>
     </div>
     <div>
       <h4 class="font-bold text-gray-800 mb-6">Menu</h4>
       <ul class="space-y-3 text-sm text-gray-500 font-medium">
         <li><a href="{{ url('/') }}" class="hover:text-brand-pink transition">Beranda</a></li>
-        <li><a href="{{ url('training-center') }}" class="hover:text-brand-pink transition">Training Center</a></li>
+        <li><a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
         <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
         <li><a href="{{ url('berita') }}" class="hover:text-brand-pink transition">Blog</a></li>
         <li><a href="{{ url('kontak') }}" class="hover:text-brand-pink transition">Kontak Kami</a></li>

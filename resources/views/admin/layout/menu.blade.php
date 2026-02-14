@@ -41,11 +41,15 @@
           <li class="batas"><hr></li>
           
           <!-- HOME -->
-          <li class="nav-item">
-            <a href="{{ asset('admin/dasbor') }}" class="nav-link">
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-home"></i>
-              <p>Home</p>
+              <p>Home<i class="fas fa-angle-left right"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item"><a href="{{ url('admin/hero-slider') }}" class="nav-link"><i class="fas fa-images nav-icon"></i><p>Hero Slider</p></a></li>
+              <li class="nav-item"><a href="{{ url('admin/home_content') }}" class="nav-link"><i class="fas fa-file-alt nav-icon"></i><p>Konten Halaman</p></a></li>
+            </ul>
           </li>
 
           <!-- TRAINING CENTER -->

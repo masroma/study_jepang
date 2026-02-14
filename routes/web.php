@@ -93,6 +93,8 @@ Route::get('company-profile', 'App\Http\Controllers\CompanyProfile@index');
 Route::get('produk', 'App\Http\Controllers\Product@index');
 Route::get('product', 'App\Http\Controllers\Product@index');
 Route::get('komoditas', 'App\Http\Controllers\Product@index');
+Route::get('produk/request-quotation', 'App\Http\Controllers\Product@requestQuotation')->name('produk.request-quotation');
+Route::post('produk/request-quotation', 'App\Http\Controllers\Product@kirimQuotation');
 // Service / Layanan
 Route::get('layanan', 'App\Http\Controllers\Service@index');
 Route::get('service', 'App\Http\Controllers\Service@index');
@@ -105,8 +107,94 @@ Route::get('service', 'App\Http\Controllers\Service@index');
 
 // admin redirect
 Route::get('admin', function () {
-    return redirect('admin/dasbor');
+    return redirect('admin/v2');
 });
+
+// Admin V2 - Dashboard Baru
+Route::get('admin/v2', 'App\Http\Controllers\Admin\DashboardV2@index');
+Route::get('admin/v2/profile/edit', 'App\Http\Controllers\Admin\DashboardV2@editProfile');
+Route::post('admin/v2/profile/update', 'App\Http\Controllers\Admin\DashboardV2@updateProfile');
+Route::get('admin/v2/password/edit', 'App\Http\Controllers\Admin\DashboardV2@editPassword');
+Route::post('admin/v2/password/update', 'App\Http\Controllers\Admin\DashboardV2@updatePassword');
+Route::get('admin/v2/logout', 'App\Http\Controllers\Admin\DashboardV2@logout');
+// Admin V2 - Setting
+Route::get('admin/v2/setting', 'App\Http\Controllers\Admin\Setting@index');
+Route::post('admin/v2/setting/update', 'App\Http\Controllers\Admin\Setting@update');
+// Admin V2 - Slider
+Route::get('admin/v2/slider', 'App\Http\Controllers\Admin\SliderController@index');
+Route::get('admin/v2/slider/tambah', 'App\Http\Controllers\Admin\SliderController@tambah');
+Route::get('admin/v2/slider/edit/{id}', 'App\Http\Controllers\Admin\SliderController@edit');
+Route::get('admin/v2/slider/delete/{id}', 'App\Http\Controllers\Admin\SliderController@delete');
+Route::post('admin/v2/slider/tambah_proses', 'App\Http\Controllers\Admin\SliderController@tambah_proses');
+Route::post('admin/v2/slider/edit_proses', 'App\Http\Controllers\Admin\SliderController@edit_proses');
+// Admin V2 - Program Masa Depan
+Route::get('admin/v2/program-masa-depan', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@index');
+Route::get('admin/v2/program-masa-depan/tambah', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@tambah');
+Route::get('admin/v2/program-masa-depan/edit/{id_program}', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@edit');
+Route::get('admin/v2/program-masa-depan/delete/{id_program}', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@delete');
+Route::post('admin/v2/program-masa-depan/tambah_proses', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@tambah_proses');
+Route::post('admin/v2/program-masa-depan/edit_proses', 'App\Http\Controllers\Admin\ProgramMasaDepanV2Controller@edit_proses');
+// Admin V2 - Industri
+Route::get('admin/v2/industri', 'App\Http\Controllers\Admin\IndustriV2Controller@index');
+Route::get('admin/v2/industri/tambah', 'App\Http\Controllers\Admin\IndustriV2Controller@tambah');
+Route::get('admin/v2/industri/edit/{id_industri}', 'App\Http\Controllers\Admin\IndustriV2Controller@edit');
+Route::get('admin/v2/industri/delete/{id_industri}', 'App\Http\Controllers\Admin\IndustriV2Controller@delete');
+Route::post('admin/v2/industri/tambah_proses', 'App\Http\Controllers\Admin\IndustriV2Controller@tambah_proses');
+Route::post('admin/v2/industri/edit_proses', 'App\Http\Controllers\Admin\IndustriV2Controller@edit_proses');
+// Admin V2 - Kisah Sukses
+Route::get('admin/v2/kisah-sukses', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@index');
+Route::get('admin/v2/kisah-sukses/tambah', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@tambah');
+Route::get('admin/v2/kisah-sukses/edit/{id_kisah}', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@edit');
+Route::get('admin/v2/kisah-sukses/delete/{id_kisah}', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@delete');
+Route::post('admin/v2/kisah-sukses/tambah_proses', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@tambah_proses');
+Route::post('admin/v2/kisah-sukses/edit_proses', 'App\Http\Controllers\Admin\KisahSuksesV2Controller@edit_proses');
+// Admin V2 - Tentang Kami
+Route::get('admin/v2/tentang-kami', 'App\Http\Controllers\Admin\TentangKamiV2Controller@index');
+Route::post('admin/v2/tentang-kami/update', 'App\Http\Controllers\Admin\TentangKamiV2Controller@update');
+// Admin V2 - Produk
+Route::get('admin/v2/produk', 'App\Http\Controllers\Admin\ProdukV2Controller@index');
+Route::get('admin/v2/produk/tambah', 'App\Http\Controllers\Admin\ProdukV2Controller@tambah');
+Route::get('admin/v2/produk/edit/{id_produk}', 'App\Http\Controllers\Admin\ProdukV2Controller@edit');
+Route::get('admin/v2/produk/delete/{id_produk}', 'App\Http\Controllers\Admin\ProdukV2Controller@delete');
+Route::post('admin/v2/produk/tambah_proses', 'App\Http\Controllers\Admin\ProdukV2Controller@tambah_proses');
+Route::post('admin/v2/produk/edit_proses', 'App\Http\Controllers\Admin\ProdukV2Controller@edit_proses');
+// Admin V2 - Layanan
+Route::get('admin/v2/layanan', 'App\Http\Controllers\Admin\LayananV2Controller@index');
+Route::get('admin/v2/layanan/tambah', 'App\Http\Controllers\Admin\LayananV2Controller@tambah');
+Route::get('admin/v2/layanan/edit/{id_layanan}', 'App\Http\Controllers\Admin\LayananV2Controller@edit');
+Route::get('admin/v2/layanan/delete/{id_layanan}', 'App\Http\Controllers\Admin\LayananV2Controller@delete');
+Route::post('admin/v2/layanan/tambah_proses', 'App\Http\Controllers\Admin\LayananV2Controller@tambah_proses');
+Route::post('admin/v2/layanan/edit_proses', 'App\Http\Controllers\Admin\LayananV2Controller@edit_proses');
+// Admin V2 - Lowongan Pekerjaan
+Route::get('admin/v2/loker', 'App\Http\Controllers\Admin\LokerV2Controller@index');
+Route::get('admin/v2/loker/tambah', 'App\Http\Controllers\Admin\LokerV2Controller@tambah');
+Route::get('admin/v2/loker/edit/{id_loker}', 'App\Http\Controllers\Admin\LokerV2Controller@edit');
+Route::get('admin/v2/loker/delete/{id_loker}', 'App\Http\Controllers\Admin\LokerV2Controller@delete');
+Route::post('admin/v2/loker/tambah_proses', 'App\Http\Controllers\Admin\LokerV2Controller@tambah_proses');
+Route::post('admin/v2/loker/edit_proses', 'App\Http\Controllers\Admin\LokerV2Controller@edit_proses');
+// Admin V2 - Pelamar
+Route::get('admin/v2/pelamar', 'App\Http\Controllers\Admin\PendaftaranLokerV2Controller@index');
+Route::get('admin/v2/pelamar/detail/{id_pendaftaran}', 'App\Http\Controllers\Admin\PendaftaranLokerV2Controller@detail');
+Route::get('admin/v2/pelamar/delete/{id_pendaftaran}', 'App\Http\Controllers\Admin\PendaftaranLokerV2Controller@delete');
+Route::get('admin/v2/pelamar/download-cv/{id_pendaftaran}', 'App\Http\Controllers\Admin\PendaftaranLokerV2Controller@download_cv');
+Route::post('admin/v2/pelamar/update-status', 'App\Http\Controllers\Admin\PendaftaranLokerV2Controller@update_status');
+// Admin V2 - Request Quotation
+Route::get('admin/v2/quotation', 'App\Http\Controllers\Admin\QuotationV2Controller@index');
+Route::get('admin/v2/quotation/detail/{id_kontak}', 'App\Http\Controllers\Admin\QuotationV2Controller@detail');
+Route::get('admin/v2/quotation/delete/{id_kontak}', 'App\Http\Controllers\Admin\QuotationV2Controller@delete');
+Route::post('admin/v2/quotation/update-status', 'App\Http\Controllers\Admin\QuotationV2Controller@update_status');
+// Admin V2 - Kontak
+Route::get('admin/v2/kontak', 'App\Http\Controllers\Admin\KontakV2Controller@index');
+Route::get('admin/v2/kontak/detail/{id_kontak}', 'App\Http\Controllers\Admin\KontakV2Controller@detail');
+Route::get('admin/v2/kontak/delete/{id_kontak}', 'App\Http\Controllers\Admin\KontakV2Controller@delete');
+Route::post('admin/v2/kontak/update-status', 'App\Http\Controllers\Admin\KontakV2Controller@update_status');
+// Admin V2 - Berita
+Route::get('admin/v2/berita', 'App\Http\Controllers\Admin\BeritaV2Controller@index');
+Route::get('admin/v2/berita/tambah', 'App\Http\Controllers\Admin\BeritaV2Controller@tambah');
+Route::get('admin/v2/berita/edit/{id_berita}', 'App\Http\Controllers\Admin\BeritaV2Controller@edit');
+Route::get('admin/v2/berita/delete/{id_berita}', 'App\Http\Controllers\Admin\BeritaV2Controller@delete');
+Route::post('admin/v2/berita/tambah_proses', 'App\Http\Controllers\Admin\BeritaV2Controller@tambah_proses');
+Route::post('admin/v2/berita/edit_proses', 'App\Http\Controllers\Admin\BeritaV2Controller@edit_proses');
 
 // dasbor
 Route::get('admin/dasbor', 'App\Http\Controllers\Admin\Dasbor@index');
@@ -324,6 +412,13 @@ Route::get('admin/home_content/edit/{par1}', 'App\Http\Controllers\Admin\HomeCon
 Route::get('admin/home_content/delete/{par1}', 'App\Http\Controllers\Admin\HomeContentController@delete');
 Route::post('admin/home_content/tambah_proses', 'App\Http\Controllers\Admin\HomeContentController@tambah_proses');
 Route::post('admin/home_content/edit_proses', 'App\Http\Controllers\Admin\HomeContentController@edit_proses');
+// hero slider
+Route::get('admin/hero-slider', 'App\Http\Controllers\Admin\HeroSliderController@index');
+Route::get('admin/hero-slider/tambah', 'App\Http\Controllers\Admin\HeroSliderController@tambah');
+Route::get('admin/hero-slider/edit/{par1}', 'App\Http\Controllers\Admin\HeroSliderController@edit');
+Route::get('admin/hero-slider/delete/{par1}', 'App\Http\Controllers\Admin\HeroSliderController@delete');
+Route::post('admin/hero-slider/tambah_proses', 'App\Http\Controllers\Admin\HeroSliderController@tambah_proses');
+Route::post('admin/hero-slider/edit_proses', 'App\Http\Controllers\Admin\HeroSliderController@edit_proses');
 // program masa depan
 Route::get('admin/program-masa-depan', 'App\Http\Controllers\Admin\ProgramMasaDepanController@index');
 Route::get('admin/program-masa-depan/tambah', 'App\Http\Controllers\Admin\ProgramMasaDepanController@tambah');
