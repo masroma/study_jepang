@@ -76,91 +76,253 @@ $content = $translations[$language] ?? $translations['id'];
 @section('nav-home', 'text-brand-pink font-semibold')
 
 @section('hero')
-<header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
-  <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Latar Belakang Jepang" loading="eager" />
-    <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
-  </div>
+@php
+// Default person images
+$defaultPersonImages = [
+    'https://i.pravatar.cc/100?img=32',
+    'https://i.pravatar.cc/100?img=47',
+    'https://i.pravatar.cc/100?img=12'
+];
 
-  <div class="container max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 items-center">
-    <div class="pt-4 md:pt-10">
-      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-2">
-        <span class="relative inline-block">
-          <span class="absolute -left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 border-2 border-white"></span>
-          {{ $content['hero_title'] }}
-        </span>
-        <br />
-        <span class="text-brand-pink">{{ $content['hero_subtitle'] }}</span> di <br />
-        {{ $content['hero_country'] }} <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
-      </h1>
+// Get hero sliders or use default
+$sliders = $hero_sliders ?? collect();
+$hasSliders = $sliders->count() > 0;
 
-      <div class="bg-white p-6 rounded-2xl md:rounded-full shadow-soft max-w-lg mt-8 mb-6 border border-gray-100">
-        <div class="grid grid-cols-3 gap-4 md:gap-6">
-          <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-            <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-green-500/25 transition-all duration-300">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Safe' : ($language == 'jp' ? '安全' : 'Aman') }}</span>
-            <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Guaranteed' : ($language == 'jp' ? '保証' : 'Terjamin') }}</span>
-          </div>
-          <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-            <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Trusted' : ($language == 'jp' ? '信頼' : 'Terpercaya') }}</span>
-            <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? '1000+ Users' : ($language == 'jp' ? '1000+ユーザー' : '1000+ Pengguna') }}</span>
-          </div>
-          <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-            <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Legal' : ($language == 'jp' ? '合法' : 'Legal') }}</span>
-            <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Official' : ($language == 'jp' ? '公式' : 'Resmi') }}</span>
-          </div>
-        </div>
+// If no sliders, create one default slider
+if (!$hasSliders) {
+    $sliders = collect([(object)[
+        'title_id' => $content['hero_title'],
+        'title_en' => $translations['en']['hero_title'],
+        'title_jp' => $translations['jp']['hero_title'],
+        'subtitle_id' => $content['hero_subtitle'],
+        'subtitle_en' => $translations['en']['hero_subtitle'],
+        'subtitle_jp' => $translations['jp']['hero_subtitle'],
+        'country_id' => $content['hero_country'],
+        'country_en' => $translations['en']['hero_country'],
+        'country_jp' => $translations['jp']['hero_country'],
+        'description_id' => $content['hero_description'],
+        'description_en' => $translations['en']['hero_description'],
+        'description_jp' => $translations['jp']['hero_description'],
+        'background_image' => asset('template/img/image6.png'),
+        'person_image' => asset('template/img/image5.png'),
+        'button_text_id' => $content['button_text'],
+        'button_text_en' => $translations['en']['button_text'],
+        'button_text_jp' => $translations['jp']['button_text'],
+        'button_link' => url('daftar'),
+        'video_link' => $videos->first()->video ?? '#',
+        'person_images' => $defaultPersonImages
+    ]]);
+}
+@endphp
+
+<header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg overflow-hidden">
+  <!-- Hero Slider Container -->
+  <div class="hero-slider relative w-full h-full">
+    @foreach($sliders as $index => $slide)
+    @php
+      $title = $slide->{'title_' . $language} ?? $slide->title_id ?? '';
+      $subtitle = $slide->{'subtitle_' . $language} ?? $slide->subtitle_id ?? '';
+      $country = $slide->{'country_' . $language} ?? $slide->country_id ?? '';
+      $description = $slide->{'description_' . $language} ?? $slide->description_id ?? '';
+      $buttonText = $slide->{'button_text_' . $language} ?? $slide->button_text_id ?? '';
+      $bgImage = $slide->background_image ? asset($slide->background_image) : asset('template/img/image6.png');
+      $personImage = $slide->person_image ? asset($slide->person_image) : asset('template/img/image5.png');
+      $personImages = $slide->person_images ?? $defaultPersonImages;
+      if (is_string($personImages)) {
+        $personImages = json_decode($personImages, true) ?? $defaultPersonImages;
+      }
+      if (empty($personImages) || !is_array($personImages)) {
+        $personImages = $defaultPersonImages;
+      }
+    @endphp
+    <div class="hero-slide absolute inset-0 w-full h-full flex items-center pt-24 md:pt-20 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-slide="{{ $index }}">
+      <!-- Background -->
+      <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+        <img src="{{ $bgImage }}" class="w-full h-full object-cover opacity-60" alt="Background" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" />
+        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
       </div>
 
-      <p class="text-gray-500 mb-8 max-w-md leading-relaxed text-sm font-medium">{{ $content['hero_description'] }}</p>
+      <!-- Content -->
+      <div class="container max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 items-center">
+        <div class="pt-4 md:pt-10">
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-2">
+            <span class="relative inline-block">
+              <span class="absolute -left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 border-2 border-white"></span>
+              {{ $title }}
+            </span>
+            <br />
+            <span class="text-brand-pink">{{ $subtitle }}</span> di <br />
+            {{ $country }} <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
+          </h1>
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-        <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
-          {{ $content['button_text'] }} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </a>
-        <button onclick="openVideoModal('{{ $videos->first()->video ?? '#' }}')" class="text-brand-pink font-bold px-6 py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent">
-          <div class="w-8 h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
-            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          <div class="bg-white p-6 rounded-2xl md:rounded-full shadow-soft max-w-lg mt-8 mb-6 border border-gray-100">
+            <div class="grid grid-cols-3 gap-4 md:gap-6">
+              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
+                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-green-500/25 transition-all duration-300">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Safe' : ($language == 'jp' ? '安全' : 'Aman') }}</span>
+                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Guaranteed' : ($language == 'jp' ? '保証' : 'Terjamin') }}</span>
+              </div>
+              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
+                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                </div>
+                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Trusted' : ($language == 'jp' ? '信頼' : 'Terpercaya') }}</span>
+                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? '1000+ Users' : ($language == 'jp' ? '1000+ユーザー' : '1000+ Pengguna') }}</span>
+              </div>
+              <div class="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
+                <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-xs font-bold text-gray-700 block">{{ $language == 'en' ? 'Legal' : ($language == 'jp' ? '合法' : 'Legal') }}</span>
+                <span class="text-xs text-gray-500 mt-1 block">{{ $language == 'en' ? 'Official' : ($language == 'jp' ? '公式' : 'Resmi') }}</span>
+              </div>
+            </div>
           </div>
-          Lihat Video
-        </button>
-      </div>
 
-      <div class="flex items-center space-x-3">
-        <div class="flex -space-x-3">
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=32" alt="" loading="lazy" />
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=47" alt="" loading="lazy" />
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=12" alt="" loading="lazy" />
-          <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
+          <p class="text-gray-500 mb-8 max-w-md leading-relaxed text-sm font-medium">{{ $description }}</p>
+
+          <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <a href="{{ $slide->button_link ?? url('daftar') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
+              {{ $buttonText }} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+            <button onclick="openVideoModal('{{ $slide->video_link ?? ($videos->first()->video ?? '#') }}')" class="text-brand-pink font-bold px-6 py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent">
+              <div class="w-8 h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
+                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              </div>
+              Lihat Video
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <div class="flex -space-x-3">
+              @foreach(array_slice($personImages, 0, 3) as $personImg)
+              <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="{{ $personImg }}" alt="" loading="lazy" />
+              @endforeach
+              <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
+            </div>
+            <div class="text-sm">
+              <span class="text-brand-pink font-bold text-lg">1,200+</span>
+              <p class="text-xs text-gray-500 font-medium">{{ $content['social_proof'] }}</p>
+            </div>
+          </div>
         </div>
-        <div class="text-sm">
-          <span class="text-brand-pink font-bold text-lg">1,200+</span>
-          <p class="text-xs text-gray-500 font-medium">{{ $content['social_proof'] }}</p>
+
+        <div class="relative h-full flex items-end justify-center md:justify-end mt-10 md:mt-0">
+          <img src="{{ $personImage }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
         </div>
       </div>
     </div>
-
-    <div class="relative h-full flex items-end justify-center md:justify-end mt-10 md:mt-0">
-      <img src="{{ asset('template/img/image5.png') }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="eager" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
-    </div>
+    @endforeach
   </div>
+
+  <!-- Slider Navigation -->
+  @if($sliders->count() > 1)
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+    @foreach($sliders as $index => $slide)
+    <button class="hero-slider-dot w-3 h-3 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-brand-pink w-8' : 'bg-gray-300 hover:bg-gray-400' }}" data-slide="{{ $index }}" aria-label="Go to slide {{ $index + 1 }}"></button>
+    @endforeach
+  </div>
+  <button class="hero-slider-prev absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300" aria-label="Previous slide">
+    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+    </svg>
+  </button>
+  <button class="hero-slider-next absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300" aria-label="Next slide">
+    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </button>
+  @endif
 
   <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10"></div>
 </header>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-slider-dot');
+  const prevBtn = document.querySelector('.hero-slider-prev');
+  const nextBtn = document.querySelector('.hero-slider-next');
+  let currentSlide = 0;
+  let slideInterval;
+
+  if (slides.length <= 1) return;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      if (i === index) {
+        slide.classList.remove('opacity-0', 'z-0');
+        slide.classList.add('opacity-100', 'z-10');
+      } else {
+        slide.classList.remove('opacity-100', 'z-10');
+        slide.classList.add('opacity-0', 'z-0');
+      }
+    });
+
+    dots.forEach((dot, i) => {
+      if (i === index) {
+        dot.classList.add('bg-brand-pink', 'w-8');
+        dot.classList.remove('bg-gray-300', 'w-3');
+      } else {
+        dot.classList.remove('bg-brand-pink', 'w-8');
+        dot.classList.add('bg-gray-300', 'w-3');
+      }
+    });
+
+    currentSlide = index;
+  }
+
+  function nextSlide() {
+    const next = (currentSlide + 1) % slides.length;
+    showSlide(next);
+  }
+
+  function prevSlide() {
+    const prev = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(prev);
+  }
+
+  function startAutoSlide() {
+    slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+  }
+
+  function stopAutoSlide() {
+    clearInterval(slideInterval);
+  }
+
+  // Event listeners
+  if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoSlide(); nextSlide(); startAutoSlide(); });
+  if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoSlide(); prevSlide(); startAutoSlide(); });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      stopAutoSlide();
+      showSlide(index);
+      startAutoSlide();
+    });
+  });
+
+  // Pause on hover
+  const heroSlider = document.querySelector('.hero-slider');
+  if (heroSlider) {
+    heroSlider.addEventListener('mouseenter', stopAutoSlide);
+    heroSlider.addEventListener('mouseleave', startAutoSlide);
+  }
+
+  // Start auto slide
+  startAutoSlide();
+});
+</script>
+@endpush
 @endsection
 
 @section('content')

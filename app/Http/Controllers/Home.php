@@ -10,6 +10,7 @@ use App\Models\HomeContent;
 use App\Models\ProgramMasaDepan;
 use App\Models\Industri;
 use App\Models\KisahSukses;
+use App\Models\HeroSlider;
 
 class Home extends Controller
 {
@@ -71,6 +72,14 @@ class Home extends Controller
             return KisahSukses::publish()->ordered()->limit(6)->get();
         });
 
+        // Load hero sliders
+        $hero_sliders = cache()->remember('home_hero_sliders', 3600, function() {
+            if (Schema::hasTable('hero_sliders')) {
+                return HeroSlider::publish()->ordered()->get();
+            }
+            return collect();
+        });
+
         /**
          * ===============================
          * FIX ERROR home_contents TIDAK ADA
@@ -99,6 +108,7 @@ class Home extends Controller
             'program_masa_depan' => $program_masa_depan,
             'industri'      => $industri,
             'kisah_sukses'  => $kisah_sukses,
+            'hero_sliders'  => $hero_sliders,
             'content'       => 'home/index_tailwind'
         ];
 
