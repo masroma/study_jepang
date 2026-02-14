@@ -7,7 +7,7 @@ $currentRoute = request()->path();
   <div class="flex justify-between items-center max-w-7xl mx-auto">
     <div class="flex items-center space-x-3">
       <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
-        <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
+        <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm" loading="eager">
         <div class="hidden md:flex flex-col items-start justify-center">
           <span class="text-base font-semibold text-gray-900">MEGHANTARA</span>
           <span class="text-xs font-medium text-gray-500">GLOBAL GROUP</span>
@@ -19,7 +19,36 @@ $currentRoute = request()->path();
       <a href="{{ url('/') }}" class="{{ $currentRoute == '/' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Home</a>
       <a href="{{ url('tentang-kami') }}" class="{{ in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Tentang Kami</a>
       <a href="{{ url('produk') }}" class="{{ in_array($currentRoute, ['produk', 'product', 'komoditas']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Produk</a>
-      <a href="{{ url('layanan') }}" class="{{ in_array($currentRoute, ['layanan', 'service']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Layanan</a>
+      <div class="relative group">
+        <button class="{{ in_array($currentRoute, ['layanan', 'service']) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }} flex items-center space-x-1">
+          <span>Layanan</span>
+          <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
+          <div class="py-2">
+            <a href="{{ url('layanan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ in_array($currentRoute, ['layanan', 'service']) ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+              Semua Layanan
+            </a>
+            <a href="{{ url('layanan/export') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition">
+              Export Service
+            </a>
+            <a href="{{ url('layanan/import') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition">
+              Import Service
+            </a>
+            <a href="{{ url('layanan/customs') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition">
+              Customs Clearance
+            </a>
+            <a href="{{ url('layanan/freight') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition">
+              Freight Forwarding
+            </a>
+            <a href="{{ url('layanan/warehousing') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition">
+              Warehousing
+            </a>
+          </div>
+        </div>
+      </div>
       <a href="{{ url('training-center') }}" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
       <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
       <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>
@@ -29,7 +58,7 @@ $currentRoute = request()->path();
 
     <div class="flex items-center space-x-2 md:space-x-3">
       <div class="hidden sm:flex items-center space-x-1 bg-white px-2 py-1 rounded-full shadow-sm">
-        <img src="https://flagcdn.com/w40/id.png" class="w-5 h-auto rounded-sm" alt="ID" />
+            <img src="https://flagcdn.com/w40/id.png" class="w-5 h-auto rounded-sm" alt="ID" loading="lazy" />
         <span class="text-xs font-bold text-gray-500">ID</span>
         <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
       </div>

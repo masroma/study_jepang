@@ -6,8 +6,20 @@
     <title>@yield('title', 'StudyAbroad - Belajar & Kerja di Jepang')</title>
     <link rel="icon" type="image/png" href="{{ asset('template/img/logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('template/img/logo.png') }}">
+    
+    <!-- Preconnect untuk resource external -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://flagcdn.com">
+    <link rel="dns-prefetch" href="https://i.pravatar.cc">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Preload font untuk performa lebih baik -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet"></noscript>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
     <script>
       tailwind.config = {
         theme: {

@@ -78,7 +78,7 @@ $content = $translations[$language] ?? $translations['id'];
 @section('hero')
 <header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
   <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Latar Belakang Jepang" />
+    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Latar Belakang Jepang" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
   </div>
 
@@ -91,7 +91,7 @@ $content = $translations[$language] ?? $translations['id'];
         </span>
         <br />
         <span class="text-brand-pink">{{ $content['hero_subtitle'] }}</span> di <br />
-        {{ $content['hero_country'] }} <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" /></span>
+        {{ $content['hero_country'] }} <span class="inline-block w-8 h-8 align-middle ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
       </h1>
 
       <div class="bg-white p-6 rounded-2xl md:rounded-full shadow-soft max-w-lg mt-8 mb-6 border border-gray-100">
@@ -142,9 +142,9 @@ $content = $translations[$language] ?? $translations['id'];
 
       <div class="flex items-center space-x-3">
         <div class="flex -space-x-3">
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=32" alt="" />
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=47" alt="" />
-          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=12" alt="" />
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=32" alt="" loading="lazy" />
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=47" alt="" loading="lazy" />
+          <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=12" alt="" loading="lazy" />
           <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
         </div>
         <div class="text-sm">
@@ -155,7 +155,7 @@ $content = $translations[$language] ?? $translations['id'];
     </div>
 
     <div class="relative h-full flex items-end justify-center md:justify-end mt-10 md:mt-0">
-      <img src="{{ asset('template/img/image5.png') }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
+      <img src="{{ asset('template/img/image5.png') }}" class="relative z-10 w-[80%] md:w-[90%] object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="eager" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
     </div>
   </div>
 
@@ -185,24 +185,13 @@ $content = $translations[$language] ?? $translations['id'];
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-      {{-- Debug info --}}
-      @php
-        $debug_count = isset($program_masa_depan) ? count($program_masa_depan) : 0;
-        error_log('DEBUG: Program count = ' . $debug_count);
-        if(isset($program_masa_depan) && count($program_masa_depan) > 0) {
-          foreach($program_masa_depan as $idx => $prog) {
-            error_log('DEBUG: Program ' . $idx . ' - ' . $prog->judul . ' - Image: ' . ($prog->gambar ?? 'NULL'));
-          }
-        }
-      @endphp
-      
       @forelse($program_masa_depan as $item)
       <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
         <div class="h-48 relative overflow-hidden bg-gray-50">
           @if(!empty($item->gambar))
-            <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
+            <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
           @else
-            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" />
+            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
           @endif
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
@@ -291,18 +280,9 @@ $content = $translations[$language] ?? $translations['id'];
     </div>
 
     <div class="flex gap-6 md:gap-8 overflow-x-auto pb-10 justify-start md:justify-between px-4 no-scrollbar">
-      @php
-        error_log('DEBUG: Industri count = ' . (isset($industri) ? count($industri) : 0));
-        if(isset($industri) && count($industri) > 0) {
-          foreach($industri as $idx => $ind) {
-            error_log('DEBUG: Industri ' . $idx . ' - ' . $ind->nama . ' - Image: ' . ($ind->gambar ?? 'NULL'));
-          }
-        }
-      @endphp
-      
       @forelse($industri as $item)
       <div class="group relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
-        <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
+        <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
         <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
           <span class="text-white font-bold text-base md:text-lg text-center leading-tight">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
         </div>
@@ -386,24 +366,15 @@ $content = $translations[$language] ?? $translations['id'];
       <a href="{{ url('kisah-sukses') }}" class="text-brand-pink hover:text-brand-pink/80 font-medium text-sm transition">Lihat Semua →</a>
     </div>
 
-    @php
-      error_log('DEBUG: Kisah Sukses count = ' . (isset($kisah_sukses) ? count($kisah_sukses) : 0));
-      if(isset($kisah_sukses) && count($kisah_sukses) > 0) {
-        foreach($kisah_sukses as $idx => $ks) {
-          error_log('DEBUG: Kisah ' . $idx . ' - ' . $ks->nama . ' - Image: ' . ($ks->foto ?? 'NULL'));
-        }
-      }
-    @endphp
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @forelse($kisah_sukses as $item)
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
         <div class="relative">
           <div class="h-48 overflow-hidden bg-gray-50">
             @if(!empty($item->foto))
-              <img src="{{ asset($item->foto) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
+              <img src="{{ asset($item->foto) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
             @else
-              <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" alt="Default testimonial" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" />
+              <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" alt="Default testimonial" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
             @endif
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>

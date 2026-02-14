@@ -27,32 +27,49 @@ class Home extends Controller
             ];
         }
 
-        $videos  = DB::table('video')->orderBy('id_video', 'DESC')->get();
-        $slider  = DB::table('galeri')
+        // Cache queries untuk performa lebih baik
+        $videos  = cache()->remember('home_videos', 3600, function() {
+            return DB::table('video')->orderBy('id_video', 'DESC')->limit(1)->get();
+        });
+        
+        $slider  = cache()->remember('home_slider', 3600, function() {
+            return DB::table('galeri')
                         ->where('jenis_galeri', 'Homepage')
                         ->limit(5)
                         ->orderBy('id_galeri', 'DESC')
                         ->get();
+        });
 
-        $layanan = DB::table('berita')
+        $layanan = cache()->remember('home_layanan', 3600, function() {
+            return DB::table('berita')
                         ->where([
                             'jenis_berita'  => 'Layanan',
                             'status_berita' => 'Publish'
                         ])
                         ->orderBy('urutan', 'ASC')
+                        ->limit(10)
                         ->get();
+        });
 
         $news   = new Berita_model();
-        $berita = $news->home();
+        $berita = cache()->remember('home_berita', 3600, function() use ($news) {
+            return $news->home();
+        });
 
-        // Load data program masa depan
-        $program_masa_depan = ProgramMasaDepan::publish()->ordered()->get();
+        // Load data program masa depan dengan limit
+        $program_masa_depan = cache()->remember('home_program_masa_depan', 3600, function() {
+            return ProgramMasaDepan::publish()->ordered()->limit(8)->get();
+        });
         
-        // Load data industri
-        $industri = Industri::publish()->ordered()->get();
+        // Load data industri dengan limit
+        $industri = cache()->remember('home_industri', 3600, function() {
+            return Industri::publish()->ordered()->limit(10)->get();
+        });
         
-        // Load data kisah sukses
-        $kisah_sukses = KisahSukses::publish()->ordered()->get();
+        // Load data kisah sukses dengan limit
+        $kisah_sukses = cache()->remember('home_kisah_sukses', 3600, function() {
+            return KisahSukses::publish()->ordered()->limit(6)->get();
+        });
 
         /**
          * ===============================

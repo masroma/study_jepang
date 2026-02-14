@@ -7,7 +7,7 @@
 @section('hero')
 <header class="relative w-full min-h-[800px] md:min-h-[750px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
   <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Blog" />
+    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Blog" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
   </div>
 
@@ -83,7 +83,7 @@
       @foreach($articles as $article)
       <article class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
         <div class="h-48 overflow-hidden bg-gray-50">
-          <img src="{{ $article->gambar }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="{{ $article->judul }}" />
+          <img src="{{ $article->gambar }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="{{ $article->judul }}" loading="lazy" />
         </div>
         <div class="p-6">
           <div class="flex items-center text-xs text-gray-400 mb-3">
