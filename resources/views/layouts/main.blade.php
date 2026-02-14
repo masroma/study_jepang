@@ -109,9 +109,31 @@
 
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
           <a href="{{ url('/') }}" class="@yield('nav-home', 'hover:text-brand-pink transition')">Home</a>
-          <a href="{{ url('tentang-kami') }}" class="@yield('nav-about', 'hover:text-brand-pink transition')">Tentang Kami</a>
-          <a href="{{ url('produk') }}" class="@yield('nav-product', 'hover:text-brand-pink transition')">Produk</a>
-          <a href="{{ url('layanan') }}" class="@yield('nav-service', 'hover:text-brand-pink transition')">Layanan</a>
+          @php
+            $currentRoute = request()->path();
+            $isPerusahaanActive = in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile', 'produk', 'product', 'komoditas', 'layanan', 'service']);
+          @endphp
+          <div class="relative group">
+            <button class="{{ $isPerusahaanActive ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }} flex items-center space-x-1">
+              <span>Perusahaan</span>
+              <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
+              <div class="py-2">
+                <a href="{{ url('tentang-kami') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile']) ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+                  Tentang Kami
+                </a>
+                <a href="{{ url('produk') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ in_array($currentRoute, ['produk', 'product', 'komoditas']) ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+                  Produk
+                </a>
+                <a href="{{ url('layanan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ in_array($currentRoute, ['layanan', 'service']) ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+                  Layanan
+                </a>
+              </div>
+            </div>
+          </div>
           <a href="{{ url('training-center') }}" class="@yield('nav-training-center', 'hover:text-brand-pink transition')">Training Center</a>
           <a href="{{ url('kisah-sukses') }}" class="@yield('nav-kisah-sukses', 'hover:text-brand-pink transition')">Kisah Sukses</a>
           <a href="{{ url('blog') }}" class="@yield('nav-blog', 'hover:text-brand-pink transition')">Blog</a>
