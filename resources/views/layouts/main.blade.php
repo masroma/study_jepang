@@ -108,11 +108,11 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
-          <a href="{{ url('/') }}" class="@yield('nav-home', 'hover:text-brand-pink transition')">Home</a>
           @php
             $currentRoute = request()->path();
             $isPerusahaanActive = in_array($currentRoute, ['tentang-kami', 'about-us', 'company-profile', 'produk', 'product', 'komoditas', 'layanan', 'service']);
           @endphp
+          <a href="{{ url('/') }}" class="{{ $currentRoute == '/' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Home</a>
           <div class="relative group">
             <button class="{{ $isPerusahaanActive ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }} flex items-center space-x-1">
               <span>Perusahaan</span>
@@ -134,11 +134,11 @@
               </div>
             </div>
           </div>
-          <a href="{{ url('training-center') }}" class="@yield('nav-training-center', 'hover:text-brand-pink transition')">Training Center</a>
-          <a href="{{ url('kisah-sukses') }}" class="@yield('nav-kisah-sukses', 'hover:text-brand-pink transition')">Kisah Sukses</a>
-          <a href="{{ url('blog') }}" class="@yield('nav-blog', 'hover:text-brand-pink transition')">Blog</a>
-          <a href="{{ url('loker') }}" class="@yield('nav-loker', 'hover:text-brand-pink transition')">Lowongan Kerja</a>
-          <a href="{{ url('kontak') }}" class="@yield('nav-kontak', 'hover:text-brand-pink transition')">Kontak Kami</a>
+          <a href="{{ url('training-center') }}" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
+          <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
+          <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>
+          <a href="{{ url('loker') }}" class="{{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Lowongan Kerja</a>
+          <a href="{{ url('kontak') }}" class="{{ $currentRoute == 'kontak' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kontak Kami</a>
         </div>
 
         <div class="flex items-center space-x-2 md:space-x-3">
