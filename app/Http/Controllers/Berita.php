@@ -20,6 +20,7 @@ class Berita extends Controller
         $data = array(  'title'     => 'Berita dan Update',
                         'deskripsi' => 'Berita dan Update',
                         'keywords'  => 'Berita dan Update',
+                        'site_config' => $site,
                         'site'		=> $site,
                         'berita'	=> $berita,
                         'beritas'    => $berita
@@ -45,6 +46,7 @@ class Berita extends Controller
         $data = array(  'title'     => $kategori->nama_kategori,
                         'deskripsi' => $kategori->nama_kategori,
                         'keywords'  => $kategori->nama_kategori,
+                        'site_config' => $site,
                         'site'      => $site,
                         'berita'    => $berita,
                         'beritas'    => $berita
@@ -103,6 +105,7 @@ class Berita extends Controller
     // kontak
     public function read($slug_berita)
     {
+       
         Paginator::useBootstrap();
         $site   = DB::table('konfigurasi')->first();
         $slider = DB::table('galeri')->where('jenis_galeri','Beritapage')->orderBy('id_galeri', 'DESC')->first();
@@ -118,10 +121,9 @@ class Berita extends Controller
                         'deskripsi' => $read->judul_berita,
                         'keywords'  => $read->judul_berita,
                         'slider'    => $slider,
-                        'site'      => $site,
-                        'read'      => $read,
-                        'content'   => 'berita/read'
+                        'site_config' => $site,
+                        'read'      => $read
                     );
-        return view('layout/wrapper',$data);
+        return view('berita.read',$data);
     }
 }
