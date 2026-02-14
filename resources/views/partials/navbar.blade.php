@@ -6,11 +6,11 @@ $currentRoute = request()->path();
   /* Premium Corporate Text Design */
   .brand-main-text {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 1.75rem;
+    font-weight: 600;
+    /* font-size: 1.75rem; */
     line-height: 1.1;
     letter-spacing: 0.15em;
-    color: #1a1a1a;
+    /* color: #1a1a1a; */
     text-transform: uppercase;
     text-shadow: 
       0 1px 0 rgba(255, 255, 255, 0.8),
