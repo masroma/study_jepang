@@ -2,10 +2,59 @@
 $waNumber = isset($site_config->telepon) ? preg_replace('/\D+/', '', $site_config->telepon) : '';
 $currentRoute = request()->path();
 @endphp
+<style>
+  /* Premium Corporate Text Design */
+  .brand-main-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: 0.15em;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    text-shadow: 
+      0 1px 0 rgba(255, 255, 255, 0.8),
+      0 2px 2px rgba(0, 0, 0, 0.1),
+      0 4px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+  .brand-sub-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.65rem;
+    line-height: 1.2;
+    letter-spacing: 0.25em;
+    color: #8b6914;
+    text-transform: uppercase;
+    margin-top: 2px;
+    position: relative;
+  }
+  .brand-sub-text::before,
+  .brand-sub-text::after {
+    content: '—';
+    color: #d4af37;
+    margin: 0 8px;
+    font-weight: 300;
+  }
+  @media (min-width: 768px) {
+    .brand-main-text {
+      font-size: 2rem;
+    }
+    .brand-sub-text {
+      font-size: 0.75rem;
+    }
+  }
+</style>
 <nav class="absolute top-0 left-0 w-full z-50 pt-4 px-4 md:pt-6 md:px-12">
   <div class="flex justify-between items-center max-w-7xl mx-auto">
-    <div class="text-xl md:text-2xl font-extrabold text-brand-pink tracking-tight">
-      <a href="{{ url('/') }}">{{ $site_config->nama_singkat ?? $site_config->namaweb }}</a>
+    <div class="flex items-center space-x-3">
+      <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
+        <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="h-9 md:h-11 w-auto transition-transform group-hover:scale-105 drop-shadow-sm">
+        <div class="hidden md:flex flex-col items-start justify-center">
+          <span class="text-xl text-gray-900">MEGHANTARA</span>
+          <span class="text-sm font-medium text-gray-500">GLOBAL GROUP</span>
+        </div>
+      </a>
     </div>
 
     <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600 bg-white/60 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm">
