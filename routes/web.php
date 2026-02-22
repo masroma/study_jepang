@@ -109,6 +109,22 @@ Route::get('service', 'App\Http\Controllers\Service@index');
 // Route::get('proyek/cetak/{par1}', 'App\Http\Controllers\Proyek@cetak');
 /* BACK END */
 
+// Member Portal Routes
+Route::prefix('member')->group(function() {
+    Route::get('dashboard', 'App\Http\Controllers\Member\Dashboard@index');
+    Route::get('lamaran', 'App\Http\Controllers\Member\Lamaran@index');
+    Route::get('lamaran/detail/{id_pendaftaran}', 'App\Http\Controllers\Member\Lamaran@detail');
+    Route::get('lamaran/download-cv/{id_pendaftaran}', 'App\Http\Controllers\Member\Lamaran@download_cv');
+    Route::get('quotation', 'App\Http\Controllers\Member\Quotation@index');
+    Route::get('quotation/detail/{id_kontak}', 'App\Http\Controllers\Member\Quotation@detail');
+    Route::get('quotation/baru', 'App\Http\Controllers\Member\Quotation@baru');
+    Route::post('quotation/kirim', 'App\Http\Controllers\Member\Quotation@kirim');
+    Route::get('profile', 'App\Http\Controllers\Member\Profile@index');
+    Route::post('profile/update', 'App\Http\Controllers\Member\Profile@update');
+    Route::get('password', 'App\Http\Controllers\Member\Profile@password');
+    Route::post('password/update', 'App\Http\Controllers\Member\Profile@updatePassword');
+});
+
 // admin redirect
 Route::get('admin', function () {
     return redirect('admin/v2');

@@ -281,7 +281,7 @@ class Product extends Controller
         ]);
 
         // Simpan ke database kontak dengan subjek khusus
-        DB::table('kontak')->insert([
+        $kontakData = [
             'nama'           => $request->nama,
             'email'          => $request->email,
             'telepon'        => $request->telepon,
@@ -293,7 +293,14 @@ class Product extends Controller
                               "Pesan: " . ($request->pesan ?? '-'),
             'tanggal_kontak' => now(),
             'status_kontak'  => 'Baru'
-        ]);
+        ];
+
+        // Jika user sudah login, simpan user_id
+        if(\Illuminate\Support\Facades\Session::has('id_user') && \Illuminate\Support\Facades\Session::get('akses_level') === 'User') {
+            $kontakData['id_user'] = \Illuminate\Support\Facades\Session::get('id_user');
+        }
+
+        DB::table('kontak')->insert($kontakData);
 
         // Redirect ke WhatsApp dengan pesan otomatis
         $site_config = DB::table('konfigurasi')->first();

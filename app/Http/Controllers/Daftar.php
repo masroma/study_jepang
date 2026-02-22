@@ -26,8 +26,7 @@ class Daftar extends Controller
         // Validasi
         $request->validate([
             'nama_lengkap' => 'required|string|max:50',
-            'email' => 'required|email|max:255',
-            'username' => 'required|string|max:32|unique:users,username',
+            'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
             'whatsapp' => 'required|string',
         ]);
@@ -41,24 +40,27 @@ class Daftar extends Controller
             return redirect('daftar')->with(['warning' => 'Email sudah terdaftar. Silakan gunakan email lain atau lakukan login.']);
         }
 
-        // Cek apakah username sudah terdaftar
-        $existingUsername = DB::table('users')
-            ->where('username', $request->username)
-            ->first();
-
-        if ($existingUsername) {
-            return redirect('daftar')->with(['warning' => 'Username sudah digunakan. Silakan gunakan username lain.']);
-        }
-
         try {
+            // Generate username dari email (ambil bagian sebelum @)
+            $emailParts = explode('@', $request->email);
+            $baseUsername = $emailParts[0];
+            $username = $baseUsername;
+            $counter = 1;
+            
+            // Cek apakah username sudah ada, jika ada tambahkan angka
+            while (DB::table('users')->where('username', $username)->exists()) {
+                $username = $baseUsername . $counter;
+                $counter++;
+            }
+
             // Simpan user baru dengan status belum verified
             $userId = DB::table('users')->insertGetId([
                 'nama' => $request->nama_lengkap,
                 'email' => $request->email,
-                'username' => $request->username,
+                'username' => $username,
                 'password' => sha1($request->password),
                 'whatsapp' => $request->whatsapp,
-                'akses_level' => 'User',
+                'akses_level' => 'User', // Member otomatis dari registrasi web
                 'email_verified' => false,
                 'email_verified_at' => null,
                 'tanggal' => now(),
@@ -140,7 +142,7 @@ class Daftar extends Controller
         // Clear session
         $request->session()->forget(['verification_otp', 'verification_user_id', 'verification_expires']);
 
-        return redirect('login')->with(['sukses' => 'Akun Anda berhasil diverifikasi! Silakan login dengan username dan password Anda.']);
+        return redirect('login')->with(['sukses' => 'Akun Anda berhasil diverifikasi! Silakan login dengan email dan password Anda.']);
     }
 
     public function kirim_ulang_otp(Request $request)

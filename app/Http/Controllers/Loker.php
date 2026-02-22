@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Loker_model;
 use App\Models\PendaftaranLoker_model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
 
 class Loker extends Controller
 {
@@ -110,6 +111,11 @@ class Loker extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ];
+
+        // Jika user sudah login, simpan user_id
+        if(Session::has('id_user') && Session::get('akses_level') === 'User') {
+            $data['id_user'] = Session::get('id_user');
+        }
 
         DB::table('pendaftaran_loker')->insert($data);
 

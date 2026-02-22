@@ -61,15 +61,7 @@
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
             <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="contoh@email.com" />
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Username <span class="text-red-500">*</span></label>
-            <input type="text" name="username" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="Masukkan username" />
-            <p class="text-xs text-gray-500 mt-1">Username akan digunakan untuk login</p>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
-            <input type="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="Masukkan password" />
+            <p class="text-xs text-gray-500 mt-1">Email akan digunakan untuk login</p>
           </div>
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Nomor WhatsApp <span class="text-red-500">*</span></label>
@@ -77,46 +69,9 @@
             <p class="text-xs text-gray-500 mt-1">Kode verifikasi akan dikirim ke nomor WhatsApp ini</p>
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Nomor Telepon</label>
-            <input type="tel" name="nomor_telepon" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="08xxxxxxxxxx" />
+            <label class="block text-sm font-bold text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
+            <input type="password" name="password" required minlength="6" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="Masukkan password (min. 6 karakter)" />
           </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Program yang Diminati <span class="text-red-500">*</span></label>
-            <select name="program" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm bg-white">
-              <option value="">Pilih Program</option>
-              <option value="sekolah-bahasa">Studi Program Sekolah (Bahasa)</option>
-              <option value="tokutei-ginou">Tokutei Ginou (Skill Spesifik)</option>
-              <option value="internship">Internship / Magang</option>
-              <option value="kursus-bahasa">Kursus Bahasa Jepang</option>
-              <option value="training-center">Training Center</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Level Bahasa Jepang</label>
-            <select name="level_bahasa" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm bg-white">
-              <option value="">Pilih Level</option>
-              <option value="pemula">Pemula (Belum ada)</option>
-              <option value="n5">N5</option>
-              <option value="n4">N4</option>
-              <option value="n3">N3</option>
-              <option value="n2">N2</option>
-              <option value="n1">N1</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Pendidikan Terakhir <span class="text-red-500">*</span></label>
-            <select name="pendidikan" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm bg-white">
-              <option value="">Pilih Pendidikan</option>
-              <option value="sma">SMA/SMK</option>
-              <option value="d3">D3</option>
-              <option value="s1">S1</option>
-              <option value="s2">S2</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Alamat Lengkap</label>
-          <textarea name="alamat" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm resize-none" placeholder="Masukkan alamat lengkap"></textarea>
         </div>
         <div class="flex items-start">
           <input type="checkbox" required class="mt-1 mr-3 w-4 h-4 text-brand-pink border-gray-300 rounded focus:ring-brand-pink" />
