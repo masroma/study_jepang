@@ -22,10 +22,32 @@ class Login extends Controller
     // Cek
     public function check(Request $request)
     {
-        $username   = $request->username;
-        $password   = $request->password;
-        $model      = new User_model();
-        $user       = $model->login($username,$password);
+        $loginMethod = $request->login_method ?? 'email';
+        $password    = $request->password;
+        $model       = new User_model();
+        $user        = null;
+
+        // Validate password
+        if (empty($password)) {
+            return redirect('login')->with(['warning' => 'Password harus diisi']);
+        }
+
+        // Login berdasarkan method yang dipilih
+        if ($loginMethod === 'whatsapp') {
+            $whatsapp = $request->whatsapp;
+            if (empty($whatsapp)) {
+                return redirect('login')->with(['warning' => 'Nomor WhatsApp harus diisi']);
+            }
+            $user = $model->loginByWhatsApp($whatsapp, $password);
+        } else {
+            // Default: login dengan email
+            $email = $request->email;
+            if (empty($email)) {
+                return redirect('login')->with(['warning' => 'Email harus diisi']);
+            }
+            $user = $model->loginByEmail($email, $password);
+        }
+
         if($user) {
             // Check if user is verified (for User level only, Admin can always login)
             if ($user->akses_level === 'User' && (!isset($user->email_verified) || !$user->email_verified)) {
@@ -39,9 +61,18 @@ class Login extends Controller
             $request->session()->put('username', $user->username);
             $request->session()->put('email', $user->email ?? $user->username);
             $request->session()->put('akses_level', $user->akses_level);
-            return redirect('admin/v2')->with(['sukses' => 'Anda berhasil login']);
-        }else{
-            return redirect('login')->with(['warning' => 'Mohon maaf, Username atau password salah']);
+            
+            // Redirect berdasarkan role
+            if ($user->akses_level === 'Admin') {
+                return redirect('admin/v2')->with(['sukses' => 'Anda berhasil login']);
+            } else {
+                return redirect('member/dashboard')->with(['sukses' => 'Selamat datang di portal member']);
+            }
+        } else {
+            $errorMessage = $loginMethod === 'whatsapp' 
+                ? 'Mohon maaf, Nomor WhatsApp atau password salah'
+                : 'Mohon maaf, Email atau password salah';
+            return redirect('login')->with(['warning' => $errorMessage]);
         }
     }
 
