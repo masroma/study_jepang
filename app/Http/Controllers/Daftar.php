@@ -177,4 +177,60 @@ class Daftar extends Controller
             return redirect('daftar/verifikasi')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan hubungi administrator.']);
         }
     }
+
+    public function verifikasi_ulang(Request $request)
+    {
+        $site_config = DB::table('konfigurasi')->first();
+
+        $data = array(
+            'title' => 'Verifikasi Ulang Akun - ' . $site_config->namaweb,
+            'site_config' => $site_config
+        );
+        
+        return view('daftar.verifikasi_ulang', $data);
+    }
+
+    public function verifikasi_ulang_proses(Request $request)
+    {
+        $email = $request->email;
+        $whatsapp = $request->whatsapp;
+
+        // Validasi input
+        if (empty($email) || empty($whatsapp)) {
+            return redirect('daftar/verifikasi-ulang')->with(['warning' => 'Email dan nomor WhatsApp harus diisi']);
+        }
+
+        // Cari user berdasarkan email dan whatsapp
+        $user = DB::table('users')
+            ->where('email', $email)
+            ->where('whatsapp', $whatsapp)
+            ->first();
+
+        if (!$user) {
+            return redirect('daftar/verifikasi-ulang')->with(['warning' => 'Email atau nomor WhatsApp tidak ditemukan. Pastikan data yang Anda masukkan benar.']);
+        }
+
+        // Cek apakah user sudah terverifikasi
+        if ($user->email_verified) {
+            return redirect('login')->with(['sukses' => 'Akun Anda sudah terverifikasi. Silakan login.']);
+        }
+
+        // Generate 6-digit OTP
+        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP in session with expiration (10 minutes)
+        $request->session()->put('verification_otp', $otp);
+        $request->session()->put('verification_user_id', $user->id_user);
+        $request->session()->put('verification_expires', now()->addMinutes(10)->timestamp);
+
+        // Send OTP via WhatsApp
+        $whatsappService = new WhatsAppService();
+        $result = $whatsappService->sendOTP($user->whatsapp, $otp);
+
+        if ($result['success']) {
+            return redirect('daftar/verifikasi')->with(['sukses' => 'Kode verifikasi telah dikirim ke WhatsApp Anda. Silakan cek pesan WhatsApp Anda.']);
+        } else {
+            return redirect('daftar/verifikasi-ulang')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan hubungi administrator.']);
+        }
+    }
 }

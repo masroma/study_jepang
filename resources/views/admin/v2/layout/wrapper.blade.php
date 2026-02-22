@@ -135,6 +135,15 @@
                             <span>Berita</span>
                         </a>
                     </li>
+                    <li class="pt-4">
+                        <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">Sistem</div>
+                    </li>
+                    <li>
+                        <a href="{{ url('admin/v2/user') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('admin/v2/user*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-users-cog w-5"></i>
+                            <span>Manajemen User</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 

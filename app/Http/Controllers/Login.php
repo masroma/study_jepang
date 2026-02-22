@@ -130,10 +130,143 @@ class Login extends Controller
         $result = $whatsappService->sendPasswordResetOTP($phone, $otp);
 
         if ($result['success']) {
-            return redirect('login/lupa')->with(['sukses' => 'Kode OTP telah dikirim ke WhatsApp Anda. Silakan cek pesan WhatsApp Anda.']);
+            return redirect('login/verifikasi-reset')->with(['sukses' => 'Kode OTP telah dikirim ke WhatsApp Anda. Silakan cek pesan WhatsApp Anda.']);
         } else {
             // If WhatsApp fails, still store OTP in session but show warning
-            return redirect('login/lupa')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan coba lagi atau hubungi administrator.']);
+            return redirect('login/verifikasi-reset')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan coba lagi atau hubungi administrator.']);
+        }
+    }
+
+    // Verifikasi OTP reset password
+    public function verifikasi_reset()
+    {
+        $site = DB::table('konfigurasi')->first();
+        $data = array(
+            'title' => 'Verifikasi Reset Password',
+            'site' => $site,
+            'site_config' => $site
+        );
+        return view('login/verifikasi-reset', $data);
+    }
+
+    // Process verifikasi OTP reset password
+    public function verifikasi_reset_proses(Request $request)
+    {
+        $otp = $request->otp;
+        $sessionOtp = $request->session()->get('reset_password_otp');
+        $userId = $request->session()->get('reset_password_user_id');
+        $expires = $request->session()->get('reset_password_expires');
+
+        // Validasi session
+        if (!$sessionOtp || !$userId || !$expires) {
+            return redirect('login/verifikasi-reset')->with(['error' => 'Sesi reset password tidak ditemukan. Silakan lakukan reset password ulang.']);
+        }
+
+        // Cek expiration
+        if (now()->timestamp > $expires) {
+            $request->session()->forget(['reset_password_otp', 'reset_password_user_id', 'reset_password_expires']);
+            return redirect('login/verifikasi-reset')->with(['error' => 'Kode OTP telah kedaluwarsa. Silakan kirim ulang kode.']);
+        }
+
+        // Validasi OTP
+        if ($otp !== $sessionOtp) {
+            return redirect('login/verifikasi-reset')->with(['error' => 'Kode OTP tidak sesuai. Silakan coba lagi.']);
+        }
+
+        // Set flag bahwa OTP sudah diverifikasi, user bisa reset password
+        $request->session()->put('reset_password_verified', true);
+
+        // Redirect langsung ke form reset password baru
+        return redirect('login/reset-password')->with(['sukses' => 'Kode OTP berhasil diverifikasi! Silakan masukkan password baru Anda.']);
+    }
+
+    // Form reset password baru
+    public function reset_password(Request $request)
+    {
+        // Cek apakah OTP sudah diverifikasi
+        if (!$request->session()->has('reset_password_verified') || !$request->session()->has('reset_password_user_id')) {
+            return redirect('login/lupa')->with(['warning' => 'Silakan verifikasi OTP terlebih dahulu.']);
+        }
+
+        $site = DB::table('konfigurasi')->first();
+        $data = array(
+            'title' => 'Reset Password',
+            'site' => $site,
+            'site_config' => $site
+        );
+        return view('login/reset-password', $data);
+    }
+
+    // Process reset password
+    public function reset_password_proses(Request $request)
+    {
+        // Cek apakah OTP sudah diverifikasi
+        if (!$request->session()->has('reset_password_verified') || !$request->session()->has('reset_password_user_id')) {
+            return redirect('login/lupa')->with(['warning' => 'Silakan verifikasi OTP terlebih dahulu.']);
+        }
+
+        $password = $request->password;
+        $password_confirmation = $request->password_confirmation;
+        $userId = $request->session()->get('reset_password_user_id');
+
+        // Validasi password
+        if (empty($password)) {
+            return redirect('login/reset-password')->with(['warning' => 'Password harus diisi']);
+        }
+
+        if (strlen($password) < 6) {
+            return redirect('login/reset-password')->with(['warning' => 'Password minimal 6 karakter']);
+        }
+
+        if ($password !== $password_confirmation) {
+            return redirect('login/reset-password')->with(['warning' => 'Konfirmasi password tidak sesuai']);
+        }
+
+        // Update password
+        DB::table('users')
+            ->where('id_user', $userId)
+            ->update([
+                'password' => sha1($password),
+            ]);
+
+        // Clear session
+        $request->session()->forget(['reset_password_otp', 'reset_password_user_id', 'reset_password_expires', 'reset_password_verified']);
+
+        return redirect('login')->with(['sukses' => 'Password berhasil direset! Silakan login dengan password baru Anda.']);
+    }
+
+    // Kirim ulang OTP reset password
+    public function kirim_ulang_otp_reset(Request $request)
+    {
+        $userId = $request->session()->get('reset_password_user_id');
+
+        if (!$userId) {
+            return redirect('login/verifikasi-reset')->with(['error' => 'Sesi reset password tidak ditemukan. Silakan lakukan reset password ulang.']);
+        }
+
+        // Get user data
+        $user = DB::table('users')->where('id_user', $userId)->first();
+
+        if (!$user) {
+            return redirect('login/verifikasi-reset')->with(['error' => 'User tidak ditemukan.']);
+        }
+
+        // Generate new OTP
+        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP in session with expiration (10 minutes)
+        $request->session()->put('reset_password_otp', $otp);
+        $request->session()->put('reset_password_expires', now()->addMinutes(10)->timestamp);
+        $request->session()->forget('reset_password_verified'); // Reset verified flag
+
+        // Send OTP via WhatsApp
+        $whatsappService = new WhatsAppService();
+        $result = $whatsappService->sendPasswordResetOTP($user->whatsapp, $otp);
+
+        if ($result['success']) {
+            return redirect('login/verifikasi-reset')->with(['sukses' => 'Kode OTP baru telah dikirim ke WhatsApp Anda.']);
+        } else {
+            return redirect('login/verifikasi-reset')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan hubungi administrator.']);
         }
     }
 }

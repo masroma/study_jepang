@@ -35,6 +35,11 @@ Route::get('login', 'App\Http\Controllers\Login@index');
 Route::post('login/check', 'App\Http\Controllers\Login@check');
 Route::get('login/lupa', 'App\Http\Controllers\Login@lupa');
 Route::post('login/lupa', 'App\Http\Controllers\Login@lupa_proses');
+Route::get('login/verifikasi-reset', 'App\Http\Controllers\Login@verifikasi_reset');
+Route::post('login/verifikasi-reset', 'App\Http\Controllers\Login@verifikasi_reset_proses');
+Route::get('login/reset-password', 'App\Http\Controllers\Login@reset_password');
+Route::post('login/reset-password', 'App\Http\Controllers\Login@reset_password_proses');
+Route::post('login/kirim-ulang-otp-reset', 'App\Http\Controllers\Login@kirim_ulang_otp_reset');
 Route::get('login/logout', 'App\Http\Controllers\Login@logout');
 // Berita
 Route::get('berita', 'App\Http\Controllers\Berita@index');
@@ -60,6 +65,8 @@ Route::post('daftar/proses', 'App\Http\Controllers\Daftar@proses');
 Route::get('daftar/verifikasi', 'App\Http\Controllers\Daftar@verifikasi');
 Route::post('daftar/verifikasi', 'App\Http\Controllers\Daftar@verifikasi_proses');
 Route::post('daftar/kirim-ulang-otp', 'App\Http\Controllers\Daftar@kirim_ulang_otp');
+Route::get('daftar/verifikasi-ulang', 'App\Http\Controllers\Daftar@verifikasi_ulang');
+Route::post('daftar/verifikasi-ulang', 'App\Http\Controllers\Daftar@verifikasi_ulang_proses');
 // Akreditasi
 // Route::get('provider-akreditasi', 'App\Http\Controllers\Akreditasi@index');
 // Route::get('akreditasi/read/{par1}', 'App\Http\Controllers\Akreditasi@read');
@@ -215,6 +222,13 @@ Route::get('admin/v2/berita/edit/{id_berita}', 'App\Http\Controllers\Admin\Berit
 Route::get('admin/v2/berita/delete/{id_berita}', 'App\Http\Controllers\Admin\BeritaV2Controller@delete');
 Route::post('admin/v2/berita/tambah_proses', 'App\Http\Controllers\Admin\BeritaV2Controller@tambah_proses');
 Route::post('admin/v2/berita/edit_proses', 'App\Http\Controllers\Admin\BeritaV2Controller@edit_proses');
+// Admin V2 - User Management
+Route::get('admin/v2/user', 'App\Http\Controllers\Admin\UserV2Controller@index');
+Route::get('admin/v2/user/tambah', 'App\Http\Controllers\Admin\UserV2Controller@tambah');
+Route::get('admin/v2/user/edit/{id_user}', 'App\Http\Controllers\Admin\UserV2Controller@edit');
+Route::get('admin/v2/user/delete/{id_user}', 'App\Http\Controllers\Admin\UserV2Controller@delete');
+Route::post('admin/v2/user/tambah_proses', 'App\Http\Controllers\Admin\UserV2Controller@tambah_proses');
+Route::post('admin/v2/user/edit_proses', 'App\Http\Controllers\Admin\UserV2Controller@edit_proses');
 
 // dasbor
 Route::get('admin/dasbor', 'App\Http\Controllers\Admin\Dasbor@index');

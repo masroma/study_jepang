@@ -50,6 +50,16 @@
           @if ($message = Session::get('warning'))
           <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl mb-6 text-sm">
             {{ $message }}
+            @if(str_contains($message, 'belum diverifikasi') || str_contains($message, 'verifikasi'))
+            <div class="mt-3 pt-3 border-t border-yellow-300">
+              <a href="{{ url('daftar/verifikasi-ulang') }}" class="text-brand-pink hover:underline font-bold text-sm inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Verifikasi Ulang Akun
+              </a>
+            </div>
+            @endif
           </div>
           @endif
 
