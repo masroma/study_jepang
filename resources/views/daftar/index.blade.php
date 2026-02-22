@@ -42,7 +42,7 @@
           ke Jepang
         </h1>
         <p class="text-gray-500 mb-8 max-w-2xl leading-relaxed text-sm md:text-base font-medium">
-          Isi formulir di bawah ini untuk bergabung dengan program belajar dan kerja di Jepang. Tim kami akan menghubungi Anda segera setelah pendaftaran.
+          Isi formulir di bawah ini untuk membuat akun. Setelah pendaftaran, Anda akan menerima kode verifikasi via WhatsApp yang harus dimasukkan sebelum dapat login.
         </p>
       </div>
     </div>
@@ -63,8 +63,22 @@
             <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="contoh@email.com" />
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Nomor Telepon <span class="text-red-500">*</span></label>
-            <input type="tel" name="nomor_telepon" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="08xxxxxxxxxx" />
+            <label class="block text-sm font-bold text-gray-700 mb-2">Username <span class="text-red-500">*</span></label>
+            <input type="text" name="username" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="Masukkan username" />
+            <p class="text-xs text-gray-500 mt-1">Username akan digunakan untuk login</p>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
+            <input type="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="Masukkan password" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Nomor WhatsApp <span class="text-red-500">*</span></label>
+            <input type="tel" name="whatsapp" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="08xxxxxxxxxx" />
+            <p class="text-xs text-gray-500 mt-1">Kode verifikasi akan dikirim ke nomor WhatsApp ini</p>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Nomor Telepon</label>
+            <input type="tel" name="nomor_telepon" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm" placeholder="08xxxxxxxxxx" />
           </div>
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Program yang Diminati <span class="text-red-500">*</span></label>

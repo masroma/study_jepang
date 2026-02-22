@@ -34,6 +34,7 @@ Route::get('info', 'App\Http\Controllers\Home@info');
 Route::get('login', 'App\Http\Controllers\Login@index');
 Route::post('login/check', 'App\Http\Controllers\Login@check');
 Route::get('login/lupa', 'App\Http\Controllers\Login@lupa');
+Route::post('login/lupa', 'App\Http\Controllers\Login@lupa_proses');
 Route::get('login/logout', 'App\Http\Controllers\Login@logout');
 // Berita
 Route::get('berita', 'App\Http\Controllers\Berita@index');
@@ -56,6 +57,9 @@ Route::post('kontak/kirim', 'App\Http\Controllers\Home@kirim_pesan');
 // Daftar
 Route::get('daftar', 'App\Http\Controllers\Daftar@index');
 Route::post('daftar/proses', 'App\Http\Controllers\Daftar@proses');
+Route::get('daftar/verifikasi', 'App\Http\Controllers\Daftar@verifikasi');
+Route::post('daftar/verifikasi', 'App\Http\Controllers\Daftar@verifikasi_proses');
+Route::post('daftar/kirim-ulang-otp', 'App\Http\Controllers\Daftar@kirim_ulang_otp');
 // Akreditasi
 // Route::get('provider-akreditasi', 'App\Http\Controllers\Akreditasi@index');
 // Route::get('akreditasi/read/{par1}', 'App\Http\Controllers\Akreditasi@read');

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\WhatsAppService;
 
 class Daftar extends Controller
 {
@@ -22,33 +23,156 @@ class Daftar extends Controller
     
     public function proses(Request $request)
     {
-        // Proses pendaftaran bisa disambungkan ke sistem pemesanan yang sudah ada
-        // atau kirim ke WhatsApp/Email
-        $site_config = DB::table('konfigurasi')->first();
-        $waNumber = isset($site_config->telepon) ? preg_replace('/\D+/', '', $site_config->telepon) : '';
-        
         // Validasi
         $request->validate([
-            'nama_lengkap' => 'required',
-            'email' => 'required|email',
-            'nomor_telepon' => 'required',
-            'program' => 'required'
+            'nama_lengkap' => 'required|string|max:50',
+            'email' => 'required|email|max:255',
+            'username' => 'required|string|max:32|unique:users,username',
+            'password' => 'required|string|min:6',
+            'whatsapp' => 'required|string',
         ]);
-        
-        // Redirect ke WhatsApp dengan pesan otomatis
-        if($waNumber) {
-            $message = urlencode("Halo, saya ingin mendaftar program:\n\n" .
-                "Nama: " . $request->nama_lengkap . "\n" .
-                "Email: " . $request->email . "\n" .
-                "Telepon: " . $request->nomor_telepon . "\n" .
-                "Program: " . $request->program . "\n" .
-                "Level Bahasa: " . ($request->level_bahasa ?? '-') . "\n" .
-                "Pendidikan: " . ($request->pendidikan ?? '-'));
-            
-            return redirect("https://wa.me/{$waNumber}?text={$message}");
+
+        // Cek apakah email sudah terdaftar
+        $existingUser = DB::table('users')
+            ->where('email', $request->email)
+            ->first();
+
+        if ($existingUser) {
+            return redirect('daftar')->with(['warning' => 'Email sudah terdaftar. Silakan gunakan email lain atau lakukan login.']);
         }
+
+        // Cek apakah username sudah terdaftar
+        $existingUsername = DB::table('users')
+            ->where('username', $request->username)
+            ->first();
+
+        if ($existingUsername) {
+            return redirect('daftar')->with(['warning' => 'Username sudah digunakan. Silakan gunakan username lain.']);
+        }
+
+        try {
+            // Simpan user baru dengan status belum verified
+            $userId = DB::table('users')->insertGetId([
+                'nama' => $request->nama_lengkap,
+                'email' => $request->email,
+                'username' => $request->username,
+                'password' => sha1($request->password),
+                'whatsapp' => $request->whatsapp,
+                'akses_level' => 'User',
+                'email_verified' => false,
+                'email_verified_at' => null,
+                'tanggal' => now(),
+            ]);
+
+            // Generate 6-digit OTP
+            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Store OTP in session with expiration (10 minutes)
+            $request->session()->put('verification_otp', $otp);
+            $request->session()->put('verification_user_id', $userId);
+            $request->session()->put('verification_expires', now()->addMinutes(10)->timestamp);
+
+            // Send OTP via WhatsApp
+            $whatsappService = new WhatsAppService();
+            $result = $whatsappService->sendOTP($request->whatsapp, $otp);
+
+            if ($result['success']) {
+                return redirect('daftar/verifikasi')->with([
+                    'sukses' => 'Pendaftaran berhasil! Kode verifikasi telah dikirim ke WhatsApp Anda. Silakan cek pesan WhatsApp Anda.',
+                    'user_id' => $userId
+                ]);
+            } else {
+                // If WhatsApp fails, still redirect to verification but show warning
+                return redirect('daftar/verifikasi')->with([
+                    'warning' => 'Pendaftaran berhasil, namun gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan hubungi administrator untuk verifikasi manual.',
+                    'user_id' => $userId
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return redirect('daftar')->with(['warning' => 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.']);
+        }
+    }
+
+    public function verifikasi()
+    {
+        $site_config = DB::table('konfigurasi')->first();
+
+        $data = array(
+            'title' => 'Verifikasi Akun - ' . $site_config->namaweb,
+            'site_config' => $site_config
+        );
         
-        // Jika tidak ada WhatsApp, redirect ke kontak
-        return redirect('kontak')->with('sukses', 'Terima kasih! Tim kami akan menghubungi Anda segera.');
+        return view('daftar.verifikasi', $data);
+    }
+
+    public function verifikasi_proses(Request $request)
+    {
+        $otp = $request->otp;
+        $sessionOtp = $request->session()->get('verification_otp');
+        $userId = $request->session()->get('verification_user_id');
+        $expires = $request->session()->get('verification_expires');
+
+        // Validasi session
+        if (!$sessionOtp || !$userId || !$expires) {
+            return redirect('daftar/verifikasi')->with(['error' => 'Sesi verifikasi tidak ditemukan. Silakan daftar ulang.']);
+        }
+
+        // Cek expiration
+        if (now()->timestamp > $expires) {
+            $request->session()->forget(['verification_otp', 'verification_user_id', 'verification_expires']);
+            return redirect('daftar/verifikasi')->with(['error' => 'Kode verifikasi telah kedaluwarsa. Silakan kirim ulang kode.']);
+        }
+
+        // Validasi OTP
+        if ($otp !== $sessionOtp) {
+            return redirect('daftar/verifikasi')->with(['error' => 'Kode verifikasi tidak sesuai. Silakan coba lagi.']);
+        }
+
+        // Update user status to verified
+        DB::table('users')
+            ->where('id_user', $userId)
+            ->update([
+                'email_verified' => true,
+                'email_verified_at' => now(),
+            ]);
+
+        // Clear session
+        $request->session()->forget(['verification_otp', 'verification_user_id', 'verification_expires']);
+
+        return redirect('login')->with(['sukses' => 'Akun Anda berhasil diverifikasi! Silakan login dengan username dan password Anda.']);
+    }
+
+    public function kirim_ulang_otp(Request $request)
+    {
+        $userId = $request->session()->get('verification_user_id');
+
+        if (!$userId) {
+            return redirect('daftar/verifikasi')->with(['error' => 'Sesi verifikasi tidak ditemukan. Silakan daftar ulang.']);
+        }
+
+        // Get user data
+        $user = DB::table('users')->where('id_user', $userId)->first();
+
+        if (!$user) {
+            return redirect('daftar/verifikasi')->with(['error' => 'User tidak ditemukan.']);
+        }
+
+        // Generate new OTP
+        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP in session with expiration (10 minutes)
+        $request->session()->put('verification_otp', $otp);
+        $request->session()->put('verification_expires', now()->addMinutes(10)->timestamp);
+
+        // Send OTP via WhatsApp
+        $whatsappService = new WhatsAppService();
+        $result = $whatsappService->sendOTP($user->whatsapp, $otp);
+
+        if ($result['success']) {
+            return redirect('daftar/verifikasi')->with(['sukses' => 'Kode verifikasi baru telah dikirim ke WhatsApp Anda.']);
+        } else {
+            return redirect('daftar/verifikasi')->with(['warning' => 'Gagal mengirim OTP via WhatsApp: ' . ($result['error'] ?? 'Terjadi kesalahan') . '. Silakan hubungi administrator.']);
+        }
     }
 }

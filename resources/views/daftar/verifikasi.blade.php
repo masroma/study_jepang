@@ -26,11 +26,11 @@
   </style>
 </head>
 <body class="font-sans text-gray-700 overflow-x-hidden">
-  @include('partials.navbar', ['site_config' => $site])
+  @include('partials.navbar', ['site_config' => $site_config])
 
   <section class="min-h-screen hero-bg flex items-center pt-24 md:pt-20 pb-20 px-4 md:px-6">
     <div class="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
-      <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-30" alt="Lupa Password" />
+      <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-30" alt="Verifikasi" />
       <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white/80"></div>
     </div>
 
@@ -38,13 +38,13 @@
       <div class="max-w-md mx-auto">
         <div class="bg-white rounded-3xl shadow-soft p-8 md:p-10 border border-gray-100">
           <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-brand-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Lupa Password?</h1>
-            <p class="text-gray-500 text-sm font-medium">Jangan khawatir! Masukkan email atau username dan nomor WhatsApp Anda, kami akan mengirimkan kode OTP via WhatsApp untuk mereset password.</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Verifikasi Akun</h1>
+            <p class="text-gray-500 text-sm font-medium">Masukkan kode verifikasi yang telah dikirim ke WhatsApp Anda</p>
           </div>
 
           @if ($message = Session::get('warning'))
@@ -65,44 +65,60 @@
           </div>
           @endif
 
-          <form action="{{ url('login/lupa') }}" method="POST" class="space-y-6">
+          @if (!Session::has('verification_user_id'))
+          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-6 text-sm">
+            Sesi verifikasi tidak ditemukan. Silakan daftar ulang.
+          </div>
+          <div class="text-center mt-6">
+            <a href="{{ url('daftar') }}" class="text-sm text-brand-pink hover:underline font-medium">
+              Kembali ke Halaman Daftar
+            </a>
+          </div>
+          @else
+          <form action="{{ url('daftar/verifikasi') }}" method="POST" class="space-y-6">
             @csrf
             <div>
-              <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Email atau Username</label>
-              <input type="text" id="email" name="email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm font-medium" placeholder="Masukkan email atau username" />
-            </div>
-
-            <div>
-              <label for="phone" class="block text-sm font-bold text-gray-700 mb-2">Nomor WhatsApp</label>
-              <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm font-medium" placeholder="08xxxxxxxxxx" />
-              <p class="text-xs text-gray-500 mt-1">Masukkan nomor WhatsApp yang terdaftar (contoh: 081234567890)</p>
+              <label for="otp" class="block text-sm font-bold text-gray-700 mb-2">Kode Verifikasi (6 digit)</label>
+              <input type="text" id="otp" name="otp" required maxlength="6" pattern="[0-9]{6}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm font-medium text-center text-2xl tracking-widest" placeholder="000000" />
+              <p class="text-xs text-gray-500 mt-2 text-center">Masukkan 6 digit kode yang diterima via WhatsApp</p>
             </div>
 
             <button type="submit" class="w-full bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-pink-600 transition text-sm">
-              Kirim Kode OTP via WhatsApp
+              Verifikasi Akun
             </button>
           </form>
 
           <div class="mt-6 pt-6 border-t border-gray-200">
-            <p class="text-center text-sm text-gray-500 font-medium mb-4">Ingat password Anda?</p>
-            <a href="{{ url('login') }}" class="block w-full bg-brand-yellow text-gray-900 px-8 py-3 rounded-full font-bold shadow-md hover:bg-yellow-300 transition text-sm text-center">
-              Kembali ke Login
-            </a>
+            <p class="text-center text-sm text-gray-500 font-medium mb-4">Tidak menerima kode?</p>
+            <form action="{{ url('daftar/kirim-ulang-otp') }}" method="POST" class="mb-4">
+              @csrf
+              <button type="submit" class="w-full bg-gray-100 text-gray-700 px-8 py-3 rounded-full font-bold shadow-md hover:bg-gray-200 transition text-sm">
+                Kirim Ulang Kode
+              </button>
+            </form>
           </div>
 
           <div class="text-center mt-6">
-            <a href="{{ url('/') }}" class="text-sm text-gray-500 hover:text-brand-pink font-medium transition inline-flex items-center gap-1">
+            <a href="{{ url('login') }}" class="text-sm text-gray-500 hover:text-brand-pink font-medium transition inline-flex items-center gap-1">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Kembali ke Beranda
+              Kembali ke Login
             </a>
           </div>
+          @endif
         </div>
       </div>
     </div>
   </section>
 
-  @include('partials.footer', ['site_config' => $site])
+  @include('partials.footer', ['site_config' => $site_config])
+
+  <script>
+    // Auto focus and move to next input (if using multiple inputs)
+    document.getElementById('otp').addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+  </script>
 </body>
 </html>
