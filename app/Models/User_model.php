@@ -21,12 +21,15 @@ class User_model extends Model
         return $query;
     }
 
-    // Login dengan email
+    // Login dengan email atau username (untuk semua role termasuk Admin)
     public function loginByEmail($email, $password)
     {
         $query = DB::table('users')
             ->select('*')
-            ->where('users.email', $email)
+            ->where(function($q) use ($email) {
+                $q->where('users.email', $email)
+                  ->orWhere('users.username', $email);
+            })
             ->where('users.password', sha1($password))
             ->orderBy('id_user','DESC')
             ->first();

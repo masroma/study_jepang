@@ -79,8 +79,8 @@
             <input type="hidden" id="login_method" name="login_method" value="email" />
             
             <div id="email-field">
-              <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Email</label>
-              <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm font-medium" placeholder="Masukkan email" />
+              <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Email atau Username</label>
+              <input type="text" id="email" name="email" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition text-sm font-medium" placeholder="Masukkan email atau username" />
             </div>
             
             <div id="whatsapp-field" style="display: none;">
