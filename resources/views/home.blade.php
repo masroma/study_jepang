@@ -1,6 +1,8 @@
 @extends('layouts.main')
 
 @php
+use Illuminate\Support\Facades\Storage;
+
 // Get language from URL parameter or localStorage, default to 'id'
 $language = request()->get('lang', 'id');
 
@@ -135,12 +137,21 @@ if (!$hasSliders) {
     
     
       // Ambil gambar dari kolom person_image di database
-      // Format: base URL (APP_URL) + person_image
-      // Contoh: https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud + /assets/upload/image/hero/1771078612_699083d4bd1b8.png
-      $personImage = !empty($slide->person_image) ? 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$slide->person_image : asset('template/img/image5.png');
+      // Gunakan Storage untuk mendapatkan URL yang benar dari S3
+      $personImage = asset('template/img/image5.png'); // default
+      if (!empty($slide->person_image)) {
+        // Gunakan Storage untuk mendapatkan URL dari S3
+        $personImage = Storage::disk('s3')->url($slide->person_image);
+      }
       
       $image = $personImage;
-      $bgImage = !empty($slide->background_image) ? 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$slide->background_image : asset('template/img/image6.png');
+      
+      // Ambil background image dengan cara yang sama
+      $bgImage = asset('template/img/image6.png'); // default
+      if (!empty($slide->background_image)) {
+        // Gunakan Storage untuk mendapatkan URL dari S3
+        $bgImage = Storage::disk('s3')->url($slide->background_image);
+      }
 
      
      
@@ -159,9 +170,9 @@ if (!$hasSliders) {
           if (is_string($img) && (strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0)) {
             return $img;
           }
-          // If it's a local path, convert to full URL
+          // If it's a local path, convert to full URL using Storage
           if (is_string($img) && !empty($img)) {
-            return 'https://fls-a0c543d2-4cd0-4123-9942-96cee9e00b49.laravel.cloud/'.$img;
+            return Storage::disk('s3')->url($img);
           }
           return $img;
         }, $personImages);
@@ -171,15 +182,15 @@ if (!$hasSliders) {
     <div class="hero-slide absolute inset-0 w-full h-full flex items-start md:items-center pt-0 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-slide="{{ $index }}">
       <!-- Background -->
     
-      <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-        <img src="{{ $bgImage }}" class="w-full h-full object-cover opacity-60" alt="Background" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" />
-        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/90 md:via-white/80 to-transparent"></div>
+      <div class="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+        <img src="{{ $bgImage }}" class="hero-bg-image w-full h-full object-cover opacity-60 transition-all duration-1500 ease-in-out" alt="Background" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" />
+        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/90 md:via-white/80 to-transparent hero-gradient-overlay transition-opacity duration-1000"></div>
       </div>
 
       <!-- Content -->
       <div class="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-10 relative z-10 items-start md:items-center py-4 sm:py-8 md:py-0">
-        <div class="pt-0 md:pt-4 order-2 md:order-1">
-          <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold leading-tight text-gray-900 mb-2 sm:mb-2">
+        <div class="hero-content-text pt-0 md:pt-4 order-2 md:order-1">
+          <h1 class="hero-title text-xl sm:text-2xl md:text-4xl font-extrabold leading-tight text-gray-900 mb-2 sm:mb-2">
             <span class="relative inline-block">
               <span class="absolute -left-4 sm:-left-6 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border-2 border-white"></span>
               {{ $title }}
@@ -190,9 +201,9 @@ if (!$hasSliders) {
 
        
 
-          <p class="text-gray-500 mb-4 sm:mb-6 max-w-md leading-relaxed text-xs sm:text-sm font-medium">{{ $description }}</p>
+          <p class="hero-description text-gray-500 mb-4 sm:mb-6 max-w-md leading-relaxed text-xs sm:text-sm font-medium">{{ $description }}</p>
 
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
+          <div class="hero-buttons flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
             <a href="{{ $slide->button_link ?? url('daftar') }}" class="bg-brand-pink text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
               {{ $buttonText }} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
@@ -218,8 +229,8 @@ if (!$hasSliders) {
           </div>
           </div>
 
-          <div class="relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
-            <img src="{{ $image }}" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
+          <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
+            <img src="{{ $image }}" class="hero-person-image relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
         </div>
       </div>
     </div>
@@ -262,12 +273,116 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function showSlide(index) {
     slides.forEach((slide, i) => {
+      const bgImage = slide.querySelector('.hero-bg-image');
+      const personImage = slide.querySelector('.hero-person-image');
+      const contentText = slide.querySelector('.hero-content-text');
+      const title = slide.querySelector('.hero-title');
+      const description = slide.querySelector('.hero-description');
+      const buttons = slide.querySelector('.hero-buttons');
+      const personContainer = slide.querySelector('.hero-person-container');
+      
       if (i === index) {
+        // Fade in current slide
         slide.classList.remove('opacity-0', 'z-0');
         slide.classList.add('opacity-100', 'z-10');
+        
+        // Animate background with zoom and fade effect
+        if (bgImage) {
+          setTimeout(() => {
+            bgImage.style.transform = 'scale(1)';
+            bgImage.style.opacity = '0.6';
+          }, 50);
+        }
+        
+        // Animate person image with slide, fade, and scale
+        if (personImage) {
+          setTimeout(() => {
+            personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
+            personImage.style.opacity = '1';
+          }, 200);
+        }
+        
+        // Animate content text (slide from left)
+        if (contentText) {
+          setTimeout(() => {
+            contentText.style.transform = 'translateX(0) translateY(0)';
+            contentText.style.opacity = '1';
+          }, 300);
+        }
+        
+        // Animate title
+        if (title) {
+          setTimeout(() => {
+            title.style.transform = 'translateY(0)';
+            title.style.opacity = '1';
+          }, 400);
+        }
+        
+        // Animate description
+        if (description) {
+          setTimeout(() => {
+            description.style.transform = 'translateY(0)';
+            description.style.opacity = '1';
+          }, 500);
+        }
+        
+        // Animate buttons
+        if (buttons) {
+          setTimeout(() => {
+            buttons.style.transform = 'translateY(0)';
+            buttons.style.opacity = '1';
+          }, 600);
+        }
+        
+        // Animate person container
+        if (personContainer) {
+          setTimeout(() => {
+            personContainer.style.transform = 'translateX(0) scale(1)';
+            personContainer.style.opacity = '1';
+          }, 200);
+        }
       } else {
+        // Fade out other slides
         slide.classList.remove('opacity-100', 'z-10');
         slide.classList.add('opacity-0', 'z-0');
+        
+        // Reset background with zoom out
+        if (bgImage) {
+          bgImage.style.transform = 'scale(1.15)';
+          bgImage.style.opacity = '0';
+        }
+        
+        // Reset person image with slide out
+        if (personImage) {
+          personImage.style.transform = 'translateX(30px) translateY(15px) scale(0.9) rotate(-2deg)';
+          personImage.style.opacity = '0';
+        }
+        
+        // Reset content text
+        if (contentText) {
+          contentText.style.transform = 'translateX(-30px)';
+          contentText.style.opacity = '0';
+        }
+        
+        if (title) {
+          title.style.transform = 'translateY(-20px)';
+          title.style.opacity = '0';
+        }
+        
+        if (description) {
+          description.style.transform = 'translateY(-20px)';
+          description.style.opacity = '0';
+        }
+        
+        if (buttons) {
+          buttons.style.transform = 'translateY(-20px)';
+          buttons.style.opacity = '0';
+        }
+        
+        if (personContainer) {
+          personContainer.style.transform = 'translateX(50px) scale(0.95)';
+          personContainer.style.opacity = '0';
+        }
       }
     });
 
@@ -295,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function startAutoSlide() {
-    slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+    slideInterval = setInterval(nextSlide, 6000); // Change slide every 6 seconds for better viewing
   }
 
   function stopAutoSlide() {
@@ -321,10 +436,115 @@ document.addEventListener('DOMContentLoaded', function() {
     heroSlider.addEventListener('mouseleave', startAutoSlide);
   }
 
+  // Initialize first slide animations
+  setTimeout(() => {
+    const firstSlide = slides[0];
+    if (firstSlide) {
+      const bgImage = firstSlide.querySelector('.hero-bg-image');
+      const personImage = firstSlide.querySelector('.hero-person-image');
+      const contentText = firstSlide.querySelector('.hero-content-text');
+      const title = firstSlide.querySelector('.hero-title');
+      const description = firstSlide.querySelector('.hero-description');
+      const buttons = firstSlide.querySelector('.hero-buttons');
+      const personContainer = firstSlide.querySelector('.hero-person-container');
+      
+      if (bgImage) {
+        bgImage.style.transform = 'scale(1)';
+        bgImage.style.opacity = '0.6';
+      }
+      
+      if (personImage) {
+        personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
+        personImage.style.opacity = '1';
+      }
+      
+      if (contentText) {
+        contentText.style.transform = 'translateX(0) translateY(0)';
+        contentText.style.opacity = '1';
+      }
+      
+      if (title) {
+        title.style.transform = 'translateY(0)';
+        title.style.opacity = '1';
+      }
+      
+      if (description) {
+        description.style.transform = 'translateY(0)';
+        description.style.opacity = '1';
+      }
+      
+      if (buttons) {
+        buttons.style.transform = 'translateY(0)';
+        buttons.style.opacity = '1';
+      }
+      
+      if (personContainer) {
+        personContainer.style.transform = 'translateX(0) scale(1)';
+        personContainer.style.opacity = '1';
+      }
+    }
+  }, 100);
+
   // Start auto slide
   startAutoSlide();
 });
 </script>
+
+<style>
+.hero-bg-image {
+  transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-person-image {
+  transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-slide {
+  transition: opacity 1s ease-in-out !important;
+}
+
+.hero-content-text {
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-title {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-description {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-buttons {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-person-container {
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s ease-in-out !important;
+  will-change: transform, opacity;
+}
+
+.hero-gradient-overlay {
+  transition: opacity 1s ease-in-out !important;
+}
+
+/* Smooth hover effects */
+.hero-slider-dot:hover {
+  transform: scale(1.2);
+}
+
+.hero-slider-prev:hover,
+.hero-slider-next:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+</style>
 @endpush
 @endsection
 

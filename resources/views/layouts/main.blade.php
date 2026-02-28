@@ -167,8 +167,12 @@
             </select>
           </div>
 
-          <a href="{{ url('login') }}" class="text-sm font-bold text-gray-600 hover:text-brand-pink px-3">Masuk</a>
-          <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-pink-600 transition">Daftar</a>
+          @if(session('username'))
+            <a href="{{ url('member/dashboard') }}" class="bg-brand-pink text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-pink-600 transition">Akses Dashboard</a>
+          @else
+            <a href="{{ url('login') }}" class="text-sm font-bold text-gray-600 hover:text-brand-pink px-3">Masuk</a>
+            <a href="{{ url('daftar') }}" class="bg-brand-pink text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-pink-600 transition">Daftar</a>
+          @endif
         </div>
 
         <!-- Mobile Menu Button -->
@@ -241,12 +245,18 @@
                 <option value="jp">🇯🇵 JP</option>
               </select>
             </div>
-            <a href="{{ url('login') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-              Masuk
-            </a>
-            <a href="{{ url('daftar') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-white bg-brand-pink rounded-lg hover:bg-pink-600 transition shadow-lg">
-              Daftar
-            </a>
+            @if(session('username'))
+              <a href="{{ url('member/dashboard') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-white bg-brand-pink rounded-lg hover:bg-pink-600 transition shadow-lg">
+                Akses Dashboard
+              </a>
+            @else
+              <a href="{{ url('login') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                Masuk
+              </a>
+              <a href="{{ url('daftar') }}" class="block w-full text-center px-4 py-3 text-base font-bold text-white bg-brand-pink rounded-lg hover:bg-pink-600 transition shadow-lg">
+                Daftar
+              </a>
+            @endif
           </div>
         </div>
       </div>

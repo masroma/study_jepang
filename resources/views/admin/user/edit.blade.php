@@ -35,7 +35,14 @@
 <div class="form-group row">
 	<label class="col-sm-3 control-label text-right">Password</label>
 	<div class="col-sm-9">
-		<input type="password" name="password" class="form-control" placeholder="Password" value="<?php echo $user->password ?>" required>
+		<div class="input-group">
+			<input type="password" name="password" id="password" class="form-control" placeholder="Password" value="<?php echo $user->password ?>" required>
+			<div class="input-group-append">
+				<button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password', 'eye-icon-password')">
+					<i id="eye-icon-password" class="fa fa-eye"></i>
+				</button>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -69,3 +76,19 @@
 </div>
 </form>
 
+<script>
+function togglePassword(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const eyeIcon = document.getElementById(iconId);
+    
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = "password";
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+</script>

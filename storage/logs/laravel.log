@@ -27651,3 +27651,7 @@ Did you mean this?
 [2026-02-22 08:38:51] local.INFO: WhatsApp message sent {"phone":"6283890435839","status":200,"response":{"detail":"success! message in queue","id":[144691134],"process":"pending","quota":{"083890435839":{"details":"deduced from total quota","quota":943,"remaining":942,"used":1}},"requestid":391789780,"status":true,"target":["6283890435839"]}} 
 [2026-02-22 08:44:19] local.INFO: WhatsApp message sent {"phone":"6283890435839","status":200,"response":{"detail":"success! message in queue","id":[144691447],"process":"pending","quota":{"083890435839":{"details":"deduced from total quota","quota":942,"remaining":941,"used":1}},"requestid":391793464,"status":true,"target":["6283890435839"]}} 
 [2026-02-22 08:47:29] local.INFO: WhatsApp message sent {"phone":"6283890435839","status":200,"response":{"detail":"success! message in queue","id":[144691591],"process":"pending","quota":{"083890435839":{"details":"deduced from total quota","quota":941,"remaining":940,"used":1}},"requestid":391795893,"status":true,"target":["6283890435839"]}} 
+[2026-02-27 22:46:00] local.ERROR: Maximum execution time of 60 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 60 seconds exceeded at C:/project/study_jepang/vendor/aws/aws-sdk-php/src/Api/Parser/AbstractRestParser.php:14)
+[stacktrace]
+#0 {main}
+"} 
