@@ -99,7 +99,7 @@ class HeroSliderController extends Controller
             $file = $request->file('background_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $background_image = 'assets/upload/image/hero/' . $filename;
         }
 
@@ -109,7 +109,7 @@ class HeroSliderController extends Controller
             $file = $request->file('person_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $person_image = 'assets/upload/image/hero/' . $filename;
         }
 
@@ -119,7 +119,7 @@ class HeroSliderController extends Controller
             foreach ($request->file('person_images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
                 $person_images[] = 'assets/upload/image/hero/' . $filename;
             }
         }
@@ -182,13 +182,13 @@ class HeroSliderController extends Controller
         $background_image = $slider->background_image;
         if ($request->hasFile('background_image')) {
             // Delete old image
-            if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
-                Storage::disk('s3')->delete($slider->background_image);
+            if ($slider->background_image && Storage::disk('public')->exists($slider->background_image)) {
+                Storage::disk('public')->delete($slider->background_image);
             }
             $file = $request->file('background_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $background_image = 'assets/upload/image/hero/' . $filename;
         }
 
@@ -196,13 +196,13 @@ class HeroSliderController extends Controller
         $person_image = $slider->person_image;
         if ($request->hasFile('person_image')) {
             // Delete old image
-            if ($slider->person_image && Storage::disk('s3')->exists($slider->person_image)) {
-                Storage::disk('s3')->delete($slider->person_image);
+            if ($slider->person_image && Storage::disk('public')->exists($slider->person_image)) {
+                Storage::disk('public')->delete($slider->person_image);
             }
             $file = $request->file('person_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $person_image = 'assets/upload/image/hero/' . $filename;
         }
 
@@ -220,8 +220,8 @@ class HeroSliderController extends Controller
             // Delete old person_images (multiple images) - BUKAN person_image (single)
             if (!empty($person_images) && is_array($person_images)) {
                 foreach ($person_images as $oldImage) {
-                    if ($oldImage && Storage::disk('s3')->exists($oldImage)) {
-                        Storage::disk('s3')->delete($oldImage);
+                    if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                        Storage::disk('public')->delete($oldImage);
                     }
                 }
             }
@@ -231,7 +231,7 @@ class HeroSliderController extends Controller
             foreach ($request->file('person_images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
                 $person_images[] = 'assets/upload/image/hero/' . $filename;
             }
         }
@@ -285,18 +285,18 @@ class HeroSliderController extends Controller
         }
 
         // Delete images
-        if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
-            Storage::disk('s3')->delete($slider->background_image);
+        if ($slider->background_image && Storage::disk('public')->exists($slider->background_image)) {
+            Storage::disk('public')->delete($slider->background_image);
         }
         
-        if ($slider->person_image && Storage::disk('s3')->exists($slider->person_image)) {
-            Storage::disk('s3')->delete($slider->person_image);
+        if ($slider->person_image && Storage::disk('public')->exists($slider->person_image)) {
+            Storage::disk('public')->delete($slider->person_image);
         }
         
         if (!empty($slider->person_images) && is_array($slider->person_images)) {
             foreach ($slider->person_images as $image) {
-                if ($image && Storage::disk('s3')->exists($image)) {
-                    Storage::disk('s3')->delete($image);
+                if ($image && Storage::disk('public')->exists($image)) {
+                    Storage::disk('public')->delete($image);
                 }
             }
         }

@@ -92,7 +92,7 @@
                         <label for="gambar" class="block text-sm font-semibold text-gray-700 mb-2">Foto Profil</label>
                         @if($user->gambar)
                         <div class="mb-3">
-                            <img src="{{ Storage::disk('s3')->url('assets/upload/user/' . $user->gambar) }}" alt="Current Photo" class="w-20 h-20 object-cover rounded-full border-2 border-gray-200">
+                            <img src="{{ Storage::disk('public')->url('assets/upload/user/' . $user->gambar) }}" alt="Current Photo" class="w-20 h-20 object-cover rounded-full border-2 border-gray-200">
                             <p class="text-xs text-gray-500 mt-1">Foto saat ini</p>
                         </div>
                         @endif

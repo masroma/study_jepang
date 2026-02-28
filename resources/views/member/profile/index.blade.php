@@ -24,7 +24,7 @@
                     <div class="flex items-center space-x-6">
                         <div class="flex-shrink-0">
                             @if($user->gambar)
-                                <img src="{{ Storage::disk('s3')->url('assets/upload/user/thumbs/' . $user->gambar) }}" 
+                                <img src="{{ Storage::disk('public')->url('assets/upload/user/thumbs/' . $user->gambar) }}" 
                                      alt="Profile Picture" 
                                      class="w-24 h-24 rounded-full object-cover border-4 border-gray-100">
                             @else

@@ -153,7 +153,7 @@ class ProdukV2Controller extends Controller
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/produk/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -208,14 +208,14 @@ class ProdukV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($produk->gambar && Storage::disk('s3')->exists('uploads/produk/' . $produk->gambar)) {
-                Storage::disk('s3')->delete('uploads/produk/' . $produk->gambar);
+            if ($produk->gambar && Storage::disk('public')->exists('uploads/produk/' . $produk->gambar)) {
+                Storage::disk('public')->delete('uploads/produk/' . $produk->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/produk/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -240,8 +240,8 @@ class ProdukV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($produk->gambar && Storage::disk('s3')->exists('uploads/produk/' . $produk->gambar)) {
-            Storage::disk('s3')->delete('uploads/produk/' . $produk->gambar);
+        if ($produk->gambar && Storage::disk('public')->exists('uploads/produk/' . $produk->gambar)) {
+            Storage::disk('public')->delete('uploads/produk/' . $produk->gambar);
         }
         
         $produk->delete();

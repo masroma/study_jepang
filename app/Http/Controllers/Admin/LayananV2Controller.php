@@ -136,7 +136,7 @@ class LayananV2Controller extends Controller
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/layanan/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -187,14 +187,14 @@ class LayananV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($layanan->gambar && Storage::disk('s3')->exists('uploads/layanan/' . $layanan->gambar)) {
-                Storage::disk('s3')->delete('uploads/layanan/' . $layanan->gambar);
+            if ($layanan->gambar && Storage::disk('public')->exists('uploads/layanan/' . $layanan->gambar)) {
+                Storage::disk('public')->delete('uploads/layanan/' . $layanan->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/layanan/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -219,8 +219,8 @@ class LayananV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($layanan->gambar && Storage::disk('s3')->exists('uploads/layanan/' . $layanan->gambar)) {
-            Storage::disk('s3')->delete('uploads/layanan/' . $layanan->gambar);
+        if ($layanan->gambar && Storage::disk('public')->exists('uploads/layanan/' . $layanan->gambar)) {
+            Storage::disk('public')->delete('uploads/layanan/' . $layanan->gambar);
         }
         
         $layanan->delete();

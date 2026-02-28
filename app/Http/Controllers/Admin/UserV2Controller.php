@@ -131,12 +131,12 @@ class UserV2Controller extends Controller
             
             // Upload original image to S3
             $s3Path = 'assets/upload/user/' . $nama_file;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             
             // Create thumbnail and upload to S3
             $img = Image::make($image->getRealPath())->resize(150, 150);
             $thumbnailPath = 'assets/upload/user/thumbs/' . $nama_file;
-            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+            Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             
             $data['gambar'] = $nama_file;
         }
@@ -188,11 +188,11 @@ class UserV2Controller extends Controller
             if ($user->gambar) {
                 $oldImagePath = 'assets/upload/user/' . $user->gambar;
                 $oldThumbPath = 'assets/upload/user/thumbs/' . $user->gambar;
-                if (Storage::disk('s3')->exists($oldImagePath)) {
-                    Storage::disk('s3')->delete($oldImagePath);
+                if (Storage::disk('public')->exists($oldImagePath)) {
+                    Storage::disk('public')->delete($oldImagePath);
                 }
-                if (Storage::disk('s3')->exists($oldThumbPath)) {
-                    Storage::disk('s3')->delete($oldThumbPath);
+                if (Storage::disk('public')->exists($oldThumbPath)) {
+                    Storage::disk('public')->delete($oldThumbPath);
                 }
             }
 
@@ -203,12 +203,12 @@ class UserV2Controller extends Controller
             
             // Upload original image to S3
             $s3Path = 'assets/upload/user/' . $nama_file;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             
             // Create thumbnail and upload to S3
             $img = Image::make($image->getRealPath())->resize(150, 150);
             $thumbnailPath = 'assets/upload/user/thumbs/' . $nama_file;
-            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+            Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             
             $data['gambar'] = $nama_file;
         }
@@ -235,11 +235,11 @@ class UserV2Controller extends Controller
         if ($user->gambar) {
             $oldImagePath = 'assets/upload/user/' . $user->gambar;
             $oldThumbPath = 'assets/upload/user/thumbs/' . $user->gambar;
-            if (Storage::disk('s3')->exists($oldImagePath)) {
-                Storage::disk('s3')->delete($oldImagePath);
+            if (Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
             }
-            if (Storage::disk('s3')->exists($oldThumbPath)) {
-                Storage::disk('s3')->delete($oldThumbPath);
+            if (Storage::disk('public')->exists($oldThumbPath)) {
+                Storage::disk('public')->delete($oldThumbPath);
             }
         }
         

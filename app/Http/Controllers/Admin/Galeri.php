@@ -146,12 +146,12 @@ class Galeri extends Controller
         
         // Upload original image to S3
         $s3Path = 'assets/upload/image/' . $input['nama_file'];
-        Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+        Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         
         // Create thumbnail and upload to S3
         $img = Image::make($image->getRealPath())->resize(150, 150);
         $thumbnailPath = 'assets/upload/image/thumbs/' . $input['nama_file'];
-        Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+        Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
         // END UPLOAD
         $slug_nama_galeri = Str::slug($request->nama_galeri, '-');
         if($request->mulai_diskon=='') {

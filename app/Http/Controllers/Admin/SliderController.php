@@ -375,82 +375,56 @@ class SliderController extends Controller
     }
 
     /**
-     * Check if S3 is properly configured
-     */
-    private function isS3Configured()
-    {
-        try {
-            $bucket = config('filesystems.disks.s3.bucket');
-            return !empty($bucket);
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Helper function to safely get image URL from S3
+     * Helper function to get image URL from public storage
      */
     private function getImageUrl($path)
     {
         try {
-            if (!$this->isS3Configured()) {
-                return null;
-            }
-            return Storage::disk('s3')->url($path);
+            return Storage::disk('public')->url($path);
         } catch (\Exception $e) {
-            Log::error('Error getting S3 image URL: ' . $e->getMessage());
+            Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Helper function to safely check if file exists in S3
+     * Helper function to check if file exists in public storage
      */
     private function s3Exists($path)
     {
         try {
-            if (!$this->isS3Configured()) {
-                return false;
-            }
-            return Storage::disk('s3')->exists($path);
+            return Storage::disk('public')->exists($path);
         } catch (\Exception $e) {
-            Log::error('Error checking S3 file existence: ' . $e->getMessage());
+            Log::error('Error checking file existence: ' . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Helper function to safely delete file from S3
+     * Helper function to delete file from public storage
      */
     private function s3Delete($path)
     {
         try {
-            if (!$this->isS3Configured()) {
-                return false;
-            }
             if ($this->s3Exists($path)) {
-                return Storage::disk('s3')->delete($path);
+                return Storage::disk('public')->delete($path);
             }
             return false;
         } catch (\Exception $e) {
-            Log::error('Error deleting S3 file: ' . $e->getMessage());
+            Log::error('Error deleting file: ' . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Helper function to safely upload file to S3
+     * Helper function to upload file to public storage
      */
     private function s3Put($path, $contents, $visibility = 'public')
     {
         try {
-            if (!$this->isS3Configured()) {
-                Log::error('S3 not configured, cannot upload file: ' . $path);
-                return false;
-            }
-            return Storage::disk('s3')->put($path, $contents, $visibility);
+            return Storage::disk('public')->put($path, $contents, $visibility);
         } catch (\Exception $e) {
-            Log::error('Error uploading to S3: ' . $e->getMessage());
+            Log::error('Error uploading file: ' . $e->getMessage());
             return false;
         }
     }

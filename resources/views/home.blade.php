@@ -141,7 +141,7 @@ if (!$hasSliders) {
       $personImage = asset('template/img/image5.png'); // default
       if (!empty($slide->person_image)) {
         // Gunakan Storage untuk mendapatkan URL dari S3
-        $personImage = Storage::disk('s3')->url($slide->person_image);
+        $personImage = Storage::disk('public')->url($slide->person_image);
       }
       
       $image = $personImage;
@@ -150,7 +150,7 @@ if (!$hasSliders) {
       $bgImage = asset('template/img/image6.png'); // default
       if (!empty($slide->background_image)) {
         // Gunakan Storage untuk mendapatkan URL dari S3
-        $bgImage = Storage::disk('s3')->url($slide->background_image);
+        $bgImage = Storage::disk('public')->url($slide->background_image);
       }
 
      
@@ -172,7 +172,7 @@ if (!$hasSliders) {
           }
           // If it's a local path, convert to full URL using Storage
           if (is_string($img) && !empty($img)) {
-            return Storage::disk('s3')->url($img);
+            return Storage::disk('public')->url($img);
           }
           return $img;
         }, $personImages);

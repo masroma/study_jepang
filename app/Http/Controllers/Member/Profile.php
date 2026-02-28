@@ -68,12 +68,12 @@ class Profile extends Controller
             
             // Upload original image to S3
             $s3Path = 'assets/upload/user/' . $input['nama_file'];
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             
             // Create thumbnail and upload to S3
             $img = Image::make($image->getRealPath())->resize(150, 150);
             $thumbnailPath = 'assets/upload/user/thumbs/' . $input['nama_file'];
-            Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+            Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
             
             $updateData['gambar'] = $input['nama_file'];
         }

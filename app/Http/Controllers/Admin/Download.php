@@ -124,8 +124,8 @@ class Download extends Controller
             'hits'      => $hits
         ]);
         $s3Path = 'assets/upload/file/' . $download->gambar;
-        if (Storage::disk('s3')->exists($s3Path)) {
-            return Storage::disk('s3')->download($s3Path, $download->gambar);
+        if (Storage::disk('public')->exists($s3Path)) {
+            return Storage::disk('public')->download($s3Path, $download->gambar);
         }
         return redirect()->back()->with(['warning' => 'File tidak ditemukan']);
     }
@@ -160,7 +160,7 @@ class Download extends Controller
         $filename               = pathinfo($filenamewithextension, PATHINFO_FILENAME);
         $input['nama_file']     = Str::slug($filename, '-').'-'.time().'.'.$image->getClientOriginalExtension();
         $s3Path = 'assets/upload/file/' . $input['nama_file'];
-        Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+        Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         // END UPLOAD
         DB::table('download')->insert([
             'id_kategori_download'  => $request->id_kategori_download,

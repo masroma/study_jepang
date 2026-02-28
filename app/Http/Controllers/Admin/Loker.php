@@ -89,8 +89,8 @@ class Loker extends Controller
         $loker = $myloker->detail($id_loker);
         
         // Hapus gambar jika ada
-        if($loker->gambar && Storage::disk('s3')->exists('assets/upload/image/loker/'.$loker->gambar)) {
-            Storage::disk('s3')->delete('assets/upload/image/loker/'.$loker->gambar);
+        if($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/'.$loker->gambar)) {
+            Storage::disk('public')->delete('assets/upload/image/loker/'.$loker->gambar);
         }
         
         DB::table('loker')->where('id_loker',$id_loker)->delete();
@@ -108,8 +108,8 @@ class Loker extends Controller
             $id_lokernya = $request->id_loker;
             for($i=0; $i < sizeof($id_lokernya);$i++) {
                 $loker = DB::table('loker')->where('id_loker',$id_lokernya[$i])->first();
-                if($loker->gambar && Storage::disk('s3')->exists('assets/upload/image/loker/'.$loker->gambar)) {
-                    Storage::disk('s3')->delete('assets/upload/image/loker/'.$loker->gambar);
+                if($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/'.$loker->gambar)) {
+                    Storage::disk('public')->delete('assets/upload/image/loker/'.$loker->gambar);
                 }
                 DB::table('loker')->where('id_loker',$id_lokernya[$i])->delete();
             }
@@ -170,7 +170,7 @@ class Loker extends Controller
             $image = $request->file('gambar');
             $gambar = time().'.'.$image->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/loker/' . $gambar;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         }
 
         $data = [
@@ -225,14 +225,14 @@ class Loker extends Controller
         $gambar = $loker->gambar;
         if($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if($gambar && Storage::disk('s3')->exists('assets/upload/image/loker/'.$gambar)) {
-                Storage::disk('s3')->delete('assets/upload/image/loker/'.$gambar);
+            if($gambar && Storage::disk('public')->exists('assets/upload/image/loker/'.$gambar)) {
+                Storage::disk('public')->delete('assets/upload/image/loker/'.$gambar);
             }
 
             $image = $request->file('gambar');
             $gambar = time().'.'.$image->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/loker/' . $gambar;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
         }
 
         $data = [

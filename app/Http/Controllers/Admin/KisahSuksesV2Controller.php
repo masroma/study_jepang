@@ -138,7 +138,7 @@ class KisahSuksesV2Controller extends Controller
             $image = $request->file('foto');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/kisah-sukses/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['foto'] = $imageName;
         }
 
@@ -147,7 +147,7 @@ class KisahSuksesV2Controller extends Controller
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
             $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
             $data['video_file'] = $videoName;
         }
 
@@ -193,28 +193,28 @@ class KisahSuksesV2Controller extends Controller
         // Upload foto baru
         if ($request->hasFile('foto')) {
             // Hapus foto lama
-            if ($kisah->foto && Storage::disk('s3')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
-                Storage::disk('s3')->delete('uploads/kisah-sukses/' . $kisah->foto);
+            if ($kisah->foto && Storage::disk('public')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
+                Storage::disk('public')->delete('uploads/kisah-sukses/' . $kisah->foto);
             }
 
             $image = $request->file('foto');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/kisah-sukses/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['foto'] = $imageName;
         }
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
             // Hapus video lama
-            if ($kisah->video_file && Storage::disk('s3')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
-                Storage::disk('s3')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
+            if ($kisah->video_file && Storage::disk('public')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
+                Storage::disk('public')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
             }
 
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
             $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
             $data['video_file'] = $videoName;
         }
 
@@ -240,13 +240,13 @@ class KisahSuksesV2Controller extends Controller
         }
 
         // Hapus foto
-        if ($kisah->foto && Storage::disk('s3')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
-            Storage::disk('s3')->delete('uploads/kisah-sukses/' . $kisah->foto);
+        if ($kisah->foto && Storage::disk('public')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
+            Storage::disk('public')->delete('uploads/kisah-sukses/' . $kisah->foto);
         }
         
         // Hapus video file
-        if ($kisah->video_file && Storage::disk('s3')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
-            Storage::disk('s3')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
+        if ($kisah->video_file && Storage::disk('public')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
+            Storage::disk('public')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
         }
         
         $kisah->delete();

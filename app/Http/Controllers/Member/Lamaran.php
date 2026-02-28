@@ -105,9 +105,9 @@ class Lamaran extends Controller
 
         $filePath = 'assets/upload/file/cv/' . $lamaran->cv_file;
         
-        if(Storage::disk('s3')->exists($filePath)) {
-            $fileContent = Storage::disk('s3')->get($filePath);
-            $mimeType = Storage::disk('s3')->mimeType($filePath);
+        if(Storage::disk('public')->exists($filePath)) {
+            $fileContent = Storage::disk('public')->get($filePath);
+            $mimeType = Storage::disk('public')->mimeType($filePath);
             
             return response($fileContent, 200)
                 ->header('Content-Type', $mimeType)

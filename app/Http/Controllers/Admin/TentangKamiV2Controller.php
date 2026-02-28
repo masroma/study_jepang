@@ -74,11 +74,11 @@ class TentangKamiV2Controller extends Controller
         // Upload gambar
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama jika ada
-            if ($site->gambar && Storage::disk('s3')->exists('assets/upload/image/' . $site->gambar)) {
-                Storage::disk('s3')->delete('assets/upload/image/' . $site->gambar);
+            if ($site->gambar && Storage::disk('public')->exists('assets/upload/image/' . $site->gambar)) {
+                Storage::disk('public')->delete('assets/upload/image/' . $site->gambar);
                 // Hapus thumbnail juga jika ada
-                if (Storage::disk('s3')->exists('assets/upload/image/thumbs/' . $site->gambar)) {
-                    Storage::disk('s3')->delete('assets/upload/image/thumbs/' . $site->gambar);
+                if (Storage::disk('public')->exists('assets/upload/image/thumbs/' . $site->gambar)) {
+                    Storage::disk('public')->delete('assets/upload/image/thumbs/' . $site->gambar);
                 }
             }
 
@@ -89,7 +89,7 @@ class TentangKamiV2Controller extends Controller
             
             // Upload ke S3
             $s3Path = 'assets/upload/image/' . $nama_file;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             
             $updateData['gambar'] = $nama_file;
         }

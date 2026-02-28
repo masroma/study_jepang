@@ -40,7 +40,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($loker->gambar)
-                                <img src="{{ Storage::disk('s3')->url('assets/upload/image/loker/' . $loker->gambar) }}" alt="Lowongan" class="w-16 h-16 object-cover rounded-lg">
+                                <img src="{{ Storage::disk('public')->url('assets/upload/image/loker/' . $loker->gambar) }}" alt="Lowongan" class="w-16 h-16 object-cover rounded-lg">
                             @else
                                 <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-briefcase text-gray-400"></i>

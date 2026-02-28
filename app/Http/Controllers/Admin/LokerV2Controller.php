@@ -145,7 +145,7 @@ class LokerV2Controller extends Controller
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/loker/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -201,14 +201,14 @@ class LokerV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($loker->gambar && Storage::disk('s3')->exists('assets/upload/image/loker/' . $loker->gambar)) {
-                Storage::disk('s3')->delete('assets/upload/image/loker/' . $loker->gambar);
+            if ($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/' . $loker->gambar)) {
+                Storage::disk('public')->delete('assets/upload/image/loker/' . $loker->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/loker/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -233,8 +233,8 @@ class LokerV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($loker->gambar && Storage::disk('s3')->exists('assets/upload/image/loker/' . $loker->gambar)) {
-            Storage::disk('s3')->delete('assets/upload/image/loker/' . $loker->gambar);
+        if ($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/' . $loker->gambar)) {
+            Storage::disk('public')->delete('assets/upload/image/loker/' . $loker->gambar);
         }
         
         $loker->delete();

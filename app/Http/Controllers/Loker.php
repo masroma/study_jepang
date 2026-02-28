@@ -91,7 +91,7 @@ class Loker extends Controller
             $file = $request->file('cv_file');
             $cv_file = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
             $s3Path = 'assets/upload/file/cv/' . $cv_file;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
         }
 
         // Simpan data pendaftaran

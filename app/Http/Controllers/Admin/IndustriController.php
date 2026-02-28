@@ -88,7 +88,7 @@ class IndustriController extends Controller
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/industri/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $request->merge(['gambar' => $imageName]);
         }
 
@@ -115,14 +115,14 @@ class IndustriController extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($industry->gambar && Storage::disk('s3')->exists('uploads/industri/' . $industry->gambar)) {
-                Storage::disk('s3')->delete('uploads/industri/' . $industry->gambar);
+            if ($industry->gambar && Storage::disk('public')->exists('uploads/industri/' . $industry->gambar)) {
+                Storage::disk('public')->delete('uploads/industri/' . $industry->gambar);
             }
 
             $image = $request->file('gambar');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $s3Path = 'uploads/industri/' . $imageName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
             $data['gambar'] = $imageName;
         }
 
@@ -137,8 +137,8 @@ class IndustriController extends Controller
         $industry = Industri::findOrFail($id_industri);
         
         // Hapus gambar
-        if ($industry->gambar && Storage::disk('s3')->exists('uploads/industri/' . $industry->gambar)) {
-            Storage::disk('s3')->delete('uploads/industri/' . $industry->gambar);
+        if ($industry->gambar && Storage::disk('public')->exists('uploads/industri/' . $industry->gambar)) {
+            Storage::disk('public')->delete('uploads/industri/' . $industry->gambar);
         }
         
         $industry->delete();

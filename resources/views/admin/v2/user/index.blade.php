@@ -66,7 +66,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($user->gambar)
-                                <img src="{{ Storage::disk('s3')->url('assets/upload/user/' . $user->gambar) }}" alt="User" class="w-12 h-12 object-cover rounded-full">
+                                <img src="{{ Storage::disk('public')->url('assets/upload/user/' . $user->gambar) }}" alt="User" class="w-12 h-12 object-cover rounded-full">
                             @else
                                 <div class="w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center text-white font-bold">
                                     {{ strtoupper(substr($user->nama, 0, 1)) }}

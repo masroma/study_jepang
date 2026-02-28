@@ -72,8 +72,8 @@ class PendaftaranLoker extends Controller
         $pendaftaran = $mypendaftaran->detail($id_pendaftaran);
         
         // Hapus file CV jika ada
-        if($pendaftaran->cv_file && Storage::disk('s3')->exists('assets/upload/file/cv/'.$pendaftaran->cv_file)) {
-            Storage::disk('s3')->delete('assets/upload/file/cv/'.$pendaftaran->cv_file);
+        if($pendaftaran->cv_file && Storage::disk('public')->exists('assets/upload/file/cv/'.$pendaftaran->cv_file)) {
+            Storage::disk('public')->delete('assets/upload/file/cv/'.$pendaftaran->cv_file);
         }
         
         DB::table('pendaftaran_loker')->where('id_pendaftaran',$id_pendaftaran)->delete();

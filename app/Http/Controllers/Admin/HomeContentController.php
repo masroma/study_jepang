@@ -71,7 +71,7 @@ class HomeContentController extends Controller
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $s3Path = 'upload/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $image = $filename;
         }
 
@@ -80,7 +80,7 @@ class HomeContentController extends Controller
             $file = $request->file('video');
             $filename = time() . '_' . $file->getClientOriginalName();
             $s3Path = 'upload/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $video = $filename;
         }
 
@@ -112,26 +112,26 @@ class HomeContentController extends Controller
         $image = $content->image;
         if ($request->hasFile('image')) {
             // Delete old image
-            if ($content->image && Storage::disk('s3')->exists('upload/' . $content->image)) {
-                Storage::disk('s3')->delete('upload/' . $content->image);
+            if ($content->image && Storage::disk('public')->exists('upload/' . $content->image)) {
+                Storage::disk('public')->delete('upload/' . $content->image);
             }
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $s3Path = 'upload/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $image = $filename;
         }
 
         $video = $content->video;
         if ($request->hasFile('video')) {
             // Delete old video
-            if ($content->video && Storage::disk('s3')->exists('upload/' . $content->video)) {
-                Storage::disk('s3')->delete('upload/' . $content->video);
+            if ($content->video && Storage::disk('public')->exists('upload/' . $content->video)) {
+                Storage::disk('public')->delete('upload/' . $content->video);
             }
             $file = $request->file('video');
             $filename = time() . '_' . $file->getClientOriginalName();
             $s3Path = 'upload/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            Storage::disk('public')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             $video = $filename;
         }
 
@@ -155,11 +155,11 @@ class HomeContentController extends Controller
             return redirect('login')->with(['warning' => 'Mohon maaf, Anda belum login']);
         }
         $content = HomeContent::find($id);
-        if ($content->image && Storage::disk('s3')->exists('upload/' . $content->image)) {
-            Storage::disk('s3')->delete('upload/' . $content->image);
+        if ($content->image && Storage::disk('public')->exists('upload/' . $content->image)) {
+            Storage::disk('public')->delete('upload/' . $content->image);
         }
-        if ($content->video && Storage::disk('s3')->exists('upload/' . $content->video)) {
-            Storage::disk('s3')->delete('upload/' . $content->video);
+        if ($content->video && Storage::disk('public')->exists('upload/' . $content->video)) {
+            Storage::disk('public')->delete('upload/' . $content->video);
         }
         $content->delete();
         return redirect('admin/home_content')->with(['sukses' => 'Konten telah dihapus']);

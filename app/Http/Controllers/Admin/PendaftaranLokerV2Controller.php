@@ -137,8 +137,8 @@ class PendaftaranLokerV2Controller extends Controller
         }
 
         // Hapus file CV jika ada
-        if ($pelamar->cv_file && Storage::disk('s3')->exists('assets/upload/file/cv/' . $pelamar->cv_file)) {
-            Storage::disk('s3')->delete('assets/upload/file/cv/' . $pelamar->cv_file);
+        if ($pelamar->cv_file && Storage::disk('public')->exists('assets/upload/file/cv/' . $pelamar->cv_file)) {
+            Storage::disk('public')->delete('assets/upload/file/cv/' . $pelamar->cv_file);
         }
         
         $pelamar->delete();
@@ -161,8 +161,8 @@ class PendaftaranLokerV2Controller extends Controller
 
         $filePath = 'assets/upload/file/cv/' . $pelamar->cv_file;
         
-        if (Storage::disk('s3')->exists($filePath)) {
-            $fileUrl = Storage::disk('s3')->url($filePath);
+        if (Storage::disk('public')->exists($filePath)) {
+            $fileUrl = Storage::disk('public')->url($filePath);
             return redirect($fileUrl);
         }
 
