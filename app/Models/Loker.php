@@ -25,6 +25,7 @@ class Loker extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'status_loker',
+        'tipe_loker',
         'gambar',
         'urutan'
     ];

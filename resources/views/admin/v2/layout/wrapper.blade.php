@@ -144,6 +144,33 @@
                             <span>Manajemen User</span>
                         </a>
                     </li>
+                    <li class="pt-4">
+                        <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">Mitra & Komisi</div>
+                    </li>
+                    <li>
+                        <a href="{{ url('admin/v2/mitra') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('admin/v2/mitra') && !request()->is('admin/v2/mitra/*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-handshake w-5"></i>
+                            <span>Daftar Mitra</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('admin/v2/mitra/setting-komisi') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('admin/v2/mitra/setting-komisi*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Setting Komisi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('admin/v2/mitra/referal') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('admin/v2/mitra/referal*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-users w-5"></i>
+                            <span>Data Referal</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('admin/v2/mitra/withdraw') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('admin/v2/mitra/withdraw*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-money-bill-wave w-5"></i>
+                            <span>List Withdraw</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 

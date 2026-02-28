@@ -161,19 +161,6 @@
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="background_image" class="block text-sm font-semibold text-gray-700 mb-2">Background Image</label>
-                        <input type="file" id="background_image" name="background_image" accept="image/*"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
-                        @if($slider->background_image_url)
-                            <div class="mt-3">
-                                <img src="{{ $slider->background_image_url }}" alt="Current background" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
-                                <p class="text-xs text-gray-500 mt-2">Gambar saat ini (kosongkan jika tidak ingin mengubah)</p>
-                            </div>
-                        @endif
-                        <p class="text-xs text-gray-500 mt-1">Gambar latar belakang untuk slider</p>
-                    </div>
-
-                    <div>
                         <label for="person_image" class="block text-sm font-semibold text-gray-700 mb-2">Person Image</label>
                         <input type="file" id="person_image" name="person_image" accept="image/*"
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">

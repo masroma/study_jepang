@@ -135,10 +135,27 @@
               </div>
             </div>
           </div>
-          <a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
+          <a href="http://meghantaraacademy.com/" target="_blank" class="{{ $currentRoute == 'training-center' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Training Center</a>
           <a href="{{ url('kisah-sukses') }}" class="{{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kisah Sukses</a>
           <a href="{{ url('berita') }}" class="{{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Blog</a>
-          <a href="{{ url('loker') }}" class="{{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Lowongan Kerja</a>
+          <div class="relative group">
+            <button class="{{ (strpos($currentRoute, 'loker') !== false && strpos($currentRoute, 'loker-luar-negeri') === false) ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }} flex items-center space-x-1">
+              <span>Lowongan Kerja</span>
+              <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
+              <div class="py-2">
+                <a href="{{ url('loker') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ (strpos($currentRoute, 'loker') !== false && strpos($currentRoute, 'loker-luar-negeri') === false) ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+                  Lowongan Instruktur
+                </a>
+                <a href="{{ url('loker-luar-negeri') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-pink hover:text-white transition {{ strpos($currentRoute, 'loker-luar-negeri') !== false ? 'bg-brand-pink/10 text-brand-pink font-semibold' : '' }}">
+                  Lowongan Luar Negeri
+                </a>
+              </div>
+            </div>
+          </div>
           <a href="{{ url('kontak') }}" class="{{ $currentRoute == 'kontak' ? 'text-brand-pink font-semibold' : 'hover:text-brand-pink transition' }}">Kontak Kami</a>
         </div>
 
@@ -220,7 +237,7 @@
               </div>
             </div>
 
-            <a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'training-center' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+            <a href="http://meghantaraacademy.com/" target="_blank" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'training-center' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
               Training Center
             </a>
             <a href="{{ url('kisah-sukses') }}" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'kisah-sukses' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
@@ -229,9 +246,25 @@
             <a href="{{ url('berita') }}" class="block px-4 py-3 text-base font-medium {{ strpos($currentRoute, 'berita') !== false ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
               Blog
             </a>
-            <a href="{{ url('loker') }}" class="block px-4 py-3 text-base font-medium {{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
-              Lowongan Kerja
-            </a>
+            
+            <!-- Lowongan Kerja Dropdown Mobile -->
+            <div class="relative">
+              <button id="mobile-loker-toggle" class="w-full flex items-center justify-between px-4 py-3 text-base font-medium {{ strpos($currentRoute, 'loker') !== false ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
+                <span>Lowongan Kerja</span>
+                <svg id="mobile-loker-arrow" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div id="mobile-loker-menu" class="hidden pl-4 mt-1 space-y-1">
+                <a href="{{ url('loker') }}" class="block px-4 py-2 text-sm {{ (strpos($currentRoute, 'loker') !== false && strpos($currentRoute, 'loker-luar-negeri') === false) ? 'text-brand-pink bg-brand-pink/10 font-semibold' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition">
+                  Lowongan Instruktur
+                </a>
+                <a href="{{ url('loker-luar-negeri') }}" class="block px-4 py-2 text-sm {{ strpos($currentRoute, 'loker-luar-negeri') !== false ? 'text-brand-pink bg-brand-pink/10 font-semibold' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition">
+                  Lowongan Luar Negeri
+                </a>
+              </div>
+            </div>
+            
             <a href="{{ url('kontak') }}" class="block px-4 py-3 text-base font-medium {{ $currentRoute == 'kontak' ? 'text-brand-pink bg-brand-pink/10' : 'text-gray-700' }} rounded-lg hover:bg-gray-50 transition">
               Kontak Kami
             </a>
@@ -288,7 +321,7 @@
             <li><a href="{{ url('tentang-kami') }}" class="hover:text-brand-pink transition">Tentang Kami</a></li>
             <li><a href="{{ url('produk') }}" class="hover:text-brand-pink transition">Produk</a></li>
             <li><a href="{{ url('layanan') }}" class="hover:text-brand-pink transition">Layanan</a></li>
-            <li><a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
+            <li><a href="http://meghantaraacademy.com/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
             <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
             <li><a href="{{ url('blog') }}" class="hover:text-brand-pink transition">Blog</a></li>
           </ul>
@@ -415,6 +448,18 @@
         e.preventDefault();
         mobilePerusahaanMenu.classList.toggle('hidden');
         mobilePerusahaanArrow.classList.toggle('rotate-180');
+      });
+    }
+
+    // Toggle Loker submenu
+    const mobileLokerToggle = document.getElementById('mobile-loker-toggle');
+    const mobileLokerMenu = document.getElementById('mobile-loker-menu');
+    const mobileLokerArrow = document.getElementById('mobile-loker-arrow');
+    if (mobileLokerToggle && mobileLokerMenu) {
+      mobileLokerToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileLokerMenu.classList.toggle('hidden');
+        mobileLokerArrow.classList.toggle('rotate-180');
       });
     }
 

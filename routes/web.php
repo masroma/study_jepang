@@ -96,6 +96,10 @@ Route::get('webinar/detail/{par1}/{par2}', 'App\Http\Controllers\Video@detail');
 Route::get('loker', 'App\Http\Controllers\Loker@index');
 Route::get('loker/detail/{slug_loker}', 'App\Http\Controllers\Loker@detail');
 Route::post('loker/proses_pendaftaran', 'App\Http\Controllers\Loker@proses_pendaftaran');
+// loker luar negeri
+Route::get('loker-luar-negeri', 'App\Http\Controllers\LokerLuarNegeri@index');
+Route::get('loker-luar-negeri/detail/{slug_loker}', 'App\Http\Controllers\LokerLuarNegeri@detail');
+Route::post('loker-luar-negeri/proses_pendaftaran', 'App\Http\Controllers\LokerLuarNegeri@proses_pendaftaran');
 // Company Profile / About Us
 Route::get('tentang-kami', 'App\Http\Controllers\CompanyProfile@index');
 Route::get('about-us', 'App\Http\Controllers\CompanyProfile@index');
@@ -130,6 +134,15 @@ Route::prefix('member')->group(function() {
     Route::post('profile/update', 'App\Http\Controllers\Member\Profile@update');
     Route::get('password', 'App\Http\Controllers\Member\Profile@password');
     Route::post('password/update', 'App\Http\Controllers\Member\Profile@updatePassword');
+    // Member - Mitra
+    Route::get('mitra/daftar', 'App\Http\Controllers\Member\MitraController@daftar');
+    Route::post('mitra/daftar/proses', 'App\Http\Controllers\Member\MitraController@prosesDaftar');
+    Route::get('mitra/dashboard', 'App\Http\Controllers\Member\MitraController@dashboard');
+    Route::get('mitra/referal', 'App\Http\Controllers\Member\MitraController@referal');
+    Route::get('mitra/referal/tambah', 'App\Http\Controllers\Member\MitraController@tambahReferal');
+    Route::post('mitra/referal/tambah/proses', 'App\Http\Controllers\Member\MitraController@prosesTambahReferal');
+    Route::get('mitra/withdraw', 'App\Http\Controllers\Member\MitraController@withdraw');
+    Route::post('mitra/withdraw/proses', 'App\Http\Controllers\Member\MitraController@prosesWithdraw');
 });
 
 // admin redirect
@@ -229,6 +242,15 @@ Route::get('admin/v2/user/edit/{id_user}', 'App\Http\Controllers\Admin\UserV2Con
 Route::get('admin/v2/user/delete/{id_user}', 'App\Http\Controllers\Admin\UserV2Controller@delete');
 Route::post('admin/v2/user/tambah_proses', 'App\Http\Controllers\Admin\UserV2Controller@tambah_proses');
 Route::post('admin/v2/user/edit_proses', 'App\Http\Controllers\Admin\UserV2Controller@edit_proses');
+// Admin V2 - Mitra
+Route::get('admin/v2/mitra', 'App\Http\Controllers\Admin\MitraV2Controller@index');
+Route::get('admin/v2/mitra/setting-komisi', 'App\Http\Controllers\Admin\MitraV2Controller@settingKomisi');
+Route::post('admin/v2/mitra/setting-komisi/update', 'App\Http\Controllers\Admin\MitraV2Controller@updateSettingKomisi');
+Route::get('admin/v2/mitra/referal', 'App\Http\Controllers\Admin\MitraV2Controller@referal');
+Route::post('admin/v2/mitra/referal/update-status/{id_referal}', 'App\Http\Controllers\Admin\MitraV2Controller@updateStatusReferal');
+Route::get('admin/v2/mitra/withdraw', 'App\Http\Controllers\Admin\MitraV2Controller@withdraw');
+Route::post('admin/v2/mitra/withdraw/update-status/{id_withdraw}', 'App\Http\Controllers\Admin\MitraV2Controller@updateStatusWithdraw');
+Route::get('admin/v2/mitra/komisi/{id_mitra}', 'App\Http\Controllers\Admin\MitraV2Controller@komisi');
 
 // dasbor
 Route::get('admin/dasbor', 'App\Http\Controllers\Admin\Dasbor@index');

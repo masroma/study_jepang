@@ -17,7 +17,7 @@ $waNumber = isset($site_config->whatsapp) ? preg_replace('/[^0-9]/', '', $site_c
       <h4 class="font-bold text-gray-800 mb-6">Menu</h4>
       <ul class="space-y-3 text-sm text-gray-500 font-medium">
         <li><a href="{{ url('/') }}" class="hover:text-brand-pink transition">Beranda</a></li>
-        <li><a href="https://lms-mega-main-gjl6xj.laravel.cloud/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
+        <li><a href="http://meghantaraacademy.com/" target="_blank" class="hover:text-brand-pink transition">Training Center</a></li>
         <li><a href="{{ url('kisah-sukses') }}" class="hover:text-brand-pink transition">Kisah Sukses</a></li>
         <li><a href="{{ url('berita') }}" class="hover:text-brand-pink transition">Blog</a></li>
         <li><a href="{{ url('kontak') }}" class="hover:text-brand-pink transition">Kontak Kami</a></li>

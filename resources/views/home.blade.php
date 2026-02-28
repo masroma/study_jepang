@@ -78,136 +78,42 @@ $content = $translations[$language] ?? $translations['id'];
 @section('nav-home', 'text-brand-pink font-semibold')
 
 @section('hero')
-@php
-// Default person images
-$defaultPersonImages = [
-    'https://i.pravatar.cc/100?img=32',
-    'https://i.pravatar.cc/100?img=47',
-    'https://i.pravatar.cc/100?img=12'
-];
 
-// ============================================
-// SLIDER HOMEPAGE: HARUS dari tabel 'hero_sliders'
-// ============================================
-// Data ini diambil dari controller: $hero_sliders = HeroSlider::publish()->ordered()->get()
-// JANGAN menggunakan $slider (dari tabel galeri) karena strukturnya berbeda
-// Pastikan controller mengirim $hero_sliders, bukan $slider
-$sliders = isset($hero_sliders) && is_object($hero_sliders) && $hero_sliders->count() > 0 
-    ? $hero_sliders 
-    : collect();
-$hasSliders = $sliders->count() > 0;
-
-// If no sliders, create one default slider
-if (!$hasSliders) {
-    $sliders = collect([(object)[
-        'title_id' => $content['hero_title'],
-        'title_en' => $translations['en']['hero_title'],
-        'title_jp' => $translations['jp']['hero_title'],
-        'subtitle_id' => $content['hero_subtitle'],
-        'subtitle_en' => $translations['en']['hero_subtitle'],
-        'subtitle_jp' => $translations['jp']['hero_subtitle'],
-        'country_id' => $content['hero_country'],
-        'country_en' => $translations['en']['hero_country'],
-        'country_jp' => $translations['jp']['hero_country'],
-        'description_id' => $content['hero_description'],
-        'description_en' => $translations['en']['hero_description'],
-        'description_jp' => $translations['jp']['hero_description'],
-        'background_image' => asset('template/img/image6.png'),
-        'person_image' => asset('template/img/image5.png'),
-        'button_text_id' => $content['button_text'],
-        'button_text_en' => $translations['en']['button_text'],
-        'button_text_jp' => $translations['jp']['button_text'],
-        'button_link' => url('daftar'),
-        'video_link' => $videos->first()->video ?? '#',
-        'person_images' => $defaultPersonImages
-    ]]);
-}
-@endphp
 
 <header class="relative w-full min-h-[700px] sm:min-h-[750px] md:min-h-[800px] hero-bg overflow-hidden mt-0 pt-12 sm:pt-16 md:pt-96">
+  <div class="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+    <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Background" loading="eager" onerror="this.onerror=null; this.src='{{ asset('template/img/image6.png') }}';" />
+    <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/90 md:via-white/80 to-transparent hero-gradient-overlay transition-opacity duration-1000"></div>
+  </div>
+
   <!-- Hero Slider Container -->
   <div class="hero-slider relative w-full h-full">
-    @foreach($sliders as $index => $slide)
-    @php
-      $title = $slide->{'title_' . $language} ?? $slide->title_id ?? '';
-      $subtitle = $slide->{'subtitle_' . $language} ?? $slide->subtitle_id ?? '';
-      $country = $slide->{'country_' . $language} ?? $slide->country_id ?? '';
-      $description = $slide->{'description_' . $language} ?? $slide->description_id ?? '';
-      $buttonText = $slide->{'button_text_' . $language} ?? $slide->button_text_id ?? '';
-    
-    
-      // Ambil gambar dari kolom person_image di database
-      // Gunakan Storage untuk mendapatkan URL yang benar dari S3
-      $personImage = asset('template/img/image5.png'); // default
-      if (!empty($slide->person_image)) {
-        // Gunakan Storage untuk mendapatkan URL dari S3
-        $personImage = Storage::disk('public')->url($slide->person_image);
-      }
-      
-      $image = $personImage;
-      
-      // Ambil background image dengan cara yang sama
-      $bgImage = asset('template/img/image6.png'); // default
-      if (!empty($slide->background_image)) {
-        // Gunakan Storage untuk mendapatkan URL dari S3
-        $bgImage = Storage::disk('public')->url($slide->background_image);
-      }
-
-     
-     
-      // Inisialisasi person_images untuk avatar kecil
-      $personImages = $slide->person_images ?? $defaultPersonImages;
-      if (is_string($personImages)) {
-        $personImages = json_decode($personImages, true) ?? $defaultPersonImages;
-      }
-      if (empty($personImages) || !is_array($personImages)) {
-        $personImages = $defaultPersonImages;
-      }
-      // Convert paths to URLs for person_images
-      if (is_array($personImages) && !empty($personImages)) {
-        $personImages = array_map(function($img) {
-          // If it's a URL (starts with http), return as is
-          if (is_string($img) && (strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0)) {
-            return $img;
-          }
-          // If it's a local path, convert to full URL using Storage
-          if (is_string($img) && !empty($img)) {
-            return Storage::disk('public')->url($img);
-          }
-          return $img;
-        }, $personImages);
-      }
-     
-    @endphp
+  
+    @foreach($hero_sliders as $index => $slide)
     <div class="hero-slide absolute inset-0 w-full h-full flex items-start md:items-center pt-0 {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }}" data-slide="{{ $index }}">
-      <!-- Background -->
-    
-      <div class="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
-        <img src="{{ $bgImage }}" class="hero-bg-image w-full h-full object-cover opacity-60 transition-all duration-1500 ease-in-out" alt="Background" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" />
-        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/90 md:via-white/80 to-transparent hero-gradient-overlay transition-opacity duration-1000"></div>
-      </div>
-
       <!-- Content -->
       <div class="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-10 relative z-10 items-start md:items-center py-4 sm:py-8 md:py-0">
         <div class="hero-content-text pt-0 md:pt-4 order-2 md:order-1">
           <h1 class="hero-title text-xl sm:text-2xl md:text-4xl font-extrabold leading-tight text-gray-900 mb-2 sm:mb-2">
             <span class="relative inline-block">
               <span class="absolute -left-4 sm:-left-6 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border-2 border-white"></span>
-              {{ $title }}
+              {{ $slide['title_' . $language] ?? $slide['title_id'] }}
             </span>
+
+            
             <br />
-            <span class="text-lg sm:text-xl md:text-2xl font-normal text-brand-pink">{{ $subtitle }}</span> <span class="inline-block w-6 h-6 sm:w-8 sm:h-8 align-middle ml-1 sm:ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
+            <span class="text-lg sm:text-xl md:text-2xl font-normal text-brand-pink">{{ $slide['subtitle_' . $language] ?? $slide['subtitle_id'] }}</span> 
+            <span class="inline-block w-6 h-6 sm:w-8 sm:h-8 align-middle ml-1 sm:ml-2 shadow-sm rounded-full overflow-hidden border border-gray-200"><img src="https://flagcdn.com/w80/jp.png" class="w-full h-full object-cover" loading="lazy" /></span>
           </h1>
 
-       
-
-          <p class="hero-description text-gray-500 mb-4 sm:mb-6 max-w-md leading-relaxed text-xs sm:text-sm font-medium">{{ $description }}</p>
+          <p class="hero-description text-gray-500 mb-4 sm:mb-6 max-w-md leading-relaxed text-xs sm:text-sm font-medium">{{ $slide['description_' . $language] ?? $slide['description_id'] }}</p>
 
           <div class="hero-buttons flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
-            <a href="{{ $slide->button_link ?? url('daftar') }}" class="bg-brand-pink text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
-              {{ $buttonText }} <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            <a href="{{ $slide['button_link'] ?? url('daftar') }}" class="bg-brand-pink text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center w-full sm:w-auto">
+              {{ $slide['button_text_' . $language] ?? $slide['button_text_id'] }} 
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
-            <button onclick="openVideoModal('{{ $slide->video_link ?? ($videos->first()->video ?? '#') }}')" class="text-brand-pink font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent text-sm sm:text-base">
+            <button onclick="openVideoModal('{{ $slide['video_link'] ?? '#' }}')" class="text-brand-pink font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-full hover:bg-pink-50 transition flex items-center justify-center w-full sm:w-auto border border-pink-100 sm:border-transparent text-sm sm:text-base">
               <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-brand-pink flex items-center justify-center mr-2">
                 <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               </div>
@@ -217,9 +123,9 @@ if (!$hasSliders) {
 
           <div class="flex items-center space-x-2 sm:space-x-3">
             <div class="flex -space-x-2 sm:-space-x-3">
-              @foreach(array_slice($personImages, 0, 3) as $personImg)
-              <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm" src="{{ $personImg }}" alt="" loading="lazy" />
-              @endforeach
+              <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=32" alt="" loading="lazy" />
+              <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=47" alt="" loading="lazy" />
+              <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm" src="https://i.pravatar.cc/100?img=12" alt="" loading="lazy" />
               <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
             </div>
             <div class="text-xs sm:text-sm">
@@ -227,10 +133,27 @@ if (!$hasSliders) {
               <p class="text-xs text-gray-500 font-medium">{{ $content['social_proof'] }}</p>
             </div>
           </div>
-          </div>
+        </div>
 
-          <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
-            <img src="{{ $image }}" class="hero-person-image relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" />
+        <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
+          <div class="hero-person-frame relative w-full flex items-center justify-center md:justify-end">
+            <img src="{{ asset('storage/'.$slide->person_image) }}" class="hero-person-image relative z-20 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" onerror="this.onerror=null; this.src='{{asset('storage/'.$slide->person_image)}}';" />
+
+            <div class="hero-mascot-orbit pointer-events-none" aria-hidden="true">
+              <div class="hero-mascot-item mascot-orbit-1">
+                <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot 1" class="hero-mascot-img" loading="lazy">
+                <span class="hero-mascot-badge">Terpercaya</span>
+              </div>
+              <div class="hero-mascot-item mascot-orbit-2">
+                <img src="{{ asset('maskot/maskot2.png') }}" alt="Maskot 2" class="hero-mascot-img" loading="lazy">
+                <span class="hero-mascot-badge">Resmi</span>
+              </div>
+              <div class="hero-mascot-item mascot-orbit-3">
+                <img src="{{ asset('maskot/maskot3.png') }}" alt="Maskot 3" class="hero-mascot-img" loading="lazy">
+                <span class="hero-mascot-badge">Berpengalaman</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -238,9 +161,9 @@ if (!$hasSliders) {
   </div>
 
   <!-- Slider Navigation -->
-  @if($sliders->count() > 1)
+  @if(count($hero_sliders) > 1)
   <div class="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
-    @foreach($sliders as $index => $slide)
+    @foreach($hero_sliders as $index => $slide)
     <button class="hero-slider-dot w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-brand-pink w-6 sm:w-8' : 'bg-gray-300 hover:bg-gray-400' }}" data-slide="{{ $index }}" aria-label="Go to slide {{ $index + 1 }}"></button>
     @endforeach
   </div>
@@ -269,122 +192,156 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentSlide = 0;
   let slideInterval;
 
-  if (slides.length <= 1) return;
+  if (slides.length <= 1) {
+    // Jika hanya 1 slide, hanya jalankan animasi
+    const slide = slides[0];
+    if (slide) {
+      setTimeout(() => {
+        const bgImage = slide.querySelector('.hero-bg-image');
+        const personImage = slide.querySelector('.hero-person-image');
+        const contentText = slide.querySelector('.hero-content-text');
+        const title = slide.querySelector('.hero-title');
+        const description = slide.querySelector('.hero-description');
+        const buttons = slide.querySelector('.hero-buttons');
+        const personContainer = slide.querySelector('.hero-person-container');
+        
+        if (bgImage) {
+          bgImage.style.transform = 'scale(1)';
+          bgImage.style.opacity = '0.6';
+        }
+        if (personImage) {
+          personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
+          personImage.style.opacity = '1';
+        }
+        if (contentText) {
+          contentText.style.transform = 'translateX(0) translateY(0)';
+          contentText.style.opacity = '1';
+        }
+        if (title) {
+          title.style.transform = 'translateY(0)';
+          title.style.opacity = '1';
+        }
+        if (description) {
+          description.style.transform = 'translateY(0)';
+          description.style.opacity = '1';
+        }
+        if (buttons) {
+          buttons.style.transform = 'translateY(0)';
+          buttons.style.opacity = '1';
+        }
+        if (personContainer) {
+          personContainer.style.transform = 'translateX(0) scale(1)';
+          personContainer.style.opacity = '1';
+        }
+      }, 100);
+    }
+    return;
+  }
 
   function showSlide(index) {
+    // Reset all slides first
     slides.forEach((slide, i) => {
-      const bgImage = slide.querySelector('.hero-bg-image');
-      const personImage = slide.querySelector('.hero-person-image');
-      const contentText = slide.querySelector('.hero-content-text');
-      const title = slide.querySelector('.hero-title');
-      const description = slide.querySelector('.hero-description');
-      const buttons = slide.querySelector('.hero-buttons');
-      const personContainer = slide.querySelector('.hero-person-container');
-      
-      if (i === index) {
-        // Fade in current slide
-        slide.classList.remove('opacity-0', 'z-0');
-        slide.classList.add('opacity-100', 'z-10');
-        
-        // Animate background with zoom and fade effect
-        if (bgImage) {
-          setTimeout(() => {
-            bgImage.style.transform = 'scale(1)';
-            bgImage.style.opacity = '0.6';
-          }, 50);
-        }
-        
-        // Animate person image with slide, fade, and scale
-        if (personImage) {
-          setTimeout(() => {
-            personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
-            personImage.style.opacity = '1';
-          }, 200);
-        }
-        
-        // Animate content text (slide from left)
-        if (contentText) {
-          setTimeout(() => {
-            contentText.style.transform = 'translateX(0) translateY(0)';
-            contentText.style.opacity = '1';
-          }, 300);
-        }
-        
-        // Animate title
-        if (title) {
-          setTimeout(() => {
-            title.style.transform = 'translateY(0)';
-            title.style.opacity = '1';
-          }, 400);
-        }
-        
-        // Animate description
-        if (description) {
-          setTimeout(() => {
-            description.style.transform = 'translateY(0)';
-            description.style.opacity = '1';
-          }, 500);
-        }
-        
-        // Animate buttons
-        if (buttons) {
-          setTimeout(() => {
-            buttons.style.transform = 'translateY(0)';
-            buttons.style.opacity = '1';
-          }, 600);
-        }
-        
-        // Animate person container
-        if (personContainer) {
-          setTimeout(() => {
-            personContainer.style.transform = 'translateX(0) scale(1)';
-            personContainer.style.opacity = '1';
-          }, 200);
-        }
-      } else {
-        // Fade out other slides
+      if (i !== index) {
         slide.classList.remove('opacity-100', 'z-10');
         slide.classList.add('opacity-0', 'z-0');
         
-        // Reset background with zoom out
-        if (bgImage) {
-          bgImage.style.transform = 'scale(1.15)';
-          bgImage.style.opacity = '0';
-        }
+        const bgImage = slide.querySelector('.hero-bg-image');
+        const personImage = slide.querySelector('.hero-person-image');
+        const contentText = slide.querySelector('.hero-content-text');
+        const title = slide.querySelector('.hero-title');
+        const description = slide.querySelector('.hero-description');
+        const buttons = slide.querySelector('.hero-buttons');
+        const personContainer = slide.querySelector('.hero-person-container');
         
-        // Reset person image with slide out
+        if (bgImage) {
+          // Reset transform for animation, but don't touch opacity
+          bgImage.style.transform = 'scale(1.15)';
+          // Opacity is handled by CSS class and slide container opacity
+        }
         if (personImage) {
           personImage.style.transform = 'translateX(30px) translateY(15px) scale(0.9) rotate(-2deg)';
           personImage.style.opacity = '0';
         }
-        
-        // Reset content text
         if (contentText) {
           contentText.style.transform = 'translateX(-30px)';
           contentText.style.opacity = '0';
         }
-        
         if (title) {
           title.style.transform = 'translateY(-20px)';
           title.style.opacity = '0';
         }
-        
         if (description) {
           description.style.transform = 'translateY(-20px)';
           description.style.opacity = '0';
         }
-        
         if (buttons) {
           buttons.style.transform = 'translateY(-20px)';
           buttons.style.opacity = '0';
         }
-        
         if (personContainer) {
           personContainer.style.transform = 'translateX(50px) scale(0.95)';
           personContainer.style.opacity = '0';
         }
       }
     });
+    
+    // Show current slide
+    const currentSlideEl = slides[index];
+    if (currentSlideEl) {
+      currentSlideEl.classList.remove('opacity-0', 'z-0');
+      currentSlideEl.classList.add('opacity-100', 'z-10');
+      
+      const bgImage = currentSlideEl.querySelector('.hero-bg-image');
+      const personImage = currentSlideEl.querySelector('.hero-person-image');
+      const contentText = currentSlideEl.querySelector('.hero-content-text');
+      const title = currentSlideEl.querySelector('.hero-title');
+      const description = currentSlideEl.querySelector('.hero-description');
+      const buttons = currentSlideEl.querySelector('.hero-buttons');
+      const personContainer = currentSlideEl.querySelector('.hero-person-container');
+      
+      if (bgImage) {
+        // Animate transform only, ensure opacity is always visible
+        bgImage.style.transform = 'scale(1)';
+        bgImage.style.opacity = '0.6';
+        bgImage.style.setProperty('opacity', '0.6', 'important');
+      }
+      if (personImage) {
+        setTimeout(() => {
+          personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
+          personImage.style.opacity = '1';
+        }, 200);
+      }
+      if (contentText) {
+        setTimeout(() => {
+          contentText.style.transform = 'translateX(0) translateY(0)';
+          contentText.style.opacity = '1';
+        }, 300);
+      }
+      if (title) {
+        setTimeout(() => {
+          title.style.transform = 'translateY(0)';
+          title.style.opacity = '1';
+        }, 400);
+      }
+      if (description) {
+        setTimeout(() => {
+          description.style.transform = 'translateY(0)';
+          description.style.opacity = '1';
+        }, 500);
+      }
+      if (buttons) {
+        setTimeout(() => {
+          buttons.style.transform = 'translateY(0)';
+          buttons.style.opacity = '1';
+        }, 600);
+      }
+      if (personContainer) {
+        setTimeout(() => {
+          personContainer.style.transform = 'translateX(0) scale(1)';
+          personContainer.style.opacity = '1';
+        }, 200);
+      }
+    }
 
     dots.forEach((dot, i) => {
       if (i === index) {
@@ -410,14 +367,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function startAutoSlide() {
-    slideInterval = setInterval(nextSlide, 6000); // Change slide every 6 seconds for better viewing
+    slideInterval = setInterval(nextSlide, 6000);
   }
 
   function stopAutoSlide() {
     clearInterval(slideInterval);
   }
 
-  // Event listeners
   if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoSlide(); nextSlide(); startAutoSlide(); });
   if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoSlide(); prevSlide(); startAutoSlide(); });
 
@@ -429,62 +385,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Pause on hover
   const heroSlider = document.querySelector('.hero-slider');
   if (heroSlider) {
     heroSlider.addEventListener('mouseenter', stopAutoSlide);
     heroSlider.addEventListener('mouseleave', startAutoSlide);
   }
 
-  // Initialize first slide animations
-  setTimeout(() => {
-    const firstSlide = slides[0];
-    if (firstSlide) {
-      const bgImage = firstSlide.querySelector('.hero-bg-image');
-      const personImage = firstSlide.querySelector('.hero-person-image');
-      const contentText = firstSlide.querySelector('.hero-content-text');
-      const title = firstSlide.querySelector('.hero-title');
-      const description = firstSlide.querySelector('.hero-description');
-      const buttons = firstSlide.querySelector('.hero-buttons');
-      const personContainer = firstSlide.querySelector('.hero-person-container');
-      
-      if (bgImage) {
+  // Initialize first slide background images immediately
+  slides.forEach((slide, i) => {
+    const bgImage = slide.querySelector('.hero-bg-image');
+    if (bgImage) {
+      bgImage.style.opacity = '0.6';
+      bgImage.style.setProperty('opacity', '0.6', 'important');
+      if (i === 0) {
         bgImage.style.transform = 'scale(1)';
-        bgImage.style.opacity = '0.6';
-      }
-      
-      if (personImage) {
-        personImage.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0deg)';
-        personImage.style.opacity = '1';
-      }
-      
-      if (contentText) {
-        contentText.style.transform = 'translateX(0) translateY(0)';
-        contentText.style.opacity = '1';
-      }
-      
-      if (title) {
-        title.style.transform = 'translateY(0)';
-        title.style.opacity = '1';
-      }
-      
-      if (description) {
-        description.style.transform = 'translateY(0)';
-        description.style.opacity = '1';
-      }
-      
-      if (buttons) {
-        buttons.style.transform = 'translateY(0)';
-        buttons.style.opacity = '1';
-      }
-      
-      if (personContainer) {
-        personContainer.style.transform = 'translateX(0) scale(1)';
-        personContainer.style.opacity = '1';
+      } else {
+        bgImage.style.transform = 'scale(1.15)';
       }
     }
-  }, 100);
+  });
 
+  // Initialize first slide
+  showSlide(0);
+  
   // Start auto slide
   startAutoSlide();
 });
@@ -534,6 +457,171 @@ document.addEventListener('DOMContentLoaded', function() {
   transition: opacity 1s ease-in-out !important;
 }
 
+.hero-mascot-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+}
+
+.hero-mascot-item {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  will-change: transform;
+}
+
+.hero-mascot-img {
+  width: clamp(52px, 6vw, 84px);
+  height: auto;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
+}
+
+.hero-mascot-badge {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  color: #be185d;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 10px;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(3px);
+}
+
+.mascot-orbit-1 {
+  top: 12%;
+  left: 8%;
+  animation: mascot-orbit-1 5.8s ease-in-out infinite;
+}
+
+.mascot-orbit-2 {
+  top: 16%;
+  right: 2%;
+  animation: mascot-orbit-2 6.4s ease-in-out infinite;
+}
+
+.mascot-orbit-3 {
+  bottom: 12%;
+  right: -2%;
+  animation: mascot-orbit-3 6s ease-in-out infinite;
+}
+
+@keyframes mascot-orbit-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(8px, -12px) rotate(3deg); }
+}
+
+@keyframes mascot-orbit-2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-10px, -10px) rotate(-3deg); }
+}
+
+@keyframes mascot-orbit-3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-8px, 10px) rotate(2deg); }
+}
+
+@media (max-width: 767px) {
+  .hero-mascot-item {
+    gap: 6px;
+  }
+
+  .hero-mascot-img {
+    width: 46px;
+  }
+
+  .hero-mascot-badge {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  .mascot-orbit-1 {
+    top: 10%;
+    left: 2%;
+  }
+
+  .mascot-orbit-2 {
+    top: 8%;
+    right: -1%;
+  }
+
+  .mascot-orbit-3 {
+    display: none;
+  }
+}
+
+.section-title-mascot {
+  width: 168px;
+  height: 168px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.16));
+  animation: section-mascot-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes section-mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(5deg); }
+}
+
+@media (min-width: 640px) {
+  .section-title-mascot {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+.program-side-mascot {
+  width: 260px;
+  height: 300px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+  animation: section-mascot-bob 3.2s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .program-side-mascot {
+    width: 280px;
+    height: 330px;
+  }
+}
+
+.industry-side-mascot {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  animation: section-mascot-bob 3.4s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .industry-side-mascot {
+    width: 192px;
+    height: 192px;
+  }
+}
+
+@media (min-width: 768px) {
+  .industry-side-mascot {
+    width: 224px;
+    height: 224px;
+  }
+}
+
+.alur-title-mascot {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  animation: section-mascot-bob 3.4s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .alur-title-mascot {
+    width: 62px;
+    height: 62px;
+  }
+}
+
 /* Smooth hover effects */
 .hero-slider-dot:hover {
   transform: scale(1.2);
@@ -552,10 +640,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="py-12 sm:py-16 md:py-20 max-w-7xl mx-auto px-4 sm:px-6">
   <div class="flex flex-col md:flex-row items-start justify-between gap-6 sm:gap-8 md:gap-10">
     <div class="w-full md:w-1/3">
-      <div class="w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full mb-3 sm:mb-4 shadow-sm"></div>
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-pink leading-tight">{{ $content['jepang_title'] }}</h2>
+      
+        <img src="{{ asset('maskot/maskot2.png') }}" alt="Maskot Jepang"  loading="lazy">
+     
     </div>
     <div class="w-full md:w-2/3">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-pink leading-tight mb-3 sm:mb-4">{{ $content['jepang_title'] }}</h2>
       <p class="text-gray-500 leading-relaxed mb-5 sm:mb-6 font-medium text-sm sm:text-base">{{ $content['jepang_subtitle'] }}</p>
       <button class="bg-brand-yellow text-gray-900 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">{!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span></button>
     </div>
@@ -564,14 +654,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <section class="py-12 sm:py-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="text-center mb-8 sm:mb-12 md:mb-16">
+    <div class="mb-6 sm:mb-8 md:mb-10">
       <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-brand-pink mb-2 sm:mb-3">{{ $content['program_title'] }}</h2>
-      <p class="text-gray-500 text-xs sm:text-sm font-medium px-4">{{ $content['program_subtitle'] }}</p>
+      <p class="text-gray-500 text-xs sm:text-sm font-medium">{{ $content['program_subtitle'] }}</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+    <div class="flex flex-col md:flex-row items-start gap-4 sm:gap-6 mb-8 sm:mb-12">
+      <div class="shrink-0">
+        <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Program" class="program-side-mascot" loading="lazy">
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex gap-4 sm:gap-6 overflow-x-auto pb-4 sm:pb-6 no-scrollbar">
       @forelse($program_masa_depan as $item)
-      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
+      <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-50">
           @if(!empty($item->gambar))
             <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
@@ -590,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       @empty
-      <div class="col-span-full text-center py-8 sm:py-12">
+      <div class="shrink-0 w-[300px] sm:w-[340px] text-center py-8 sm:py-12">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
           <div class="text-yellow-600 mb-3 sm:mb-4">
             <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -607,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+      <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
@@ -620,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+      <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
@@ -633,7 +728,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </ul>
         </div>
       </div>
-      <div class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
+      <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 overflow-hidden">
           <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=500&q=60" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
         </div>
@@ -647,6 +742,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       @endforelse
+        </div>
+      </div>
     </div>
 
     <div class="text-center mt-8 sm:mt-12">
@@ -664,7 +761,12 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
 
-    <div class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-6 sm:pb-10 justify-start md:justify-between px-2 sm:px-4 no-scrollbar">
+    <div class="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
+      <div class="shrink-0">
+        <img src="{{ asset('maskot/maskot3.png') }}" alt="Maskot Industri" class="industry-side-mascot" loading="lazy" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-6 sm:pb-10 justify-start md:justify-between px-2 sm:px-4 no-scrollbar">
       @forelse($industri as $item)
       <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
         <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
@@ -694,13 +796,18 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       @endforelse
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="py-12 sm:py-16 md:py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <h2 class="text-2xl sm:text-3xl font-bold text-brand-pink text-center mb-10 sm:mb-12 md:mb-16">Alur Pendaftaran</h2>
+    <div class="flex items-center justify-center gap-3 mb-10 sm:mb-12 md:mb-16">
+      <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Alur" class="alur-title-mascot" loading="lazy">
+      <h2 class="text-2xl sm:text-3xl font-bold text-brand-pink text-center">Alur Pendaftaran</h2>
+    </div>
 
     <div class="flex flex-col md:flex-row justify-between items-start text-center relative px-2 sm:px-4">
       <div class="hidden md:block absolute top-10 left-0 w-full h-[2px] bg-gray-100 -z-0"></div>
@@ -740,6 +847,127 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="text-center mt-8 sm:mt-12">
       <a href="{{ url('daftar') }}" class="bg-brand-yellow text-gray-900 px-8 sm:px-10 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition inline-block">Mulai Pendaftaran ></a>
+    </div>
+  </div>
+</section>
+
+<!-- Section Jadi Mitra -->
+<section class="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-brand-pink via-pink-600 to-purple-600 relative overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+      <div class="text-white">
+        <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
+          <span class="text-sm font-semibold">💰 Passive Income Opportunity</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
+          Jadi Mitra & Dapatkan Komisi
+        </h2>
+        <p class="text-lg sm:text-xl text-pink-100 mb-6 sm:mb-8 leading-relaxed">
+          Ajak teman, keluarga, atau kenalan Anda yang ingin bekerja atau melanjutkan pendidikan ke luar negeri. Dapatkan komisi setiap kali referal Anda berhasil!
+        </p>
+        <div class="space-y-4 mb-6 sm:mb-8">
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-white">Komisi Menarik</p>
+              <p class="text-sm text-pink-100">Dapatkan komisi setiap referal yang berhasil bekerja atau kuliah di luar negeri</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-white">Passive Income</p>
+              <p class="text-sm text-pink-100">Dapatkan penghasilan tambahan tanpa harus bekerja full-time</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-white">Mudah & Cepat</p>
+              <p class="text-sm text-pink-100">Proses pendaftaran mudah, withdraw cepat, dan transparan</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4">
+          @auth
+            <a href="{{ url('member/mitra/daftar') }}" class="bg-white text-brand-pink px-8 py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition inline-flex items-center justify-center">
+              Daftar Sekarang
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          @else
+            <a href="{{ url('daftar') }}" class="bg-white text-brand-pink px-8 py-3 rounded-full font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition inline-flex items-center justify-center">
+              Daftar Jadi Mitra
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          @endauth
+          <a href="{{ url('member/mitra/dashboard') }}" class="bg-white/10 backdrop-blur-sm text-white border-2 border-white px-8 py-3 rounded-full font-bold text-sm sm:text-base hover:bg-white/20 transition inline-flex items-center justify-center">
+            Lihat Dashboard Mitra
+          </a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+          <div class="text-center mb-6">
+            <div class="inline-block bg-white/20 rounded-full p-4 mb-4">
+              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2">Cara Kerja</h3>
+            <p class="text-pink-100">Sangat mudah untuk mulai mendapatkan komisi</p>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-10 h-10 bg-white text-brand-pink rounded-full flex items-center justify-center font-bold">1</div>
+              <div>
+                <p class="font-semibold text-white mb-1">Daftar Jadi Mitra</p>
+                <p class="text-sm text-pink-100">Daftar gratis dan dapatkan kode referal unik Anda</p>
+              </div>
+            </div>
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-10 h-10 bg-white text-brand-pink rounded-full flex items-center justify-center font-bold">2</div>
+              <div>
+                <p class="font-semibold text-white mb-1">Ajak Orang Lain</p>
+                <p class="text-sm text-pink-100">Bagikan kode referal Anda ke teman yang ingin kerja/kuliah di luar negeri</p>
+              </div>
+            </div>
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-10 h-10 bg-white text-brand-pink rounded-full flex items-center justify-center font-bold">3</div>
+              <div>
+                <p class="font-semibold text-white mb-1">Dapatkan Komisi</p>
+                <p class="text-sm text-pink-100">Ketika referal Anda diterima, komisi langsung masuk ke saldo Anda</p>
+              </div>
+            </div>
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-10 h-10 bg-white text-brand-pink rounded-full flex items-center justify-center font-bold">4</div>
+              <div>
+                <p class="font-semibold text-white mb-1">Withdraw Kapan Saja</p>
+                <p class="text-sm text-pink-100">Tarik saldo Anda kapan saja melalui rekening bank</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

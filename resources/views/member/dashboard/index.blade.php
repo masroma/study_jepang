@@ -195,6 +195,40 @@
         </div>
     </div>
 
+    <!-- Ajakan Gabung Mitra -->
+    @php
+        use App\Models\Mitra;
+        $isMitra = Mitra::where('id_user', session('id_user'))->exists();
+    @endphp
+    @if(!$isMitra)
+    <div class="bg-gradient-to-r from-brand-pink to-pink-600 rounded-xl p-6 text-white">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-4 md:mb-0">
+                <h3 class="text-2xl font-bold mb-2">💰 Dapatkan Passive Income!</h3>
+                <p class="text-pink-100 mb-2">Gabung jadi mitra dan dapatkan komisi setiap kali referal Anda berhasil bekerja atau kuliah di luar negeri.</p>
+                <p class="text-sm text-pink-200">Ajak teman, keluarga, atau kenalan Anda dan dapatkan komisi menarik!</p>
+            </div>
+            <a href="{{ url('member/mitra/daftar') }}" class="bg-white text-brand-pink px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-handshake mr-2"></i>
+                Daftar Jadi Mitra
+            </a>
+        </div>
+    </div>
+    @else
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-4 md:mb-0">
+                <h3 class="text-2xl font-bold mb-2">🎉 Anda Sudah Jadi Mitra!</h3>
+                <p class="text-green-100 mb-2">Kelola referal dan komisi Anda di dashboard mitra.</p>
+            </div>
+            <a href="{{ url('member/mitra/dashboard') }}" class="bg-white text-green-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-chart-line mr-2"></i>
+                Lihat Dashboard Mitra
+            </a>
+        </div>
+    </div>
+    @endif
+
     <!-- Quick Actions -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">Aksi Cepat</h3>

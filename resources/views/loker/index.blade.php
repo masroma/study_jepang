@@ -33,8 +33,8 @@
       <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Lowongan Kerja" />
       <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
     </div>
-    <div class="container max-w-7xl mx-auto px-6 relative z-10">
-      <div class="max-w-3xl pt-4 md:pt-10">
+    <div class="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-10 relative z-10 items-center py-4 sm:py-8 md:py-0">
+      <div class="pt-0 md:pt-4 order-2 md:order-1">
         <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
         <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-4">
           <span class="text-brand-pink">Lowongan Kerja</span><br />
@@ -49,6 +49,10 @@
             Lihat Lowongan <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </a>
         </div>
+      </div>
+
+      <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
+        <img src="{{ asset('maskot/maskot3.png') }}" alt="Maskot Lowongan Kerja" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl" loading="lazy">
       </div>
     </div>
     <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10"></div>

@@ -70,7 +70,7 @@
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
                         @if($industry->gambar)
                             <div class="mt-3">
-                                <img src="{{ Storage::disk('public')->url('uploads/industri/' . $industry->gambar) }}" alt="Current logo" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
+                                <img src="{{ asset('storage/uploads/industri/' . $industry->gambar) }}" alt="Current logo" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">Logo saat ini (kosongkan jika tidak ingin mengubah)</p>
                             </div>
                         @endif

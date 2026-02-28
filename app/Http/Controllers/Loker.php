@@ -15,8 +15,21 @@ class Loker extends Controller
     public function index()
     {
         $site_config = DB::table('konfigurasi')->first();
-        $myloker = new Loker_model();
-        $loker = $myloker->publik();
+        
+        // Ambil hanya lowongan instruktur
+        $loker = DB::table('loker')
+            ->where('status_loker', 'Publish')
+            ->where(function($query) {
+                $query->whereNull('tipe_loker')
+                      ->orWhere('tipe_loker', 'instruktur');
+            })
+            ->where(function($query) {
+                $query->whereNull('tanggal_selesai')
+                      ->orWhere('tanggal_selesai', '>=', date('Y-m-d'));
+            })
+            ->orderBy('urutan', 'ASC')
+            ->orderBy('id_loker', 'DESC')
+            ->get();
 
         $data = [
             'title'         => 'Lowongan Kerja - Instruktur - ' . $site_config->namaweb,
@@ -33,17 +46,28 @@ class Loker extends Controller
     public function detail($slug_loker)
     {
         $site_config = DB::table('konfigurasi')->first();
-        $myloker = new Loker_model();
-        $loker = $myloker->detail_slug($slug_loker);
+        
+        // Ambil detail lowongan instruktur
+        $loker = DB::table('loker')
+            ->where('slug_loker', $slug_loker)
+            ->where('status_loker', 'Publish')
+            ->where(function($query) {
+                $query->whereNull('tipe_loker')
+                      ->orWhere('tipe_loker', 'instruktur');
+            })
+            ->first();
 
         if(!$loker) {
             return redirect('loker')->with(['warning' => 'Lowongan kerja tidak ditemukan']);
         }
 
         // Ambil lowongan lain untuk rekomendasi
-        $myloker_all = new Loker_model();
         $loker_lain = DB::table('loker')
             ->where('status_loker', 'Publish')
+            ->where(function($query) {
+                $query->whereNull('tipe_loker')
+                      ->orWhere('tipe_loker', 'instruktur');
+            })
             ->where('id_loker', '!=', $loker->id_loker)
             ->where(function($query) {
                 $query->whereNull('tanggal_selesai')
@@ -77,9 +101,14 @@ class Loker extends Controller
             'cv_file' => 'required|mimes:pdf,doc,docx|max:5120', // max 5MB
         ]);
 
-        // Cek apakah lowongan masih aktif
-        $myloker = new Loker_model();
-        $loker = $myloker->detail($request->id_loker);
+        // Cek apakah lowongan masih aktif dan tipe instruktur
+        $loker = DB::table('loker')
+            ->where('id_loker', $request->id_loker)
+            ->where(function($query) {
+                $query->whereNull('tipe_loker')
+                      ->orWhere('tipe_loker', 'instruktur');
+            })
+            ->first();
         
         if(!$loker || $loker->status_loker != 'Publish') {
             return redirect('loker')->with(['warning' => 'Lowongan kerja tidak tersedia']);

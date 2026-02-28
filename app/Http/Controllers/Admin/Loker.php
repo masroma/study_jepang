@@ -153,6 +153,7 @@ class Loker extends Controller
             'judul_loker' => 'required|string|max:255',
             'posisi' => 'required|string|max:255',
             'isi_loker' => 'required|string',
+            'tipe_loker' => 'required|in:instruktur,luar_negeri',
             'status_loker' => 'required|in:Publish,Draft,Tutup'
         ]);
 
@@ -181,6 +182,7 @@ class Loker extends Controller
             'posisi' => $request->posisi,
             'lokasi_kerja' => $request->lokasi_kerja,
             'tipe_kerja' => $request->tipe_kerja,
+            'tipe_loker' => $request->tipe_loker,
             'persyaratan' => $request->persyaratan,
             'tanggung_jawab' => $request->tanggung_jawab,
             'tanggal_mulai' => $request->tanggal_mulai,
@@ -206,6 +208,7 @@ class Loker extends Controller
             'judul_loker' => 'required|string|max:255',
             'posisi' => 'required|string|max:255',
             'isi_loker' => 'required|string',
+            'tipe_loker' => 'required|in:instruktur,luar_negeri',
             'status_loker' => 'required|in:Publish,Draft,Tutup'
         ]);
 
@@ -243,6 +246,7 @@ class Loker extends Controller
             'posisi' => $request->posisi,
             'lokasi_kerja' => $request->lokasi_kerja,
             'tipe_kerja' => $request->tipe_kerja,
+            'tipe_loker' => $request->tipe_loker,
             'persyaratan' => $request->persyaratan,
             'tanggung_jawab' => $request->tanggung_jawab,
             'tanggal_mulai' => $request->tanggal_mulai,

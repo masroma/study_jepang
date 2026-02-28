@@ -85,6 +85,27 @@
                         </a>
                     </li>
                     <li class="pt-4">
+                        <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">Mitra & Komisi</div>
+                    </li>
+                    <li>
+                        <a href="{{ url('member/mitra/dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('member/mitra*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-handshake w-5"></i>
+                            <span>Dashboard Mitra</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('member/mitra/referal') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('member/mitra/referal*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-users w-5"></i>
+                            <span>List Referal</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('member/mitra/withdraw') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition {{ request()->is('member/mitra/withdraw*') ? 'bg-brand-pink text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <i class="fas fa-money-bill-wave w-5"></i>
+                            <span>Withdraw</span>
+                        </a>
+                    </li>
+                    <li class="pt-4">
                         <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">Akun</div>
                     </li>
                     <li>

@@ -73,6 +73,21 @@
                     </div>
 
                     <div>
+                        <label for="tipe_loker" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tipe Lowongan <span class="text-red-500">*</span>
+                        </label>
+                        <select id="tipe_loker" name="tipe_loker" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
+                            <option value="instruktur" {{ old('tipe_loker', $loker->tipe_loker ?? 'instruktur') == 'instruktur' ? 'selected' : '' }}>Instruktur (Lowongan untuk menjadi instruktur)</option>
+                            <option value="luar_negeri" {{ old('tipe_loker', $loker->tipe_loker ?? 'instruktur') == 'luar_negeri' ? 'selected' : '' }}>Luar Negeri (Lowongan kerja di luar negeri)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Pilih tipe lowongan: Instruktur untuk lowongan menjadi instruktur, atau Luar Negeri untuk lowongan kerja di luar negeri</p>
+                        @error('tipe_loker')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
                         <label for="urutan" class="block text-sm font-semibold text-gray-700 mb-2">Urutan</label>
                         <input type="number" id="urutan" name="urutan" value="{{ old('urutan', $loker->urutan) }}" min="0"
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
@@ -193,7 +208,7 @@
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
                         @if($loker->gambar)
                             <div class="mt-3">
-                                <img src="{{ Storage::disk('public')->url('assets/upload/image/loker/' . $loker->gambar) }}" alt="Current image" class="w-64 h-48 object-cover rounded-lg border border-gray-200">
+                                <img src="{{ asset('storage/assets/upload/image/loker/' . $loker->gambar) }}" alt="Current image" class="w-64 h-48 object-cover rounded-lg border border-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">Gambar saat ini (kosongkan jika tidak ingin mengubah)</p>
                             </div>
                         @endif

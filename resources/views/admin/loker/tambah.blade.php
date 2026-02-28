@@ -77,6 +77,20 @@
 </div>
 
 <div class="row form-group">
+  <label class="col-md-3 text-right">Tipe Lowongan *</label>
+  <div class="col-md-9">
+    <select name="tipe_loker" class="form-control" required>
+      <option value="instruktur" {{ old('tipe_loker', 'instruktur') == 'instruktur' ? 'selected' : '' }}>Instruktur (Lowongan untuk menjadi instruktur)</option>
+      <option value="luar_negeri" {{ old('tipe_loker') == 'luar_negeri' ? 'selected' : '' }}>Luar Negeri (Lowongan kerja di luar negeri)</option>
+    </select>
+    <small class="text-muted">Pilih tipe lowongan: Instruktur untuk lowongan menjadi instruktur, atau Luar Negeri untuk lowongan kerja di luar negeri</small>
+    @error('tipe_loker')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+  </div>
+</div>
+
+<div class="row form-group">
   <label class="col-md-3 text-right">Persyaratan</label>
   <div class="col-md-9">
     <textarea name="persyaratan" class="form-control" rows="5">{{ old('persyaratan') }}</textarea>

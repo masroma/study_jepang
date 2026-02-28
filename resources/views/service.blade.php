@@ -11,8 +11,8 @@
     <div class="absolute inset-0 bg-gradient-to-r from-white via-white/90 md:via-white/80 to-transparent"></div>
   </div>
 
-  <div class="container max-w-7xl mx-auto px-6 relative z-10">
-    <div class="pt-4 md:pt-10">
+  <div class="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-10 relative z-10 items-center py-4 sm:py-8 md:py-0">
+    <div class="pt-0 md:pt-4 order-2 md:order-1">
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-4">
         <span class="relative inline-block">
           <span class="absolute -left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 border-2 border-white"></span>
@@ -24,6 +24,10 @@
       <p class="text-gray-500 mb-8 max-w-2xl leading-relaxed text-sm md:text-base font-medium">
         Layanan ekspor-impor profesional dengan dukungan customs clearance, freight, dan warehousing terintegrasi.
       </p>
+    </div>
+
+    <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
+      <img src="{{ asset('maskot/maskot3.png') }}" alt="Maskot Layanan" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl" loading="lazy">
     </div>
   </div>
 
