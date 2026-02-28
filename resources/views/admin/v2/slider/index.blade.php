@@ -37,8 +37,8 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($slider->background_image)
-                                <img src="{{ Storage::disk('s3')->url($slider->background_image) }}" alt="Slider" class="w-20 h-12 object-cover rounded-lg">
+                            @if($slider->image_url)
+                                <img src="{{ $slider->image_url }}" alt="Slider" class="w-20 h-12 object-cover rounded-lg">
                             @else
                                 <div class="w-20 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400"></i>

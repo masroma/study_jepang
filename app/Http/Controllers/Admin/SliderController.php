@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +51,19 @@ class SliderController extends Controller
         }
         
         $sliders = $query->paginate($perPage)->withQueryString();
+        
+        // Add image URLs to each slider safely
+        foreach ($sliders as $slider) {
+            if ($slider->background_image) {
+                try {
+                    $slider->image_url = $this->getImageUrl($slider->background_image);
+                } catch (\Exception $e) {
+                    $slider->image_url = null;
+                }
+            } else {
+                $slider->image_url = null;
+            }
+        }
         
         $data = [
             'title' => 'Kelola Slider Homepage - ' . $site->namaweb,
@@ -336,5 +350,24 @@ class SliderController extends Controller
         $slider->delete();
         
         return redirect('admin/v2/slider')->with(['sukses' => 'Slider telah dihapus']);
+    }
+
+    /**
+     * Helper function to safely get image URL from S3
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            // Check if S3 is configured
+            $bucket = config('filesystems.disks.s3.bucket');
+            if (empty($bucket)) {
+                return null;
+            }
+            
+            return Storage::disk('s3')->url($path);
+        } catch (\Exception $e) {
+            \Log::error('Error getting S3 image URL: ' . $e->getMessage());
+            return null;
+        }
     }
 }
