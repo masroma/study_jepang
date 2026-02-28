@@ -162,8 +162,9 @@ class SliderController extends Controller
             $file = $request->file('background_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $background_image = 'assets/upload/image/hero/' . $filename;
+            if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                $background_image = 'assets/upload/image/hero/' . $filename;
+            }
         }
 
         // Upload person_image (single image)
@@ -172,8 +173,9 @@ class SliderController extends Controller
             $file = $request->file('person_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $person_image = 'assets/upload/image/hero/' . $filename;
+            if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                $person_image = 'assets/upload/image/hero/' . $filename;
+            }
         }
 
         // Handle person_images (multiple images)
@@ -182,8 +184,9 @@ class SliderController extends Controller
             foreach ($request->file('person_images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                $person_images[] = 'assets/upload/image/hero/' . $filename;
+                if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                    $person_images[] = 'assets/upload/image/hero/' . $filename;
+                }
             }
         }
 
@@ -245,28 +248,30 @@ class SliderController extends Controller
         $background_image = $slider->background_image;
         if ($request->hasFile('background_image')) {
             // Delete old image
-            if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
-                Storage::disk('s3')->delete($slider->background_image);
+            if ($slider->background_image) {
+                $this->s3Delete($slider->background_image);
             }
             $file = $request->file('background_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $background_image = 'assets/upload/image/hero/' . $filename;
+            if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                $background_image = 'assets/upload/image/hero/' . $filename;
+            }
         }
 
         // Handle person_image (single image)
         $person_image = $slider->person_image;
         if ($request->hasFile('person_image')) {
             // Delete old image
-            if ($slider->person_image && Storage::disk('s3')->exists($slider->person_image)) {
-                Storage::disk('s3')->delete($slider->person_image);
+            if ($slider->person_image) {
+                $this->s3Delete($slider->person_image);
             }
             $file = $request->file('person_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $s3Path = 'assets/upload/image/hero/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $person_image = 'assets/upload/image/hero/' . $filename;
+            if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                $person_image = 'assets/upload/image/hero/' . $filename;
+            }
         }
 
         // Handle person_images (multiple images) - INI YANG DIHAPUS, BUKAN person_image
@@ -283,8 +288,8 @@ class SliderController extends Controller
             // Delete old person_images (multiple images) - BUKAN person_image (single)
             if (!empty($person_images) && is_array($person_images)) {
                 foreach ($person_images as $oldImage) {
-                    if ($oldImage && Storage::disk('s3')->exists($oldImage)) {
-                        Storage::disk('s3')->delete($oldImage);
+                    if ($oldImage) {
+                        $this->s3Delete($oldImage);
                     }
                 }
             }
@@ -294,8 +299,9 @@ class SliderController extends Controller
             foreach ($request->file('person_images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                $person_images[] = 'assets/upload/image/hero/' . $filename;
+                if ($this->s3Put($s3Path, file_get_contents($file->getRealPath()), 'public')) {
+                    $person_images[] = 'assets/upload/image/hero/' . $filename;
+                }
             }
         }
 
@@ -348,8 +354,8 @@ class SliderController extends Controller
         }
 
         // Delete images
-        if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
-            Storage::disk('s3')->delete($slider->background_image);
+        if ($slider->background_image) {
+            $this->s3Delete($slider->background_image);
         }
         
         // Handle person_images - decode if JSON string
@@ -359,8 +365,8 @@ class SliderController extends Controller
         }
         if (!empty($person_images) && is_array($person_images)) {
             foreach ($person_images as $image) {
-                if ($image && Storage::disk('s3')->exists($image)) {
-                    Storage::disk('s3')->delete($image);
+                if ($image) {
+                    $this->s3Delete($image);
                 }
             }
         }
@@ -371,21 +377,83 @@ class SliderController extends Controller
     }
 
     /**
+     * Check if S3 is properly configured
+     */
+    private function isS3Configured()
+    {
+        try {
+            $bucket = config('filesystems.disks.s3.bucket');
+            return !empty($bucket);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Helper function to safely get image URL from S3
      */
     private function getImageUrl($path)
     {
         try {
-            // Check if S3 is configured
-            $bucket = config('filesystems.disks.s3.bucket');
-            if (empty($bucket)) {
+            if (!$this->isS3Configured()) {
                 return null;
             }
-            
             return Storage::disk('s3')->url($path);
         } catch (\Exception $e) {
-            \Log::error('Error getting S3 image URL: ' . $e->getMessage());
+            Log::error('Error getting S3 image URL: ' . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Helper function to safely check if file exists in S3
+     */
+    private function s3Exists($path)
+    {
+        try {
+            if (!$this->isS3Configured()) {
+                return false;
+            }
+            return Storage::disk('s3')->exists($path);
+        } catch (\Exception $e) {
+            Log::error('Error checking S3 file existence: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Helper function to safely delete file from S3
+     */
+    private function s3Delete($path)
+    {
+        try {
+            if (!$this->isS3Configured()) {
+                return false;
+            }
+            if ($this->s3Exists($path)) {
+                return Storage::disk('s3')->delete($path);
+            }
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting S3 file: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Helper function to safely upload file to S3
+     */
+    private function s3Put($path, $contents, $visibility = 'public')
+    {
+        try {
+            if (!$this->isS3Configured()) {
+                Log::error('S3 not configured, cannot upload file: ' . $path);
+                return false;
+            }
+            return Storage::disk('s3')->put($path, $contents, $visibility);
+        } catch (\Exception $e) {
+            Log::error('Error uploading to S3: ' . $e->getMessage());
+            return false;
         }
     }
 }
