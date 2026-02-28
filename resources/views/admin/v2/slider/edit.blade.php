@@ -164,9 +164,9 @@
                         <label for="background_image" class="block text-sm font-semibold text-gray-700 mb-2">Background Image</label>
                         <input type="file" id="background_image" name="background_image" accept="image/*"
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
-                        @if($slider->background_image)
+                        @if($slider->background_image_url)
                             <div class="mt-3">
-                                <img src="{{ Storage::disk('s3')->url($slider->background_image) }}" alt="Current background" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
+                                <img src="{{ $slider->background_image_url }}" alt="Current background" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">Gambar saat ini (kosongkan jika tidak ingin mengubah)</p>
                             </div>
                         @endif
@@ -177,9 +177,9 @@
                         <label for="person_image" class="block text-sm font-semibold text-gray-700 mb-2">Person Image</label>
                         <input type="file" id="person_image" name="person_image" accept="image/*"
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
-                        @if($slider->person_image)
+                        @if($slider->person_image_url)
                             <div class="mt-3">
-                                <img src="{{ Storage::disk('s3')->url($slider->person_image) }}" alt="Current person" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
+                                <img src="{{ $slider->person_image_url }}" alt="Current person" class="w-48 h-32 object-cover rounded-lg border border-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">Gambar saat ini (kosongkan jika tidak ingin mengubah)</p>
                             </div>
                         @endif
@@ -200,11 +200,11 @@
                                 $personImages = [];
                             }
                         @endphp
-                        @if(!empty($personImages) && count($personImages) > 0)
+                        @if(!empty($slider->person_images_urls) && count($slider->person_images_urls) > 0)
                             <div class="mt-3 flex flex-wrap gap-3">
-                                @foreach($personImages as $img)
-                                    @if(!empty($img))
-                                        <img src="{{ Storage::disk('s3')->url($img) }}" alt="Person image" class="w-24 h-24 object-cover rounded-lg border border-gray-200">
+                                @foreach($slider->person_images_urls as $imgUrl)
+                                    @if(!empty($imgUrl))
+                                        <img src="{{ $imgUrl }}" alt="Person image" class="w-24 h-24 object-cover rounded-lg border border-gray-200">
                                     @endif
                                 @endforeach
                             </div>

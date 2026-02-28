@@ -117,6 +117,24 @@ class SliderController extends Controller
             }
         }
         
+        // Add image URLs safely
+        $slider->background_image_url = $slider->background_image ? $this->getImageUrl($slider->background_image) : null;
+        $slider->person_image_url = $slider->person_image ? $this->getImageUrl($slider->person_image) : null;
+        
+        // Add URLs for person_images array
+        if (!empty($slider->person_images) && is_array($slider->person_images)) {
+            $slider->person_images_urls = [];
+            foreach ($slider->person_images as $img) {
+                if (!empty($img)) {
+                    $slider->person_images_urls[] = $this->getImageUrl($img);
+                } else {
+                    $slider->person_images_urls[] = null;
+                }
+            }
+        } else {
+            $slider->person_images_urls = [];
+        }
+        
         $data = [
             'title' => 'Edit Slider Homepage - ' . $site->namaweb,
             'site' => $site,
