@@ -53,17 +53,15 @@ class SliderController extends Controller
         $sliders = $query->paginate($perPage)->withQueryString();
         
         // Add image URLs to each slider safely
-        foreach ($sliders as $slider) {
+        // Use getCollection() to modify items in paginated result
+        $sliders->getCollection()->transform(function ($slider) {
             if ($slider->background_image) {
-                try {
-                    $slider->image_url = $this->getImageUrl($slider->background_image);
-                } catch (\Exception $e) {
-                    $slider->image_url = null;
-                }
+                $slider->image_url = $this->getImageUrl($slider->background_image);
             } else {
                 $slider->image_url = null;
             }
-        }
+            return $slider;
+        });
         
         $data = [
             'title' => 'Kelola Slider Homepage - ' . $site->namaweb,
