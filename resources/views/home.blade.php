@@ -1021,7 +1021,17 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="relative">
           <div class="h-40 sm:h-48 overflow-hidden bg-gray-50">
             @if(!empty($item->foto))
-              <img src="{{ asset($item->foto) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
+              @php
+                // Handle both new path (image/kisah-sukses/) and old path
+                $kisahFotoUrl = $item->foto;
+                // If path starts with uploads/kisah-sukses/, it's old format - need storage/ prefix
+                if (strpos($kisahFotoUrl, 'uploads/kisah-sukses/') === 0) {
+                  $kisahFotoUrl = 'storage/' . $kisahFotoUrl;
+                }
+                // If path already starts with storage/, use as is
+                // If path starts with image/kisah-sukses/, use as is (new format)
+              @endphp
+              <img src="{{ asset($kisahFotoUrl) }}" alt="{{ $item->nama ?? 'Testimonial' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'" />
             @else
               <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" alt="Default testimonial" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
             @endif

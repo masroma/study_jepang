@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\KisahSukses;
 
 class KisahSuksesV2Controller extends Controller
@@ -57,6 +59,16 @@ class KisahSuksesV2Controller extends Controller
         
         $kisah_sukses = $query->paginate($perPage)->withQueryString();
         
+        // Add image URLs to each kisah sukses safely
+        $kisah_sukses->getCollection()->transform(function ($kisah) {
+            if ($kisah->foto) {
+                $kisah->image_url = $this->getImageUrl($kisah->foto);
+            } else {
+                $kisah->image_url = null;
+            }
+            return $kisah;
+        });
+        
         $data = [
             'title' => 'Kelola Kisah Sukses - ' . $site->namaweb,
             'site' => $site,
@@ -100,6 +112,9 @@ class KisahSuksesV2Controller extends Controller
             return redirect('admin/v2/kisah-sukses')->with(['warning' => 'Kisah sukses tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $kisah->image_url = $kisah->foto ? $this->getImageUrl($kisah->foto) : null;
+        
         $data = [
             'title' => 'Edit Kisah Sukses - ' . $site->namaweb,
             'site' => $site,
@@ -121,7 +136,7 @@ class KisahSuksesV2Controller extends Controller
             'pekerjaan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'testimoni' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'program' => 'nullable|string|max:255',
             'tahun' => 'nullable|integer|min:2000|max:' . date('Y'),
             'rating' => 'nullable|integer|min:1|max:5',
@@ -135,20 +150,34 @@ class KisahSuksesV2Controller extends Controller
 
         // Upload foto
         if ($request->hasFile('foto')) {
-            $image = $request->file('foto');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['foto'] = $imageName;
+            $file = $request->file('foto');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/kisah-sukses');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['foto'] = 'image/kisah-sukses/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload foto']);
+            }
         }
 
         // Upload video
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('public')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
-            $data['video_file'] = $videoName;
+            $uploadPath = public_path('image/kisah-sukses/videos');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($video->move($uploadPath, $videoName)) {
+                $data['video_file'] = 'image/kisah-sukses/videos/' . $videoName;
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -172,7 +201,7 @@ class KisahSuksesV2Controller extends Controller
             'pekerjaan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'testimoni' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'program' => 'nullable|string|max:255',
             'tahun' => 'nullable|integer|min:2000|max:' . date('Y'),
             'rating' => 'nullable|integer|min:1|max:5',
@@ -192,30 +221,42 @@ class KisahSuksesV2Controller extends Controller
 
         // Upload foto baru
         if ($request->hasFile('foto')) {
-            // Hapus foto lama
-            if ($kisah->foto && Storage::disk('public')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
-                Storage::disk('public')->delete('uploads/kisah-sukses/' . $kisah->foto);
+            $file = $request->file('foto');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
             }
-
-            $image = $request->file('foto');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['foto'] = $imageName;
+            // Hapus foto lama
+            if ($kisah->foto) {
+                $this->deleteImage($kisah->foto);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/kisah-sukses');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['foto'] = 'image/kisah-sukses/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload foto']);
+            }
         }
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
             // Hapus video lama
-            if ($kisah->video_file && Storage::disk('public')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
-                Storage::disk('public')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
+            if ($kisah->video_file) {
+                $this->deleteVideo($kisah->video_file);
             }
-
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('public')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
-            $data['video_file'] = $videoName;
+            $uploadPath = public_path('image/kisah-sukses/videos');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($video->move($uploadPath, $videoName)) {
+                $data['video_file'] = 'image/kisah-sukses/videos/' . $videoName;
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $kisah->urutan;
@@ -240,17 +281,124 @@ class KisahSuksesV2Controller extends Controller
         }
 
         // Hapus foto
-        if ($kisah->foto && Storage::disk('public')->exists('uploads/kisah-sukses/' . $kisah->foto)) {
-            Storage::disk('public')->delete('uploads/kisah-sukses/' . $kisah->foto);
+        if ($kisah->foto) {
+            $this->deleteImage($kisah->foto);
         }
         
         // Hapus video file
-        if ($kisah->video_file && Storage::disk('public')->exists('uploads/kisah-sukses/videos/' . $kisah->video_file)) {
-            Storage::disk('public')->delete('uploads/kisah-sukses/videos/' . $kisah->video_file);
+        if ($kisah->video_file) {
+            $this->deleteVideo($kisah->video_file);
         }
         
         $kisah->delete();
 
         return redirect('admin/v2/kisah-sukses')->with(['sukses' => 'Kisah Sukses berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/kisah-sukses/...
+            if (strpos($path, 'image/kisah-sukses/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/kisah-sukses/...
+            if (strpos($path, 'image/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Helper function to delete video from public directory
+     */
+    private function deleteVideo($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/kisah-sukses/videos/...
+            if (strpos($path, 'image/kisah-sukses/videos/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'uploads/kisah-sukses/videos/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting video: ' . $e->getMessage());
+            return false;
+        }
     }
 }
