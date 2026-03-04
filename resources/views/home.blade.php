@@ -649,12 +649,14 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="w-full md:w-2/3">
       <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-pink leading-tight mb-3 sm:mb-4">{{ $content['jepang_title'] }}</h2>
       <p class="text-gray-500 leading-relaxed mb-5 sm:mb-6 font-medium text-sm sm:text-base">{{ $content['jepang_subtitle'] }}</p>
-      <button class="bg-brand-yellow text-gray-900 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">{!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span></button>
+      <a href="#program-section" class="bg-brand-yellow text-gray-900 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition flex items-center inline-flex">
+        {!! $home_contents['more_button']->content ?? 'Selengkapnya' !!} <span class="ml-2">></span>
+      </a>
     </div>
   </div>
 </section>
 
-<section class="py-12 sm:py-16">
+<section id="program-section" class="py-12 sm:py-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <div class="mb-6 sm:mb-8 md:mb-10">
       <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-brand-pink mb-2 sm:mb-3">{{ $content['program_title'] }}</h2>
