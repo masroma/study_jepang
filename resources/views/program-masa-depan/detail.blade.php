@@ -122,8 +122,8 @@
         <div class="bg-gray-50 rounded-2xl p-6 sticky top-24">
           <h3 class="font-bold text-gray-800 text-lg mb-6">Program Lainnya</h3>
           <div class="space-y-4">
-            @forelse($related_programs as $related)
-            <a href="{{ url('program-masa-depan/detail/'.$related->id_program) }}" class="block group">
+          @forelse($related_programs as $related)
+          <a href="{{ url('program/detail/'.$related->id_program) }}" class="block group">
               <div class="bg-white rounded-xl p-4 hover:shadow-lg transition-all duration-300">
                 @if($related->gambar_url)
                 <div class="mb-3 rounded-lg overflow-hidden">
@@ -140,7 +140,7 @@
           </div>
 
           <div class="mt-8 pt-8 border-t border-gray-200">
-            <a href="{{ url('program-masa-depan') }}" class="text-brand-pink hover:text-brand-pink/80 font-medium text-sm transition inline-flex items-center">
+          <a href="{{ url('program') }}" class="text-brand-pink hover:text-brand-pink/80 font-medium text-sm transition inline-flex items-center">
               Lihat Semua Program <span class="ml-1">→</span>
             </a>
           </div>

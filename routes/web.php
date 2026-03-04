@@ -50,9 +50,9 @@ Route::get('berita/kategori/{par1}', 'App\Http\Controllers\Berita@kategori');
 // Kisah Sukses
 Route::get('kisah-sukses', 'App\Http\Controllers\KisahSuksesController@index');
 Route::get('kisah-sukses/detail/{id_kisah}', 'App\Http\Controllers\KisahSuksesController@detail');
-// Program Masa Depan
-Route::get('program-masa-depan', 'App\Http\Controllers\ProgramMasaDepanController@index');
-Route::get('program-masa-depan/detail/{id_program}', 'App\Http\Controllers\ProgramMasaDepanController@detail');
+// Program
+Route::get('program', 'App\Http\Controllers\ProgramMasaDepanController@index');
+Route::get('program/detail/{id_program}', 'App\Http\Controllers\ProgramMasaDepanController@detail');
 // Industri
 Route::get('industri', 'App\Http\Controllers\IndustriController@index');
 Route::get('industri/detail/{id_industri}', 'App\Http\Controllers\IndustriController@detail');

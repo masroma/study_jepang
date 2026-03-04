@@ -668,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="flex-1 min-w-0">
         <div class="flex gap-4 sm:gap-6 overflow-x-auto pb-4 sm:pb-6 no-scrollbar">
       @forelse($program_masa_depan as $item)
-      <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
+      <a href="{{ url('program/detail/'.$item->id_program) }}" class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-50">
           @if($item->gambar_url)
             <img src="{{ $item->gambar_url }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="text-xs text-gray-500">{{ $item->durasi ?? 'Duration' }}</span>
           </div>
         </div>
-      </div>
+      </a>
       @empty
       <div class="shrink-0 w-[300px] sm:w-[340px] text-center py-8 sm:py-12">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="text-center mt-8 sm:mt-12">
-      <button class="bg-brand-yellow text-gray-900 px-8 sm:px-10 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition inline-flex items-center">Lihat Semua Program <span class="ml-2">></span></button>
+      <a href="{{ url('program') }}" class="bg-brand-yellow text-gray-900 px-8 sm:px-10 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 transition inline-flex items-center">Lihat Semua Program <span class="ml-2">></span></a>
     </div>
   </div>
 </section>
@@ -770,12 +770,12 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="flex-1 min-w-0">
         <div class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-6 sm:pb-10 justify-start md:justify-between px-2 sm:px-4 no-scrollbar">
       @forelse($industri as $item)
-      <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
+      <a href="{{ url('industri/detail/'.$item->id_industri) }}" class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
         <img src="{{ $item->gambar_url ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
         <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
           <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
         </div>
-      </div>
+      </a>
       @empty
       <div class="flex gap-4 sm:gap-6 md:gap-8 justify-start md:justify-between px-2 sm:px-4">
         <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
@@ -983,7 +983,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       @forelse($kisah_sukses as $item)
-      <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
+      <a href="{{ url('kisah-sukses/detail/'.$item->id_kisah) }}" class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
         <div class="relative">
           <div class="h-40 sm:h-48 overflow-hidden bg-gray-50">
             @if($item->foto_url)
@@ -1022,17 +1022,17 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="flex items-center justify-between flex-wrap gap-2">
             <span class="text-xs bg-brand-pink/10 text-brand-pink px-2 py-1 rounded-full font-medium">{{ $item->program ?? 'Program' }}</span>
             @if(!empty($item->video_url))
-              <button onclick="window.open('{{ $item->video_url }}', '_blank')" class="text-brand-pink hover:text-brand-pink/80 text-xs font-medium transition flex items-center">
+              <span onclick="event.stopPropagation(); window.open('{{ $item->video_url }}', '_blank')" class="text-brand-pink hover:text-brand-pink/80 text-xs font-medium transition flex items-center cursor-pointer">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010.905 6.5L3 13.586V16a1 1 0 001 1h6a1 1 0 001-1v-2.414l-3.197-2.132A1 1 0 0013.248 6.5L14.752 11.168z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v-1.236a1 1 0 00-.447-.894l-4.553-2.276A1 1 0 0014 4.618v1.236a1 1 0 00.447.894l4.553 2.276A1 1 0 0016 9.618V8.382a1 1 0 00-.447-.894L11 5.212V3a1 1 0 00-1-1H7a1 1 0 00-1 1v2.212L5.447 7.488A1 1 0 005 8.382v9.236a1 1 0 00.447.894L10 18.788V21a1 1 0 001 1h6a1 1 0 001-1v-2.212l13.553-2.276A1 1 0 0018 17.618v8.236z"></path>
                 </svg>
                 Video
-              </button>
+              </span>
             @endif
           </div>
         </div>
-      </div>
+      </a>
       @empty
       <div class="col-span-full text-center py-8 sm:py-12">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 sm:p-8 max-w-md mx-auto">

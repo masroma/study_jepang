@@ -69,7 +69,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
       @forelse($kisah_sukses as $kisah)
-      <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-2 group">
+      <a href="{{ url('kisah-sukses/detail/'.$kisah->id_kisah) }}" class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-2 group">
         <div class="w-full relative overflow-hidden h-56 md:h-64">
           <div class="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-yellow-500/10 mix-blend-overlay z-10"></div>
           @if($kisah->foto_url)
@@ -102,7 +102,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
       @empty
       <!-- Default data jika belum ada di database -->
       <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-2 group">
