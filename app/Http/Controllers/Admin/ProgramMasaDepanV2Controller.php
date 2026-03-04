@@ -123,58 +123,22 @@ class ProgramMasaDepanV2Controller extends Controller
             return redirect('login')->with(['warning' => 'Mohon maaf, Anda belum login']);
         }
         
+        // NOTE: Table `program_masa_depan` uses single-language columns (judul, deskripsi, dll).
+        // Views `admin/v2/program_masa_depan/tambah|edit.blade.php` also post these fields.
         $request->validate([
-            'judul_id' => 'required|string|max:255',
-            'judul_en' => 'nullable|string|max:255',
-            'judul_jp' => 'nullable|string|max:255',
+            'judul' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
-            'deskripsi_id' => 'nullable|string',
-            'deskripsi_en' => 'nullable|string',
-            'deskripsi_jp' => 'nullable|string',
-            'lokasi_id' => 'nullable|string|max:255',
-            'lokasi_en' => 'nullable|string|max:255',
-            'lokasi_jp' => 'nullable|string|max:255',
-            'durasi_id' => 'nullable|string|max:255',
-            'durasi_en' => 'nullable|string|max:255',
-            'durasi_jp' => 'nullable|string|max:255',
-            'visa_id' => 'nullable|string|max:255',
-            'visa_en' => 'nullable|string|max:255',
-            'visa_jp' => 'nullable|string|max:255',
-            'gaji_id' => 'nullable|string|max:255',
-            'gaji_en' => 'nullable|string|max:255',
-            'gaji_jp' => 'nullable|string|max:255',
-            'sertifikat_id' => 'nullable|string|max:255',
-            'sertifikat_en' => 'nullable|string|max:255',
-            'sertifikat_jp' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'durasi' => 'nullable|string|max:255',
+            'visa' => 'nullable|string|max:255',
+            'gaji' => 'nullable|string|max:255',
+            'sertifikat' => 'nullable|string|max:255',
             'urutan' => 'nullable|integer|min:0',
             'status' => 'required|in:Publish,Draft'
         ]);
 
         $data = $request->except('gambar');
-        
-        // Map old field names to new multi-language fields for backward compatibility
-        // If old fields exist, use them as _id
-        if ($request->has('judul') && !$request->has('judul_id')) {
-            $data['judul_id'] = $request->judul;
-        }
-        if ($request->has('deskripsi') && !$request->has('deskripsi_id')) {
-            $data['deskripsi_id'] = $request->deskripsi;
-        }
-        if ($request->has('lokasi') && !$request->has('lokasi_id')) {
-            $data['lokasi_id'] = $request->lokasi;
-        }
-        if ($request->has('durasi') && !$request->has('durasi_id')) {
-            $data['durasi_id'] = $request->durasi;
-        }
-        if ($request->has('visa') && !$request->has('visa_id')) {
-            $data['visa_id'] = $request->visa;
-        }
-        if ($request->has('gaji') && !$request->has('gaji_id')) {
-            $data['gaji_id'] = $request->gaji;
-        }
-        if ($request->has('sertifikat') && !$request->has('sertifikat_id')) {
-            $data['sertifikat_id'] = $request->sertifikat;
-        }
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
@@ -211,28 +175,14 @@ class ProgramMasaDepanV2Controller extends Controller
         
         $request->validate([
             'id_program' => 'required|exists:program_masa_depan,id_program',
-            'judul_id' => 'required|string|max:255',
-            'judul_en' => 'nullable|string|max:255',
-            'judul_jp' => 'nullable|string|max:255',
+            'judul' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
-            'deskripsi_id' => 'nullable|string',
-            'deskripsi_en' => 'nullable|string',
-            'deskripsi_jp' => 'nullable|string',
-            'lokasi_id' => 'nullable|string|max:255',
-            'lokasi_en' => 'nullable|string|max:255',
-            'lokasi_jp' => 'nullable|string|max:255',
-            'durasi_id' => 'nullable|string|max:255',
-            'durasi_en' => 'nullable|string|max:255',
-            'durasi_jp' => 'nullable|string|max:255',
-            'visa_id' => 'nullable|string|max:255',
-            'visa_en' => 'nullable|string|max:255',
-            'visa_jp' => 'nullable|string|max:255',
-            'gaji_id' => 'nullable|string|max:255',
-            'gaji_en' => 'nullable|string|max:255',
-            'gaji_jp' => 'nullable|string|max:255',
-            'sertifikat_id' => 'nullable|string|max:255',
-            'sertifikat_en' => 'nullable|string|max:255',
-            'sertifikat_jp' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'durasi' => 'nullable|string|max:255',
+            'visa' => 'nullable|string|max:255',
+            'gaji' => 'nullable|string|max:255',
+            'sertifikat' => 'nullable|string|max:255',
             'urutan' => 'nullable|integer|min:0',
             'status' => 'required|in:Publish,Draft'
         ]);
@@ -244,29 +194,6 @@ class ProgramMasaDepanV2Controller extends Controller
         }
 
         $data = $request->except(['gambar', 'id_program']);
-        
-        // Map old field names to new multi-language fields for backward compatibility
-        if ($request->has('judul') && !$request->has('judul_id')) {
-            $data['judul_id'] = $request->judul;
-        }
-        if ($request->has('deskripsi') && !$request->has('deskripsi_id')) {
-            $data['deskripsi_id'] = $request->deskripsi;
-        }
-        if ($request->has('lokasi') && !$request->has('lokasi_id')) {
-            $data['lokasi_id'] = $request->lokasi;
-        }
-        if ($request->has('durasi') && !$request->has('durasi_id')) {
-            $data['durasi_id'] = $request->durasi;
-        }
-        if ($request->has('visa') && !$request->has('visa_id')) {
-            $data['visa_id'] = $request->visa;
-        }
-        if ($request->has('gaji') && !$request->has('gaji_id')) {
-            $data['gaji_id'] = $request->gaji;
-        }
-        if ($request->has('sertifikat') && !$request->has('sertifikat_id')) {
-            $data['sertifikat_id'] = $request->sertifikat;
-        }
 
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
