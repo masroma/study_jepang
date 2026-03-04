@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\KisahSukses;
+use App\Models\ProgramMasaDepan;
 
-class KisahSuksesController extends Controller
+class ProgramMasaDepanController extends Controller
 {
-    // Kisah Sukses page
+    // Index page - list all programs
     public function index()
     {
         $site_config = DB::table('konfigurasi')->first();
@@ -22,28 +22,28 @@ class KisahSuksesController extends Controller
             ];
         }
 
-        $kisah_sukses = KisahSukses::publish()->ordered()->get();
+        $programs = ProgramMasaDepan::publish()->ordered()->get();
         
         // Add S3 URLs
-        foreach ($kisah_sukses as $kisah) {
-            if ($kisah->foto) {
-                $kisah->foto_url = $this->getImageUrl($kisah->foto);
+        foreach ($programs as $program) {
+            if ($program->gambar) {
+                $program->gambar_url = $this->getImageUrl($program->gambar);
             }
         }
 
         $data = [
-            'title'         => 'Kisah Sukses - ' . $site_config->namaweb,
-            'deskripsi'     => 'Kisah Sukses Alumni - ' . $site_config->namaweb,
-            'keywords'      => 'Kisah Sukses, Alumni, Testimoni',
+            'title'         => 'Program Masa Depan - ' . $site_config->namaweb,
+            'deskripsi'     => 'Program Masa Depan - ' . $site_config->namaweb,
+            'keywords'      => 'Program Masa Depan, Program Jepang',
             'site_config'   => $site_config,
-            'kisah_sukses'  => $kisah_sukses
+            'programs'      => $programs
         ];
 
-        return view('kisah-sukses', $data);
+        return view('program-masa-depan.index', $data);
     }
 
     // Detail page
-    public function detail($id_kisah)
+    public function detail($id_program)
     {
         $site_config = DB::table('konfigurasi')->first();
 
@@ -56,38 +56,38 @@ class KisahSuksesController extends Controller
             ];
         }
 
-        $kisah = KisahSukses::where('id_kisah', $id_kisah)
+        $program = ProgramMasaDepan::where('id_program', $id_program)
             ->where('status', 'Publish')
             ->firstOrFail();
         
         // Add S3 URL
-        if ($kisah->foto) {
-            $kisah->foto_url = $this->getImageUrl($kisah->foto);
+        if ($program->gambar) {
+            $program->gambar_url = $this->getImageUrl($program->gambar);
         }
 
-        // Get related kisah sukses
-        $related_kisah = KisahSukses::where('id_kisah', '!=', $id_kisah)
+        // Get related programs
+        $related_programs = ProgramMasaDepan::where('id_program', '!=', $id_program)
             ->where('status', 'Publish')
             ->ordered()
             ->limit(3)
             ->get();
         
-        foreach ($related_kisah as $related) {
-            if ($related->foto) {
-                $related->foto_url = $this->getImageUrl($related->foto);
+        foreach ($related_programs as $related) {
+            if ($related->gambar) {
+                $related->gambar_url = $this->getImageUrl($related->gambar);
             }
         }
 
         $data = [
-            'title'         => $kisah->nama . ' - Kisah Sukses - ' . $site_config->namaweb,
-            'deskripsi'     => strip_tags($kisah->testimoni ?? ''),
-            'keywords'      => $kisah->nama . ', Kisah Sukses, Alumni',
+            'title'         => $program->judul . ' - ' . $site_config->namaweb,
+            'deskripsi'     => strip_tags($program->deskripsi ?? ''),
+            'keywords'      => $program->judul . ', Program Jepang',
             'site_config'   => $site_config,
-            'kisah'         => $kisah,
-            'related_kisah' => $related_kisah
+            'program'       => $program,
+            'related_programs' => $related_programs
         ];
 
-        return view('kisah-sukses.detail', $data);
+        return view('program-masa-depan.detail', $data);
     }
 
     /**
@@ -119,7 +119,7 @@ class KisahSuksesController extends Controller
             }
             
             // Try direct asset path
-            return asset('storage/uploads/kisah-sukses/' . $path);
+            return asset('storage/uploads/program/' . $path);
         } catch (\Exception $e) {
             return null;
         }

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\KisahSukses;
+use App\Models\Industri;
 
-class KisahSuksesController extends Controller
+class IndustriController extends Controller
 {
-    // Kisah Sukses page
+    // Index page - list all industries
     public function index()
     {
         $site_config = DB::table('konfigurasi')->first();
@@ -22,28 +22,28 @@ class KisahSuksesController extends Controller
             ];
         }
 
-        $kisah_sukses = KisahSukses::publish()->ordered()->get();
+        $industries = Industri::publish()->ordered()->get();
         
         // Add S3 URLs
-        foreach ($kisah_sukses as $kisah) {
-            if ($kisah->foto) {
-                $kisah->foto_url = $this->getImageUrl($kisah->foto);
+        foreach ($industries as $item) {
+            if ($item->gambar) {
+                $item->gambar_url = $this->getImageUrl($item->gambar);
             }
         }
 
         $data = [
-            'title'         => 'Kisah Sukses - ' . $site_config->namaweb,
-            'deskripsi'     => 'Kisah Sukses Alumni - ' . $site_config->namaweb,
-            'keywords'      => 'Kisah Sukses, Alumni, Testimoni',
+            'title'         => 'Industri - ' . $site_config->namaweb,
+            'deskripsi'     => 'Industri - ' . $site_config->namaweb,
+            'keywords'      => 'Industri, Industri Jepang',
             'site_config'   => $site_config,
-            'kisah_sukses'  => $kisah_sukses
+            'industries'    => $industries
         ];
 
-        return view('kisah-sukses', $data);
+        return view('industri.index', $data);
     }
 
     // Detail page
-    public function detail($id_kisah)
+    public function detail($id_industri)
     {
         $site_config = DB::table('konfigurasi')->first();
 
@@ -56,38 +56,38 @@ class KisahSuksesController extends Controller
             ];
         }
 
-        $kisah = KisahSukses::where('id_kisah', $id_kisah)
+        $industri = Industri::where('id_industri', $id_industri)
             ->where('status', 'Publish')
             ->firstOrFail();
         
         // Add S3 URL
-        if ($kisah->foto) {
-            $kisah->foto_url = $this->getImageUrl($kisah->foto);
+        if ($industri->gambar) {
+            $industri->gambar_url = $this->getImageUrl($industri->gambar);
         }
 
-        // Get related kisah sukses
-        $related_kisah = KisahSukses::where('id_kisah', '!=', $id_kisah)
+        // Get related industries
+        $related_industries = Industri::where('id_industri', '!=', $id_industri)
             ->where('status', 'Publish')
             ->ordered()
             ->limit(3)
             ->get();
         
-        foreach ($related_kisah as $related) {
-            if ($related->foto) {
-                $related->foto_url = $this->getImageUrl($related->foto);
+        foreach ($related_industries as $related) {
+            if ($related->gambar) {
+                $related->gambar_url = $this->getImageUrl($related->gambar);
             }
         }
 
         $data = [
-            'title'         => $kisah->nama . ' - Kisah Sukses - ' . $site_config->namaweb,
-            'deskripsi'     => strip_tags($kisah->testimoni ?? ''),
-            'keywords'      => $kisah->nama . ', Kisah Sukses, Alumni',
+            'title'         => $industri->nama . ' - ' . $site_config->namaweb,
+            'deskripsi'     => strip_tags($industri->deskripsi ?? ''),
+            'keywords'      => $industri->nama . ', Industri Jepang',
             'site_config'   => $site_config,
-            'kisah'         => $kisah,
-            'related_kisah' => $related_kisah
+            'industri'      => $industri,
+            'related_industries' => $related_industries
         ];
 
-        return view('kisah-sukses.detail', $data);
+        return view('industri.detail', $data);
     }
 
     /**
@@ -119,7 +119,7 @@ class KisahSuksesController extends Controller
             }
             
             // Try direct asset path
-            return asset('storage/uploads/kisah-sukses/' . $path);
+            return asset('storage/uploads/industri/' . $path);
         } catch (\Exception $e) {
             return null;
         }
