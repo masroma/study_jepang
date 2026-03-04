@@ -169,4 +169,35 @@
         </div>
     </form>
 </div>
+
+<!-- CKEditor Script -->
+<script src="{{ asset('assets/ckeditor/ckeditor.js') }}"></script>
+<script>
+    CKEDITOR.replace('isi', {
+        height: 400,
+        filebrowserBrowseUrl: '{{ asset("assets/responsive_filemanager/filemanager/dialog.php") }}?type=2&editor=ckeditor&fldr=',
+        filebrowserUploadUrl: '{{ asset("assets/responsive_filemanager/filemanager/dialog.php") }}?type=2&editor=ckeditor&fldr=',
+        filebrowserImageBrowseUrl: '{{ asset("assets/responsive_filemanager/filemanager/dialog.php") }}?type=1&editor=ckeditor&fldr=',
+        toolbar: [
+            { name: 'document', items: ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates'] },
+            { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+            { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll'] },
+            '/',
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+            { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+            { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak'] },
+            '/',
+            { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+            { name: 'colors', items: ['TextColor', 'BGColor'] },
+            { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+        ],
+        language: 'id',
+        uiColor: '#f8f9fa',
+        removeDialogTabs: 'image:advanced;link:advanced',
+        allowedContent: true,
+        enterMode: CKEDITOR.ENTER_BR,
+        shiftEnterMode: CKEDITOR.ENTER_P
+    });
+</script>
 @endsection
