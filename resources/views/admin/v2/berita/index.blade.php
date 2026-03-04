@@ -98,8 +98,8 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($berita->gambar)
-                                <img src="{{ asset('storage/assets/upload/image/' . $berita->gambar) }}" alt="Berita" class="w-16 h-16 object-cover rounded-lg">
+                            @if($berita->image_url)
+                                <img src="{{ $berita->image_url }}" alt="Berita" class="w-16 h-16 object-cover rounded-lg">
                             @else
                                 <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-newspaper text-gray-400"></i>

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\Berita;
 use App\Models\Kategori;
 use Illuminate\Support\Str;
@@ -52,6 +54,17 @@ class BeritaV2Controller extends Controller
         $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
         
         $beritas = $query->paginate($perPage)->withQueryString();
+        
+        // Add image URL to each berita
+        $beritas->getCollection()->transform(function ($berita) {
+            if ($berita->gambar) {
+                $berita->image_url = $this->getImageUrl($berita->gambar);
+            } else {
+                $berita->image_url = null;
+            }
+            return $berita;
+        });
+        
         $kategoris = Kategori::orderBy('urutan', 'ASC')->get();
         
         // Statistik
@@ -109,6 +122,9 @@ class BeritaV2Controller extends Controller
             return redirect('admin/v2/berita')->with(['warning' => 'Berita tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $berita->image_url = $berita->gambar ? $this->getImageUrl($berita->gambar) : null;
+        
         $kategoris = Kategori::orderBy('urutan', 'ASC')->get();
         
         $data = [
@@ -132,7 +148,7 @@ class BeritaV2Controller extends Controller
             'judul_berita' => 'required|string|max:255|unique:berita,judul_berita',
             'id_kategori' => 'required|exists:kategori,id_kategori',
             'isi' => 'required|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'icon' => 'nullable|string|max:255',
             'keywords' => 'nullable|string|max:500',
             'tanggal_publish' => 'nullable|date',
@@ -154,21 +170,38 @@ class BeritaV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            $image = $request->file('gambar');
-            $filenamewithextension = $image->getClientOriginalName();
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            
+            $filenamewithextension = $file->getClientOriginalName();
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-            $nama_file = Str::slug($filename, '-') . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $nama_file = Str::slug($filename, '-') . '-' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
-            // Upload original image to S3
-            $s3Path = 'assets/upload/image/' . $nama_file;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            $uploadPath = public_path('image/berita');
+            $thumbPath = public_path('image/berita/thumbs');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if (!File::exists($thumbPath)) {
+                File::makeDirectory($thumbPath, 0755, true);
+            }
             
-            // Create thumbnail and upload to S3
-            $img = Image::make($image->getRealPath())->resize(150, 150);
-            $thumbnailPath = 'assets/upload/image/thumbs/' . $nama_file;
-            Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
-            
-            $data['gambar'] = $nama_file;
+            // Move original image
+            if ($file->move($uploadPath, $nama_file)) {
+                // Create thumbnail
+                try {
+                    $img = Image::make($uploadPath . '/' . $nama_file)->resize(150, 150);
+                    $img->save($thumbPath . '/' . $nama_file);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to create thumbnail: ' . $e->getMessage());
+                }
+                $data['gambar'] = 'image/berita/' . $nama_file;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         // Tanggal publish
@@ -198,7 +231,7 @@ class BeritaV2Controller extends Controller
             'judul_berita' => 'required|string|max:255|unique:berita,judul_berita,' . $request->id_berita . ',id_berita',
             'id_kategori' => 'required|exists:kategori,id_kategori',
             'isi' => 'required|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'icon' => 'nullable|string|max:255',
             'keywords' => 'nullable|string|max:500',
             'tanggal_publish' => 'nullable|date',
@@ -229,29 +262,41 @@ class BeritaV2Controller extends Controller
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
             if ($berita->gambar) {
-                if (Storage::disk('public')->exists('assets/upload/image/' . $berita->gambar)) {
-                    Storage::disk('public')->delete('assets/upload/image/' . $berita->gambar);
-                }
-                if (Storage::disk('public')->exists('assets/upload/image/thumbs/' . $berita->gambar)) {
-                    Storage::disk('public')->delete('assets/upload/image/thumbs/' . $berita->gambar);
-                }
+                $this->deleteImage($berita->gambar);
             }
 
-            $image = $request->file('gambar');
-            $filenamewithextension = $image->getClientOriginalName();
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            
+            $filenamewithextension = $file->getClientOriginalName();
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-            $nama_file = Str::slug($filename, '-') . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $nama_file = Str::slug($filename, '-') . '-' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
-            // Upload original image to S3
-            $s3Path = 'assets/upload/image/' . $nama_file;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            $uploadPath = public_path('image/berita');
+            $thumbPath = public_path('image/berita/thumbs');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if (!File::exists($thumbPath)) {
+                File::makeDirectory($thumbPath, 0755, true);
+            }
             
-            // Create thumbnail and upload to S3
-            $img = Image::make($image->getRealPath())->resize(150, 150);
-            $thumbnailPath = 'assets/upload/image/thumbs/' . $nama_file;
-            Storage::disk('public')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
-            
-            $data['gambar'] = $nama_file;
+            // Move original image
+            if ($file->move($uploadPath, $nama_file)) {
+                // Create thumbnail
+                try {
+                    $img = Image::make($uploadPath . '/' . $nama_file)->resize(150, 150);
+                    $img->save($thumbPath . '/' . $nama_file);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to create thumbnail: ' . $e->getMessage());
+                }
+                $data['gambar'] = 'image/berita/' . $nama_file;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         // Tanggal publish
@@ -282,16 +327,89 @@ class BeritaV2Controller extends Controller
 
         // Hapus gambar
         if ($berita->gambar) {
-            if (Storage::disk('public')->exists('assets/upload/image/' . $berita->gambar)) {
-                Storage::disk('public')->delete('assets/upload/image/' . $berita->gambar);
-            }
-            if (Storage::disk('public')->exists('assets/upload/image/thumbs/' . $berita->gambar)) {
-                Storage::disk('public')->delete('assets/upload/image/thumbs/' . $berita->gambar);
-            }
+            $this->deleteImage($berita->gambar);
         }
         
         $berita->delete();
 
         return redirect('admin/v2/berita')->with(['sukses' => 'Berita berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/berita/...
+            if (strpos($path, 'image/berita/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'assets/upload/image/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/berita/...
+            if (strpos($path, 'image/berita/') === 0) {
+                $filePath = public_path($path);
+                $thumbPath = public_path('image/berita/thumbs/' . basename($path));
+                if (File::exists($filePath)) {
+                    File::delete($filePath);
+                }
+                if (File::exists($thumbPath)) {
+                    File::delete($thumbPath);
+                }
+                return true;
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'assets/upload/image/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                $oldThumbPath = public_path('storage/assets/upload/image/thumbs/' . basename($path));
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
+                if (File::exists($oldThumbPath)) {
+                    File::delete($oldThumbPath);
+                }
+                return true;
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }
