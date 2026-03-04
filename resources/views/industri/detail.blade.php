@@ -12,17 +12,22 @@
   </div>
 
   <div class="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10 py-8 sm:py-12 md:py-16">
-    <div class="max-w-4xl">
-      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
-        <span class="text-brand-pink">{{ $industri->nama }}</span>
-        @if($industri->sub_nama)
-        <br /><span class="text-xl sm:text-2xl md:text-3xl font-normal text-gray-600">{{ $industri->sub_nama }}</span>
-        @endif
-      </h1>
-      <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
-        {{ \Illuminate\Support\Str::limit(strip_tags($industri->deskripsi ?? ''), 200) }}
-      </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="max-w-2xl">
+        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
+          <span class="text-brand-pink">{{ $industri->nama }}</span>
+          @if($industri->sub_nama)
+          <br /><span class="text-xl sm:text-2xl md:text-3xl font-normal text-gray-600">{{ $industri->sub_nama }}</span>
+          @endif
+        </h1>
+        <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
+          {{ \Illuminate\Support\Str::limit(strip_tags($industri->deskripsi ?? ''), 200) }}
+        </p>
+      </div>
+      <div class="hero-person-container relative w-full md:h-full hidden md:flex items-center justify-end mt-2 md:mt-0">
+        <img src="{{ asset('maskot/maskot3.png') }}" alt="Maskot Industri" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl" loading="lazy">
+      </div>
     </div>
   </div>
 
@@ -38,7 +43,7 @@
       <div class="lg:col-span-2">
         @if($industri->gambar_url)
         <div class="mb-8 rounded-2xl overflow-hidden shadow-xl">
-          <img src="{{ $industri->gambar_url }}" alt="{{ $industri->nama }}" class="w-full h-auto object-cover" loading="lazy" />
+          <img src="{{ $industri->gambar_url }}" alt="{{ $industri->nama }}" class="w-full h-auto object-cover" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('template/img/image6.png') }}';" />
         </div>
         @endif
 
@@ -65,7 +70,7 @@
               <div class="bg-white rounded-xl p-4 hover:shadow-lg transition-all duration-300">
                 @if($related->gambar_url)
                 <div class="mb-3 rounded-lg overflow-hidden">
-                  <img src="{{ $related->gambar_url }}" alt="{{ $related->nama }}" class="w-full h-32 object-cover rounded-full group-hover:scale-110 transition duration-500" loading="lazy" />
+                  <img src="{{ $related->gambar_url }}" alt="{{ $related->nama }}" class="w-full h-32 object-cover rounded-full group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('template/img/image6.png') }}';" />
                 </div>
                 @endif
                 <h4 class="font-bold text-gray-800 text-sm mb-1 group-hover:text-brand-pink transition">{{ $related->nama }}</h4>

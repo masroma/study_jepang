@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\Industri;
 
 class IndustriController extends Controller
@@ -100,26 +102,77 @@ class IndustriController extends Controller
                 return null;
             }
             
-            // Handle old paths that might still be in database
-            if (strpos($path, 'image/') === 0) {
+            // Handle old paths that might still be in database (for backward compatibility)
+            // If path starts with image/industri/, it's old local path - try local first
+            if (strpos($path, 'image/industri/') === 0) {
                 $localPath = public_path($path);
-                if (file_exists($localPath)) {
+                if (File::exists($localPath)) {
                     return asset($path);
                 }
+                // If not found locally, try to construct S3 URL anyway (might be migrated)
+                // Convert old path to new S3 path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    if (Storage::disk('s3')->exists($s3Path)) {
+                        return Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore S3 check error for old paths
+                }
+                // Try direct S3 URL with old path (in case file was uploaded with old path)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                return null;
             }
             
-            // For uploads/ paths
-            if (strpos($path, 'uploads/') === 0) {
+            // Handle old uploads/industri/ path
+            if (strpos($path, 'uploads/industri/') === 0) {
                 $oldPath = public_path('storage/' . $path);
-                if (file_exists($oldPath)) {
+                if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
-                // Try direct asset path
-                return asset('storage/' . $path);
+                // Try S3 with new path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    return Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
             }
             
-            // Try direct asset path
-            return asset('storage/uploads/industri/' . $path);
+            // For new S3 paths (assets/upload/image/hero/)
+            if (strpos($path, 'assets/upload/image/hero/') === 0) {
+                try {
+                    // Try to check if exists in S3
+                    if (Storage::disk('s3')->exists($path)) {
+                        return Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // If check fails, still try to return URL (file might exist but check failed)
+                }
+                // Return S3 URL anyway (file might exist even if check failed)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                // Fallback to local storage check
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                return null;
+            }
+            
+            // For any other path, try S3 first
+            try {
+                return Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                return null;
+            }
         } catch (\Exception $e) {
             return null;
         }
