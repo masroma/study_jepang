@@ -28,6 +28,8 @@ class ProgramMasaDepanController extends Controller
         foreach ($programs as $program) {
             if ($program->gambar) {
                 $program->gambar_url = $this->getImageUrl($program->gambar);
+            } else {
+                $program->gambar_url = null;
             }
         }
 
@@ -63,6 +65,8 @@ class ProgramMasaDepanController extends Controller
         // Add S3 URL
         if ($program->gambar) {
             $program->gambar_url = $this->getImageUrl($program->gambar);
+        } else {
+            $program->gambar_url = null;
         }
 
         // Get related programs
@@ -75,6 +79,8 @@ class ProgramMasaDepanController extends Controller
         foreach ($related_programs as $related) {
             if ($related->gambar) {
                 $related->gambar_url = $this->getImageUrl($related->gambar);
+            } else {
+                $related->gambar_url = null;
             }
         }
 

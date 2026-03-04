@@ -12,25 +12,30 @@
   </div>
 
   <div class="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10 py-8 sm:py-12 md:py-16">
-    <div class="max-w-4xl">
-      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
-        <span class="text-brand-pink">{{ $program->judul }}</span>
-      </h1>
-      <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
-        {{ \Illuminate\Support\Str::limit(strip_tags($program->deskripsi ?? ''), 200) }}
-      </p>
-      <div class="flex flex-wrap gap-3">
-        @if($program->lokasi)
-        <span class="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
-          📍 {{ $program->lokasi }}
-        </span>
-        @endif
-        @if($program->durasi)
-        <span class="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
-          ⏱️ {{ $program->durasi }}
-        </span>
-        @endif
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="max-w-2xl">
+        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
+          <span class="text-brand-pink">{{ $program->judul }}</span>
+        </h1>
+        <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
+          {{ \Illuminate\Support\Str::limit(strip_tags($program->deskripsi ?? ''), 200) }}
+        </p>
+        <div class="flex flex-wrap gap-3">
+          @if($program->lokasi)
+          <span class="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
+            📍 {{ $program->lokasi }}
+          </span>
+          @endif
+          @if($program->durasi)
+          <span class="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
+            ⏱️ {{ $program->durasi }}
+          </span>
+          @endif
+        </div>
+      </div>
+      <div class="hero-person-container relative w-full md:h-full hidden md:flex items-center justify-end mt-2 md:mt-0">
+        <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Program" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl" loading="lazy">
       </div>
     </div>
   </div>

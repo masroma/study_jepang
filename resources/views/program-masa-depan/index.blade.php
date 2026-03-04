@@ -38,11 +38,11 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       @forelse($programs as $program)
       <a href="{{ url('program/detail/'.$program->id_program) }}" class="group bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
-        <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-50">
+        <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-100">
           @if($program->gambar_url)
-            <img src="{{ $program->gambar_url }}" alt="{{ $program->judul }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
+            <img src="{{ $program->gambar_url }}" alt="{{ $program->judul }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('template/img/program-default.jpg') }}';" />
           @else
-            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
+            <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" />
           @endif
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
