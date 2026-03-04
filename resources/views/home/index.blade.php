@@ -53,7 +53,27 @@
                         </div>
                      </div>
                      <div class="col-lg-5">
-                        <a href="#"><img src="{{ asset('assets/upload/image/'.$site_config->gambar) }}" alt="{{ $site_config->nama_singkat }}" class="img img-fluid img-thumbnail">
+                        @php
+                          // Handle both new path (image/tentang-kami/) and old path
+                          $tentangKamiImageUrl = $site_config->gambar ?? null;
+                          if ($tentangKamiImageUrl) {
+                            // If path starts with image/tentang-kami/, use as is (new format)
+                            if (strpos($tentangKamiImageUrl, 'image/tentang-kami/') === 0) {
+                              $tentangKamiImageUrl = $tentangKamiImageUrl;
+                            }
+                            // If path starts with assets/upload/image/, it's old format
+                            elseif (strpos($tentangKamiImageUrl, 'assets/upload/image/') === 0) {
+                              $tentangKamiImageUrl = 'storage/' . $tentangKamiImageUrl;
+                            }
+                            // If it's just filename, assume old format
+                            else {
+                              $tentangKamiImageUrl = 'storage/assets/upload/image/' . $tentangKamiImageUrl;
+                            }
+                          }
+                        @endphp
+                        @if($tentangKamiImageUrl)
+                        <a href="#"><img src="{{ asset($tentangKamiImageUrl) }}" alt="{{ $site_config->nama_singkat }}" class="img img-fluid img-thumbnail">
+                        @endif
                      </div>
                   </div>
                </div>

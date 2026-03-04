@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TentangKamiV2Controller extends Controller
@@ -33,6 +35,13 @@ class TentangKamiV2Controller extends Controller
             $site = DB::table('konfigurasi')->where('id_konfigurasi', $id)->first();
         }
 
+        // Add image URL safely
+        if ($site->gambar) {
+            $site->image_url = $this->getImageUrl($site->gambar);
+        } else {
+            $site->image_url = null;
+        }
+        
         $data = [
             'title' => 'Kelola Tentang Kami - ' . $site->namaweb,
             'site' => $site
@@ -52,7 +61,7 @@ class TentangKamiV2Controller extends Controller
             'id_konfigurasi' => 'required|exists:konfigurasi,id_konfigurasi',
             'nama_singkat' => 'nullable|string|max:200',
             'tentang' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'visi' => 'nullable|string',
             'misi' => 'nullable|string',
             'sejarah' => 'nullable|string',
@@ -73,25 +82,30 @@ class TentangKamiV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
-            if ($site->gambar && Storage::disk('public')->exists('assets/upload/image/' . $site->gambar)) {
-                Storage::disk('public')->delete('assets/upload/image/' . $site->gambar);
-                // Hapus thumbnail juga jika ada
-                if (Storage::disk('public')->exists('assets/upload/image/thumbs/' . $site->gambar)) {
-                    Storage::disk('public')->delete('assets/upload/image/thumbs/' . $site->gambar);
-                }
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
-
-            $image = $request->file('gambar');
-            $filenamewithextension = $image->getClientOriginalName();
+            // Hapus gambar lama jika ada
+            if ($site->gambar) {
+                $this->deleteImage($site->gambar);
+            }
+            
+            $filenamewithextension = $file->getClientOriginalName();
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-            $nama_file = Str::slug($filename, '-') . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $nama_file = Str::slug($filename, '-') . '-' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
-            // Upload ke S3
-            $s3Path = 'assets/upload/image/' . $nama_file;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
+            $uploadPath = public_path('image/tentang-kami');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
             
-            $updateData['gambar'] = $nama_file;
+            if ($file->move($uploadPath, $nama_file)) {
+                $updateData['gambar'] = 'image/tentang-kami/' . $nama_file;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         // Update field tambahan jika ada di database
@@ -121,5 +135,78 @@ class TentangKamiV2Controller extends Controller
             ->update($updateData);
 
         return redirect('admin/v2/tentang-kami')->with(['sukses' => 'Tentang Kami berhasil diupdate']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/tentang-kami/...
+            if (strpos($path, 'image/tentang-kami/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'assets/upload/image/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/tentang-kami/...
+            if (strpos($path, 'image/tentang-kami/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'assets/upload/image/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+                // Also try to delete thumbnail
+                $thumbPath = public_path('storage/assets/upload/image/thumbs/' . basename($path));
+                if (File::exists($thumbPath)) {
+                    File::delete($thumbPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }
