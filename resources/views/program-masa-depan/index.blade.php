@@ -12,14 +12,19 @@
   </div>
 
   <div class="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10 py-8 sm:py-12 md:py-16">
-    <div class="max-w-4xl">
-      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
-        <span class="text-brand-pink">Program Masa Depan</span>
-      </h1>
-      <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
-        Pilihan program terbaik untuk meraih impian Anda di Jepang. Dari program bahasa hingga skill spesifik, kami menyediakan berbagai pilihan yang sesuai dengan kebutuhan Anda.
-      </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="max-w-2xl">
+        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-4">
+          <span class="text-brand-pink">Program Masa Depan</span>
+        </h1>
+        <p class="text-gray-500 mb-6 max-w-2xl leading-relaxed text-sm sm:text-base font-medium">
+          Pilihan program terbaik untuk meraih impian Anda di Jepang. Dari program bahasa hingga skill spesifik, kami menyediakan berbagai pilihan yang sesuai dengan kebutuhan Anda.
+        </p>
+      </div>
+      <div class="hidden md:flex justify-end">
+        <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Program" class="w-56 lg:w-64 h-auto object-contain drop-shadow-2xl" loading="lazy">
+      </div>
     </div>
   </div>
 

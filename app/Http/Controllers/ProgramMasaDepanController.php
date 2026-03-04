@@ -91,7 +91,10 @@ class ProgramMasaDepanController extends Controller
     }
 
     /**
-     * Helper function to get image URL from S3
+     * Helper function to get image URL (local or S3).
+     *
+     * NOTE:
+     * - Disamakan dengan helper di Admin V2 agar path gambar konsisten.
      */
     private function getImageUrl($path)
     {
@@ -99,27 +102,76 @@ class ProgramMasaDepanController extends Controller
             if (empty($path)) {
                 return null;
             }
-            
-            // Handle old paths that might still be in database
-            if (strpos($path, 'image/') === 0) {
+
+            // Handle old local path: image/program-masa-depan/...
+            if (strpos($path, 'image/program-masa-depan/') === 0) {
                 $localPath = public_path($path);
                 if (file_exists($localPath)) {
                     return asset($path);
                 }
+
+                // Jika sudah dimigrasi ke S3 dengan format baru, coba hero folder
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    if (\Storage::disk('s3')->exists($s3Path)) {
+                        return \Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Abaikan error cek S3
+                }
+
+                // Terakhir, coba langsung pakai path lama di S3
+                try {
+                    return \Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    return null;
+                }
             }
-            
-            // For uploads/ paths
-            if (strpos($path, 'uploads/') === 0) {
+
+            // Handle old uploads/program/ path (local atau S3)
+            if (strpos($path, 'uploads/program/') === 0) {
                 $oldPath = public_path('storage/' . $path);
                 if (file_exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
-                // Try direct asset path
-                return asset('storage/' . $path);
+
+                // Coba S3 dengan format baru
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    return \Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Abaikan jika gagal
+                }
             }
-            
-            // Try direct asset path
-            return asset('storage/uploads/program/' . $path);
+
+            // Jika path sudah format baru S3: assets/upload/image/hero/...
+            if (strpos($path, 'assets/upload/image/hero/') === 0) {
+                try {
+                    if (\Storage::disk('s3')->exists($path)) {
+                        return \Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // Jika cek gagal, tetap coba return URL-nya
+                }
+
+                try {
+                    return \Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Fallback ke local storage jika ada
+                    $oldPath = public_path('storage/' . $path);
+                    if (file_exists($oldPath)) {
+                        return asset('storage/' . $path);
+                    }
+                    return null;
+                }
+            }
+
+            // Path lain: coba S3 langsung
+            try {
+                return \Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                return null;
+            }
         } catch (\Exception $e) {
             return null;
         }
