@@ -791,7 +791,21 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-6 sm:pb-10 justify-start md:justify-between px-2 sm:px-4 no-scrollbar">
       @forelse($industri as $item)
       <div class="group relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-[4px] sm:border-[6px] border-white shadow-xl shrink-0 cursor-pointer transition transform hover:scale-105">
-        <img src="{{ $item->gambar ?? 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60' }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
+        @php
+          // Handle both new path (image/industri/) and old path
+          $industriImageUrl = $item->gambar ?? null;
+          if ($industriImageUrl) {
+            // If path starts with uploads/industri/, it's old format - need storage/ prefix
+            if (strpos($industriImageUrl, 'uploads/industri/') === 0) {
+              $industriImageUrl = 'storage/' . $industriImageUrl;
+            }
+            // If path already starts with storage/, use as is
+            // If path starts with image/industri/, use as is (new format)
+          } else {
+            $industriImageUrl = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60';
+          }
+        @endphp
+        <img src="{{ asset($industriImageUrl) }}" alt="{{ $item->nama ?? 'Industry Image' }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60'" />
         <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4 sm:pb-6">
           <span class="text-white font-bold text-sm sm:text-base md:text-lg text-center leading-tight px-2">{{ $item->nama ?? 'Industry Name' }}<br /><span class="text-xs font-normal text-gray-300">{{ $item->sub_nama ?? '' }}</span></span>
         </div>
