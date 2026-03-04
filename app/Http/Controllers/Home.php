@@ -232,28 +232,78 @@ class Home extends Controller
             if (empty($path)) {
                 return null;
             }
-            // Check if file exists in S3
-            if (Storage::disk('s3')->exists($path)) {
-                return Storage::disk('s3')->url($path);
-            }
+            
             // Handle old paths that might still be in database (for backward compatibility)
-            // Try to find in old local storage
-            if (strpos($path, 'assets/upload/image/') === 0 || 
-                strpos($path, 'uploads/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (file_exists($oldPath)) {
-                    return asset('storage/' . $path);
-                }
-            }
-            // If path starts with image/, try to find in local
-            if (strpos($path, 'image/') === 0) {
+            // If path starts with image/, it's old local path - try local first
+            if (strpos($path, 'image/') === 0 && strpos($path, '/videos/') === false) {
                 $localPath = public_path($path);
                 if (file_exists($localPath)) {
                     return asset($path);
                 }
+                // If not found locally, try to construct S3 URL anyway (might be migrated)
+                // Convert old path to new S3 path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    if (Storage::disk('s3')->exists($s3Path)) {
+                        return Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore S3 check error for old paths
+                }
+                // Try direct S3 URL with old path (in case file was uploaded with old path)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                return null;
             }
-            // Return null if file doesn't exist
-            return null;
+            
+            // Handle old uploads/ paths
+            if (strpos($path, 'uploads/') === 0 && strpos($path, '/videos/') === false) {
+                $oldPath = public_path('storage/' . $path);
+                if (file_exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                // Try S3 with new path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    return Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+            }
+            
+            // For new S3 paths (assets/upload/image/hero/)
+            if (strpos($path, 'assets/upload/image/hero/') === 0 && strpos($path, '/videos/') === false) {
+                try {
+                    // Try to check if exists in S3
+                    if (Storage::disk('s3')->exists($path)) {
+                        return Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // If check fails, still try to return URL (file might exist but check failed)
+                }
+                // Return S3 URL anyway (file might exist even if check failed)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                // Fallback to local storage check
+                $oldPath = public_path('storage/' . $path);
+                if (file_exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                return null;
+            }
+            
+            // For any other path, try S3 first
+            try {
+                return Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                return null;
+            }
         } catch (\Exception $e) {
             return null;
         }
