@@ -56,10 +56,8 @@ class SliderController extends Controller
         // Add image URLs to each slider safely
         // Use getCollection() to modify items in paginated result
         $sliders->getCollection()->transform(function ($slider) {
-            // Use background_image if available, otherwise use person_image as fallback
-            if ($slider->background_image) {
-                $slider->image_url = $this->getImageUrl($slider->background_image);
-            } elseif ($slider->person_image) {
+            // Only show person_image in index
+            if ($slider->person_image) {
                 $slider->image_url = $this->getImageUrl($slider->person_image);
             } else {
                 $slider->image_url = null;
