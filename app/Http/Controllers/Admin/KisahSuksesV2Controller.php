@@ -155,19 +155,31 @@ class KisahSuksesV2Controller extends Controller
             if ($file->getSize() > 5242880) {
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
             }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $data['foto'] = $s3Path;
+            try {
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $data['foto'] = $s3Path;
+                Log::info('Kisah sukses foto uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading kisah sukses foto to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload foto: ' . $e->getMessage()]);
+            }
         }
 
         // Upload video
         if ($request->hasFile('video_file')) {
-            $video = $request->file('video_file');
-            $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
-            $data['video_file'] = $s3Path;
+            try {
+                $video = $request->file('video_file');
+                $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/videos/' . $videoName;
+                Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+                $data['video_file'] = $s3Path;
+                Log::info('Kisah sukses video uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading kisah sukses video to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload video: ' . $e->getMessage()]);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -217,26 +229,52 @@ class KisahSuksesV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
             }
             // Hapus foto lama
-            if ($kisah->foto && Storage::disk('s3')->exists($kisah->foto)) {
-                Storage::disk('s3')->delete($kisah->foto);
+            if ($kisah->foto) {
+                try {
+                    if (Storage::disk('s3')->exists($kisah->foto)) {
+                        Storage::disk('s3')->delete($kisah->foto);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but continue - file might not exist in S3
+                    Log::warning('Error checking/deleting kisah sukses foto from S3: ' . $e->getMessage() . ' - Path: ' . $kisah->foto);
+                }
             }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $data['foto'] = $s3Path;
+            try {
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $data['foto'] = $s3Path;
+                Log::info('Kisah sukses foto (edit) uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading kisah sukses foto (edit) to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload foto: ' . $e->getMessage()]);
+            }
         }
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
             // Hapus video lama
-            if ($kisah->video_file && Storage::disk('s3')->exists($kisah->video_file)) {
-                Storage::disk('s3')->delete($kisah->video_file);
+            if ($kisah->video_file) {
+                try {
+                    if (Storage::disk('s3')->exists($kisah->video_file)) {
+                        Storage::disk('s3')->delete($kisah->video_file);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but continue - file might not exist in S3
+                    Log::warning('Error checking/deleting kisah sukses video from S3: ' . $e->getMessage() . ' - Path: ' . $kisah->video_file);
+                }
             }
-            $video = $request->file('video_file');
-            $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
-            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
-            $data['video_file'] = $s3Path;
+            try {
+                $video = $request->file('video_file');
+                $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/videos/' . $videoName;
+                Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+                $data['video_file'] = $s3Path;
+                Log::info('Kisah sukses video (edit) uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading kisah sukses video (edit) to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload video: ' . $e->getMessage()]);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $kisah->urutan;
@@ -261,13 +299,25 @@ class KisahSuksesV2Controller extends Controller
         }
 
         // Hapus foto
-        if ($kisah->foto && Storage::disk('s3')->exists($kisah->foto)) {
-            Storage::disk('s3')->delete($kisah->foto);
+        if ($kisah->foto) {
+            try {
+                if (Storage::disk('s3')->exists($kisah->foto)) {
+                    Storage::disk('s3')->delete($kisah->foto);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error checking/deleting kisah sukses foto from S3: ' . $e->getMessage() . ' - Path: ' . $kisah->foto);
+            }
         }
         
         // Hapus video file
-        if ($kisah->video_file && Storage::disk('s3')->exists($kisah->video_file)) {
-            Storage::disk('s3')->delete($kisah->video_file);
+        if ($kisah->video_file) {
+            try {
+                if (Storage::disk('s3')->exists($kisah->video_file)) {
+                    Storage::disk('s3')->delete($kisah->video_file);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error checking/deleting kisah sukses video from S3: ' . $e->getMessage() . ' - Path: ' . $kisah->video_file);
+            }
         }
         
         $kisah->delete();
@@ -284,29 +334,82 @@ class KisahSuksesV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // Check if file exists in S3
-            if (Storage::disk('s3')->exists($path)) {
-                return Storage::disk('s3')->url($path);
-            }
+            
             // Handle old paths that might still be in database (for backward compatibility)
-            // Try to find in old local storage
-            if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return asset('storage/' . $path);
-                }
-            }
-            // If path starts with image/kisah-sukses/, try to find in local
+            // If path starts with image/kisah-sukses/, it's old local path - try local first
             if (strpos($path, 'image/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
                 $localPath = public_path($path);
                 if (File::exists($localPath)) {
                     return asset($path);
                 }
+                // If not found locally, try to construct S3 URL anyway (might be migrated)
+                // Convert old path to new S3 path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    if (Storage::disk('s3')->exists($s3Path)) {
+                        return Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore S3 check error for old paths
+                }
+                // Try direct S3 URL with old path (in case file was uploaded with old path)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                return null;
             }
-            // Return null if file doesn't exist
-            return null;
+            
+            // Handle old uploads/kisah-sukses/ path (not videos)
+            if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                // Try S3 with new path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    return Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+            }
+            
+            // For new S3 paths (assets/upload/image/hero/)
+            if (strpos($path, 'assets/upload/image/hero/') === 0 && strpos($path, '/videos/') === false) {
+                try {
+                    // Try to check if exists in S3
+                    if (Storage::disk('s3')->exists($path)) {
+                        return Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // If check fails, still try to return URL (file might exist but check failed)
+                    Log::warning('Error checking S3 file existence: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Return S3 URL anyway (file might exist even if check failed)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    Log::error('Error getting S3 URL: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Fallback to local storage check
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                return null;
+            }
+            
+            // For any other path, try S3 first
+            try {
+                return Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                Log::warning('Error getting S3 URL for path: ' . $path . ' - ' . $e->getMessage());
+                return null;
+            }
         } catch (\Exception $e) {
-            Log::error('Error getting image URL: ' . $e->getMessage());
+            Log::error('Error getting image URL: ' . $e->getMessage() . ' - Path: ' . $path);
             return null;
         }
     }
