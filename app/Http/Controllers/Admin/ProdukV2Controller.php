@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\Produk;
 use Illuminate\Support\Str;
 
@@ -62,6 +64,16 @@ class ProdukV2Controller extends Controller
         
         $produks = $query->paginate($perPage)->withQueryString();
         
+        // Add image URL to each produk
+        $produks->getCollection()->transform(function ($produk) {
+            if ($produk->gambar) {
+                $produk->image_url = $this->getImageUrl($produk->gambar);
+            } else {
+                $produk->image_url = null;
+            }
+            return $produk;
+        });
+        
         $data = [
             'title' => 'Kelola Produk - ' . $site->namaweb,
             'site' => $site,
@@ -106,6 +118,9 @@ class ProdukV2Controller extends Controller
             return redirect('admin/v2/produk')->with(['warning' => 'Produk tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $produk->image_url = $produk->gambar ? $this->getImageUrl($produk->gambar) : null;
+        
         $data = [
             'title' => 'Edit Produk - ' . $site->namaweb,
             'site' => $site,
@@ -127,7 +142,7 @@ class ProdukV2Controller extends Controller
             'kategori' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'spesifikasi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'moq' => 'nullable|string|max:255',
             'harga' => 'nullable|string|max:255',
             'asal' => 'nullable|string|max:255',
@@ -150,11 +165,21 @@ class ProdukV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/produk/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/produk');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/produk/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -177,7 +202,7 @@ class ProdukV2Controller extends Controller
             'kategori' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'spesifikasi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'moq' => 'nullable|string|max:255',
             'harga' => 'nullable|string|max:255',
             'asal' => 'nullable|string|max:255',
@@ -208,15 +233,25 @@ class ProdukV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($produk->gambar && Storage::disk('public')->exists('uploads/produk/' . $produk->gambar)) {
-                Storage::disk('public')->delete('uploads/produk/' . $produk->gambar);
+            if ($produk->gambar) {
+                $this->deleteImage($produk->gambar);
             }
 
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/produk/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/produk');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/produk/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $produk->urutan;
@@ -240,12 +275,80 @@ class ProdukV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($produk->gambar && Storage::disk('public')->exists('uploads/produk/' . $produk->gambar)) {
-            Storage::disk('public')->delete('uploads/produk/' . $produk->gambar);
+        if ($produk->gambar) {
+            $this->deleteImage($produk->gambar);
         }
         
         $produk->delete();
 
         return redirect('admin/v2/produk')->with(['sukses' => 'Produk berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/produk/...
+            if (strpos($path, 'image/produk/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'uploads/produk/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/produk/...
+            if (strpos($path, 'image/produk/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'uploads/produk/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }

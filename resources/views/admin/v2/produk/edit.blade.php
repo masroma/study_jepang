@@ -144,13 +144,13 @@
                         <label for="gambar" class="block text-sm font-semibold text-gray-700 mb-2">Gambar Produk</label>
                         <input type="file" id="gambar" name="gambar" accept="image/*"
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/20 outline-none transition">
-                        @if($produk->gambar)
+                        @if($produk->image_url)
                             <div class="mt-3">
-                                <img src="{{ asset('storage/uploads/produk/' . $produk->gambar) }}" alt="Current image" class="w-64 h-48 object-cover rounded-lg border border-gray-200">
+                                <img src="{{ $produk->image_url }}" alt="Current image" class="w-64 h-48 object-cover rounded-lg border border-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">Gambar saat ini (kosongkan jika tidak ingin mengubah)</p>
                             </div>
                         @endif
-                        <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF (Max: 2MB)</p>
+                        <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF, WebP (Max: 5MB)</p>
                         @error('gambar')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
