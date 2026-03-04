@@ -139,11 +139,14 @@ $content = $translations[$language] ?? $translations['id'];
           <div class="hero-person-frame relative w-full flex items-center justify-center md:justify-end">
             @if($slide->person_image)
                 @php
-                    // Handle both new path (image/slider/) and old path (storage/...)
+                    // Handle both new path (image/slider/) and old path
                     $personImageUrl = $slide->person_image;
-                    if (strpos($personImageUrl, 'storage/') === 0 || strpos($personImageUrl, 'assets/upload/image/hero/') === 0) {
+                    // If path starts with assets/upload/image/hero/, it's old format - need storage/ prefix
+                    if (strpos($personImageUrl, 'assets/upload/image/hero/') === 0) {
                         $personImageUrl = 'storage/' . $personImageUrl;
                     }
+                    // If path already starts with storage/, use as is
+                    // If path starts with image/slider/, use as is (new format)
                 @endphp
                 <img src="{{ asset($personImageUrl) }}" class="hero-person-image relative z-20 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" onerror="this.onerror=null; this.src='{{asset($personImageUrl)}}';" />
             @endif
