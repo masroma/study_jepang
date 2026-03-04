@@ -22,8 +22,8 @@
           Pilihan program terbaik untuk meraih impian Anda di Jepang. Dari program bahasa hingga skill spesifik, kami menyediakan berbagai pilihan yang sesuai dengan kebutuhan Anda.
         </p>
       </div>
-      <div class="hidden md:flex justify-end">
-        <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Program" class="w-56 lg:w-64 h-auto object-contain drop-shadow-2xl" loading="lazy">
+      <div class="hero-person-container relative w-full md:h-full hidden md:flex items-center justify-end mt-2 md:mt-0">
+        <img src="{{ asset('maskot/maskot1.png') }}" alt="Maskot Program" class="relative z-10 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl" loading="lazy">
       </div>
     </div>
   </div>
