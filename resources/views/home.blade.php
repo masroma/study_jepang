@@ -681,7 +681,17 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="group shrink-0 w-[260px] sm:w-[280px] bg-white rounded-xl sm:rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
         <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-50">
           @if(!empty($item->gambar))
-            <img src="{{ asset($item->gambar) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
+            @php
+              // Handle both new path (image/program-masa-depan/) and old path
+              $programImageUrl = $item->gambar;
+              // If path starts with uploads/program/, it's old format - need storage/ prefix
+              if (strpos($programImageUrl, 'uploads/program/') === 0) {
+                $programImageUrl = 'storage/' . $programImageUrl;
+              }
+              // If path already starts with storage/, use as is
+              // If path starts with image/program-masa-depan/, use as is (new format)
+            @endphp
+            <img src="{{ asset($programImageUrl) }}" alt="{{ $item->judul ?? 'Program Image' }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1576091160550-217358c7db81?auto=format&fit=crop&w=500&q=60'" />
           @else
             <img src="{{ asset('template/img/program-default.jpg') }}" alt="Default program image" class="w-full h-full object-contain group-hover:scale-110 transition duration-500" loading="lazy" />
           @endif

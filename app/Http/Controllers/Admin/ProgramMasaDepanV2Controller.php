@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\ProgramMasaDepan;
 
 class ProgramMasaDepanV2Controller extends Controller
@@ -48,6 +50,16 @@ class ProgramMasaDepanV2Controller extends Controller
         }
         
         $programs = $query->paginate($perPage)->withQueryString();
+        
+        // Add image URLs to each program safely
+        $programs->getCollection()->transform(function ($program) {
+            if ($program->gambar) {
+                $program->image_url = $this->getImageUrl($program->gambar);
+            } else {
+                $program->image_url = null;
+            }
+            return $program;
+        });
         
         $data = [
             'title' => 'Kelola Program Masa Depan - ' . $site->namaweb,
@@ -92,6 +104,9 @@ class ProgramMasaDepanV2Controller extends Controller
             return redirect('admin/v2/program-masa-depan')->with(['warning' => 'Program tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $program->image_url = $program->gambar ? $this->getImageUrl($program->gambar) : null;
+        
         $data = [
             'title' => 'Edit Program Masa Depan - ' . $site->namaweb,
             'site' => $site,
@@ -112,7 +127,7 @@ class ProgramMasaDepanV2Controller extends Controller
             'judul_id' => 'required|string|max:255',
             'judul_en' => 'nullable|string|max:255',
             'judul_jp' => 'nullable|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'deskripsi_id' => 'nullable|string',
             'deskripsi_en' => 'nullable|string',
             'deskripsi_jp' => 'nullable|string',
@@ -163,11 +178,21 @@ class ProgramMasaDepanV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/program/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/program-masa-depan');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/program-masa-depan/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -189,7 +214,7 @@ class ProgramMasaDepanV2Controller extends Controller
             'judul_id' => 'required|string|max:255',
             'judul_en' => 'nullable|string|max:255',
             'judul_jp' => 'nullable|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'deskripsi_id' => 'nullable|string',
             'deskripsi_en' => 'nullable|string',
             'deskripsi_jp' => 'nullable|string',
@@ -245,16 +270,25 @@ class ProgramMasaDepanV2Controller extends Controller
 
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama
-            if ($program->gambar && Storage::disk('public')->exists('uploads/program/' . $program->gambar)) {
-                Storage::disk('public')->delete('uploads/program/' . $program->gambar);
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
-
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/program/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            // Hapus gambar lama
+            if ($program->gambar) {
+                $this->deleteImage($program->gambar);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/program-masa-depan');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/program-masa-depan/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $program->urutan;
@@ -278,12 +312,80 @@ class ProgramMasaDepanV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($program->gambar && Storage::disk('public')->exists('uploads/program/' . $program->gambar)) {
-            Storage::disk('public')->delete('uploads/program/' . $program->gambar);
+        if ($program->gambar) {
+            $this->deleteImage($program->gambar);
         }
         
         $program->delete();
 
         return redirect('admin/v2/program-masa-depan')->with(['sukses' => 'Program Masa Depan berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/program-masa-depan/...
+            if (strpos($path, 'image/program-masa-depan/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'uploads/program/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/program-masa-depan/...
+            if (strpos($path, 'image/program-masa-depan/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'uploads/program/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }
