@@ -168,15 +168,9 @@ class SliderController extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file background image terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $background_image = 'image/slider/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image']);
-            }
+            $s3Path = 'assets/upload/image/hero/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $background_image = $s3Path;
         }
 
         // Upload person_image (single image)
@@ -188,33 +182,23 @@ class SliderController extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file person image terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $person_image = 'image/slider/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image']);
-            }
+            $s3Path = 'assets/upload/image/hero/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $person_image = $s3Path;
         }
 
         // Handle person_images (multiple images)
         $person_images = [];
         if ($request->hasFile('person_images')) {
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
             foreach ($request->file('person_images') as $file) {
                 // Validate file size (5MB = 5242880 bytes)
                 if ($file->getSize() > 5242880) {
                     return redirect()->back()->withInput()->with(['warning' => 'Salah satu file person images terlalu besar. Maksimal 5MB per file']);
                 }
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                if ($file->move($uploadPath, $filename)) {
-                    $person_images[] = 'image/slider/' . $filename;
-                }
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $person_images[] = $s3Path;
             }
         }
 
@@ -284,19 +268,13 @@ class SliderController extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file background image terlalu besar. Maksimal 5MB']);
             }
             // Delete old image
-            if ($slider->background_image) {
-                $this->deleteImage($slider->background_image);
+            if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
+                Storage::disk('s3')->delete($slider->background_image);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $background_image = 'image/slider/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image']);
-            }
+            $s3Path = 'assets/upload/image/hero/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $background_image = $s3Path;
         }
 
         // Handle person_image (single image)
@@ -308,19 +286,13 @@ class SliderController extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file person image terlalu besar. Maksimal 5MB']);
             }
             // Delete old image
-            if ($slider->person_image) {
-                $this->deleteImage($slider->person_image);
+            if ($slider->person_image && Storage::disk('s3')->exists($slider->person_image)) {
+                Storage::disk('s3')->delete($slider->person_image);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $person_image = 'image/slider/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image']);
-            }
+            $s3Path = 'assets/upload/image/hero/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $person_image = $s3Path;
         }
 
         // Handle person_images (multiple images) - INI YANG DIHAPUS, BUKAN person_image
@@ -337,17 +309,13 @@ class SliderController extends Controller
             // Delete old person_images (multiple images) - BUKAN person_image (single)
             if (!empty($person_images) && is_array($person_images)) {
                 foreach ($person_images as $oldImage) {
-                    if ($oldImage) {
-                        $this->deleteImage($oldImage);
+                    if ($oldImage && Storage::disk('s3')->exists($oldImage)) {
+                        Storage::disk('s3')->delete($oldImage);
                     }
                 }
             }
             
             // Upload new person_images
-            $uploadPath = public_path('image/slider');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
             $person_images = [];
             foreach ($request->file('person_images') as $file) {
                 // Validate file size (5MB = 5242880 bytes)
@@ -355,9 +323,9 @@ class SliderController extends Controller
                     return redirect()->back()->withInput()->with(['warning' => 'Salah satu file person images terlalu besar. Maksimal 5MB per file']);
                 }
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                if ($file->move($uploadPath, $filename)) {
-                    $person_images[] = 'image/slider/' . $filename;
-                }
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $person_images[] = $s3Path;
             }
         }
 
@@ -410,12 +378,12 @@ class SliderController extends Controller
         }
 
         // Delete images
-        if ($slider->background_image) {
-            $this->deleteImage($slider->background_image);
+        if ($slider->background_image && Storage::disk('s3')->exists($slider->background_image)) {
+            Storage::disk('s3')->delete($slider->background_image);
         }
         
-        if ($slider->person_image) {
-            $this->deleteImage($slider->person_image);
+        if ($slider->person_image && Storage::disk('s3')->exists($slider->person_image)) {
+            Storage::disk('s3')->delete($slider->person_image);
         }
         
         // Handle person_images - decode if JSON string
@@ -425,8 +393,8 @@ class SliderController extends Controller
         }
         if (!empty($person_images) && is_array($person_images)) {
             foreach ($person_images as $image) {
-                if ($image) {
-                    $this->deleteImage($image);
+                if ($image && Storage::disk('s3')->exists($image)) {
+                    Storage::disk('s3')->delete($image);
                 }
             }
         }
@@ -437,7 +405,7 @@ class SliderController extends Controller
     }
 
     /**
-     * Helper function to get image URL from public directory
+     * Helper function to get image URL from S3
      */
     private function getImageUrl($path)
     {
@@ -445,64 +413,30 @@ class SliderController extends Controller
             if (empty($path)) {
                 return null;
             }
-            // New path: image/slider/...
-            if (strpos($path, 'image/slider/') === 0) {
-                return asset($path);
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
             }
-            // Handle old paths that might still be in database
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
             if (strpos($path, 'assets/upload/image/hero/') === 0) {
-                // Try to find in old location first, then return asset path
                 $oldPath = public_path('storage/' . $path);
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
-                // If old file doesn't exist, return null
-                return null;
             }
-            // If path doesn't match known patterns, try as direct asset
-            return asset($path);
+            // If path starts with image/slider/, try to find in local
+            if (strpos($path, 'image/slider/') === 0) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Helper function to delete image from public directory
-     */
-    private function deleteImage($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'assets/upload/image/hero/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return File::delete($oldPath);
-                }
-            }
-            
-            // New path: image/slider/...
-            if (strpos($path, 'image/slider/') === 0) {
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: ' . $e->getMessage());
-            return false;
         }
     }
 }

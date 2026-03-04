@@ -156,28 +156,18 @@ class KisahSuksesV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/kisah-sukses');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['foto'] = 'image/kisah-sukses/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload foto']);
-            }
+            $s3Path = 'uploads/kisah-sukses/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['foto'] = $s3Path;
         }
 
         // Upload video
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $uploadPath = public_path('image/kisah-sukses/videos');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($video->move($uploadPath, $videoName)) {
-                $data['video_file'] = 'image/kisah-sukses/videos/' . $videoName;
-            }
+            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+            $data['video_file'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -227,36 +217,26 @@ class KisahSuksesV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file foto terlalu besar. Maksimal 5MB']);
             }
             // Hapus foto lama
-            if ($kisah->foto) {
-                $this->deleteImage($kisah->foto);
+            if ($kisah->foto && Storage::disk('s3')->exists($kisah->foto)) {
+                Storage::disk('s3')->delete($kisah->foto);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/kisah-sukses');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['foto'] = 'image/kisah-sukses/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload foto']);
-            }
+            $s3Path = 'uploads/kisah-sukses/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['foto'] = $s3Path;
         }
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
             // Hapus video lama
-            if ($kisah->video_file) {
-                $this->deleteVideo($kisah->video_file);
+            if ($kisah->video_file && Storage::disk('s3')->exists($kisah->video_file)) {
+                Storage::disk('s3')->delete($kisah->video_file);
             }
             $video = $request->file('video_file');
             $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $uploadPath = public_path('image/kisah-sukses/videos');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($video->move($uploadPath, $videoName)) {
-                $data['video_file'] = 'image/kisah-sukses/videos/' . $videoName;
-            }
+            $s3Path = 'uploads/kisah-sukses/videos/' . $videoName;
+            Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
+            $data['video_file'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? $kisah->urutan;
@@ -281,13 +261,13 @@ class KisahSuksesV2Controller extends Controller
         }
 
         // Hapus foto
-        if ($kisah->foto) {
-            $this->deleteImage($kisah->foto);
+        if ($kisah->foto && Storage::disk('s3')->exists($kisah->foto)) {
+            Storage::disk('s3')->delete($kisah->foto);
         }
         
         // Hapus video file
-        if ($kisah->video_file) {
-            $this->deleteVideo($kisah->video_file);
+        if ($kisah->video_file && Storage::disk('s3')->exists($kisah->video_file)) {
+            Storage::disk('s3')->delete($kisah->video_file);
         }
         
         $kisah->delete();
@@ -296,7 +276,7 @@ class KisahSuksesV2Controller extends Controller
     }
 
     /**
-     * Helper function to get image URL from public directory
+     * Helper function to get image URL from S3
      */
     private function getImageUrl($path)
     {
@@ -304,101 +284,30 @@ class KisahSuksesV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // New path: image/kisah-sukses/...
-            if (strpos($path, 'image/kisah-sukses/') === 0) {
-                return asset($path);
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
             }
-            // Handle old paths that might still be in database
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
             if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
-                // Try to find in old location first, then return asset path
                 $oldPath = public_path('storage/' . $path);
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
             }
-            // If path doesn't match known patterns, assume it's relative to public
-            return asset($path);
+            // If path starts with image/kisah-sukses/, try to find in local
+            if (strpos($path, 'image/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Helper function to delete image from public directory
-     */
-    private function deleteImage($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // New path: image/kisah-sukses/...
-            if (strpos($path, 'image/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'uploads/kisah-sukses/') === 0 && strpos($path, '/videos/') === false) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return File::delete($oldPath);
-                }
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Helper function to delete video from public directory
-     */
-    private function deleteVideo($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // New path: image/kisah-sukses/videos/...
-            if (strpos($path, 'image/kisah-sukses/videos/') === 0) {
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'uploads/kisah-sukses/videos/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return File::delete($oldPath);
-                }
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting video: ' . $e->getMessage());
-            return false;
         }
     }
 }

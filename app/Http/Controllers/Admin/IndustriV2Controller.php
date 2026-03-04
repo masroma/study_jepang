@@ -146,15 +146,9 @@ class IndustriV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/industri');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['gambar'] = 'image/industri/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
-            }
+            $s3Path = 'uploads/industri/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['gambar'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -197,19 +191,13 @@ class IndustriV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
             // Hapus gambar lama
-            if ($industry->gambar) {
-                $this->deleteImage($industry->gambar);
+            if ($industry->gambar && Storage::disk('s3')->exists($industry->gambar)) {
+                Storage::disk('s3')->delete($industry->gambar);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/industri');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['gambar'] = 'image/industri/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
-            }
+            $s3Path = 'uploads/industri/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['gambar'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? $industry->urutan;
@@ -233,8 +221,8 @@ class IndustriV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($industry->gambar) {
-            $this->deleteImage($industry->gambar);
+        if ($industry->gambar && Storage::disk('s3')->exists($industry->gambar)) {
+            Storage::disk('s3')->delete($industry->gambar);
         }
         
         $industry->delete();
@@ -243,7 +231,7 @@ class IndustriV2Controller extends Controller
     }
 
     /**
-     * Helper function to get image URL from public directory
+     * Helper function to get image URL from S3
      */
     private function getImageUrl($path)
     {
@@ -251,62 +239,30 @@ class IndustriV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // New path: image/industri/...
-            if (strpos($path, 'image/industri/') === 0) {
-                return asset($path);
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
             }
-            // Handle old paths that might still be in database
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
             if (strpos($path, 'uploads/industri/') === 0) {
-                // Try to find in old location first, then return asset path
                 $oldPath = public_path('storage/' . $path);
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
             }
-            // If path doesn't match known patterns, assume it's relative to public
-            return asset($path);
+            // If path starts with image/industri/, try to find in local
+            if (strpos($path, 'image/industri/') === 0) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Helper function to delete image from public directory
-     */
-    private function deleteImage($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // New path: image/industri/...
-            if (strpos($path, 'image/industri/') === 0) {
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'uploads/industri/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return File::delete($oldPath);
-                }
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: ' . $e->getMessage());
-            return false;
         }
     }
 }

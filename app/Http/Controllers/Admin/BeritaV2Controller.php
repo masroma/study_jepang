@@ -180,28 +180,19 @@ class BeritaV2Controller extends Controller
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $nama_file = Str::slug($filename, '-') . '-' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
-            $uploadPath = public_path('image/berita');
-            $thumbPath = public_path('image/berita/thumbs');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if (!File::exists($thumbPath)) {
-                File::makeDirectory($thumbPath, 0755, true);
-            }
+            // Upload original image to S3
+            $s3Path = 'assets/upload/image/' . $nama_file;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             
-            // Move original image
-            if ($file->move($uploadPath, $nama_file)) {
-                // Create thumbnail
-                try {
-                    $img = Image::make($uploadPath . '/' . $nama_file)->resize(150, 150);
-                    $img->save($thumbPath . '/' . $nama_file);
-                } catch (\Exception $e) {
-                    Log::warning('Failed to create thumbnail: ' . $e->getMessage());
-                }
-                $data['gambar'] = 'image/berita/' . $nama_file;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            // Create thumbnail and upload to S3
+            try {
+                $img = Image::make($file->getRealPath())->resize(150, 150);
+                $thumbnailPath = 'assets/upload/image/thumbs/' . $nama_file;
+                Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+            } catch (\Exception $e) {
+                Log::warning('Failed to create thumbnail: ' . $e->getMessage());
             }
+            $data['gambar'] = $s3Path;
         }
 
         // Tanggal publish
@@ -261,8 +252,13 @@ class BeritaV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($berita->gambar) {
-                $this->deleteImage($berita->gambar);
+            if ($berita->gambar && Storage::disk('s3')->exists($berita->gambar)) {
+                Storage::disk('s3')->delete($berita->gambar);
+                // Also delete thumbnail if exists
+                $thumbPath = 'assets/upload/image/thumbs/' . basename($berita->gambar);
+                if (Storage::disk('s3')->exists($thumbPath)) {
+                    Storage::disk('s3')->delete($thumbPath);
+                }
             }
 
             $file = $request->file('gambar');
@@ -275,28 +271,19 @@ class BeritaV2Controller extends Controller
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
             $nama_file = Str::slug($filename, '-') . '-' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             
-            $uploadPath = public_path('image/berita');
-            $thumbPath = public_path('image/berita/thumbs');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if (!File::exists($thumbPath)) {
-                File::makeDirectory($thumbPath, 0755, true);
-            }
+            // Upload original image to S3
+            $s3Path = 'assets/upload/image/' . $nama_file;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
             
-            // Move original image
-            if ($file->move($uploadPath, $nama_file)) {
-                // Create thumbnail
-                try {
-                    $img = Image::make($uploadPath . '/' . $nama_file)->resize(150, 150);
-                    $img->save($thumbPath . '/' . $nama_file);
-                } catch (\Exception $e) {
-                    Log::warning('Failed to create thumbnail: ' . $e->getMessage());
-                }
-                $data['gambar'] = 'image/berita/' . $nama_file;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            // Create thumbnail and upload to S3
+            try {
+                $img = Image::make($file->getRealPath())->resize(150, 150);
+                $thumbnailPath = 'assets/upload/image/thumbs/' . $nama_file;
+                Storage::disk('s3')->put($thumbnailPath, $img->encode()->getEncoded(), 'public');
+            } catch (\Exception $e) {
+                Log::warning('Failed to create thumbnail: ' . $e->getMessage());
             }
+            $data['gambar'] = $s3Path;
         }
 
         // Tanggal publish
@@ -326,8 +313,13 @@ class BeritaV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($berita->gambar) {
-            $this->deleteImage($berita->gambar);
+        if ($berita->gambar && Storage::disk('s3')->exists($berita->gambar)) {
+            Storage::disk('s3')->delete($berita->gambar);
+            // Also delete thumbnail if exists
+            $thumbPath = 'assets/upload/image/thumbs/' . basename($berita->gambar);
+            if (Storage::disk('s3')->exists($thumbPath)) {
+                Storage::disk('s3')->delete($thumbPath);
+            }
         }
         
         $berita->delete();
@@ -336,7 +328,7 @@ class BeritaV2Controller extends Controller
     }
 
     /**
-     * Helper function to get image URL from public directory
+     * Helper function to get image URL from S3
      */
     private function getImageUrl($path)
     {
@@ -344,72 +336,30 @@ class BeritaV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // New path: image/berita/...
-            if (strpos($path, 'image/berita/') === 0) {
-                return asset($path);
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
             }
-            // Handle old paths that might still be in database
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
             if (strpos($path, 'assets/upload/image/') === 0) {
-                // Try to find in old location first, then return asset path
                 $oldPath = public_path('storage/' . $path);
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
             }
-            // If path doesn't match known patterns, assume it's relative to public
-            return asset($path);
+            // If path starts with image/berita/, try to find in local
+            if (strpos($path, 'image/berita/') === 0) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Helper function to delete image from public directory
-     */
-    private function deleteImage($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // New path: image/berita/...
-            if (strpos($path, 'image/berita/') === 0) {
-                $filePath = public_path($path);
-                $thumbPath = public_path('image/berita/thumbs/' . basename($path));
-                if (File::exists($filePath)) {
-                    File::delete($filePath);
-                }
-                if (File::exists($thumbPath)) {
-                    File::delete($thumbPath);
-                }
-                return true;
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'assets/upload/image/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                $oldThumbPath = public_path('storage/assets/upload/image/thumbs/' . basename($path));
-                if (File::exists($oldPath)) {
-                    File::delete($oldPath);
-                }
-                if (File::exists($oldThumbPath)) {
-                    File::delete($oldThumbPath);
-                }
-                return true;
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: ' . $e->getMessage());
-            return false;
         }
     }
 }

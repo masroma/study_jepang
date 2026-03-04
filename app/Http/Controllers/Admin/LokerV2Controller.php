@@ -164,15 +164,9 @@ class LokerV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/loker');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['gambar'] = 'image/loker/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
-            }
+            $s3Path = 'assets/upload/image/loker/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['gambar'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -228,8 +222,8 @@ class LokerV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($loker->gambar) {
-                $this->deleteImage($loker->gambar);
+            if ($loker->gambar && Storage::disk('s3')->exists($loker->gambar)) {
+                Storage::disk('s3')->delete($loker->gambar);
             }
 
             $file = $request->file('gambar');
@@ -238,15 +232,9 @@ class LokerV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('image/loker');
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($file->move($uploadPath, $filename)) {
-                $data['gambar'] = 'image/loker/' . $filename;
-            } else {
-                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
-            }
+            $s3Path = 'assets/upload/image/loker/' . $filename;
+            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+            $data['gambar'] = $s3Path;
         }
 
         $data['urutan'] = $request->urutan ?? $loker->urutan;
@@ -270,8 +258,8 @@ class LokerV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($loker->gambar) {
-            $this->deleteImage($loker->gambar);
+        if ($loker->gambar && Storage::disk('s3')->exists($loker->gambar)) {
+            Storage::disk('s3')->delete($loker->gambar);
         }
         
         $loker->delete();
@@ -280,7 +268,7 @@ class LokerV2Controller extends Controller
     }
 
     /**
-     * Helper function to get image URL from public directory
+     * Helper function to get image URL from S3
      */
     private function getImageUrl($path)
     {
@@ -288,62 +276,30 @@ class LokerV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // New path: image/loker/...
-            if (strpos($path, 'image/loker/') === 0) {
-                return asset($path);
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
             }
-            // Handle old paths that might still be in database
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
             if (strpos($path, 'assets/upload/image/loker/') === 0) {
-                // Try to find in old location first, then return asset path
                 $oldPath = public_path('storage/' . $path);
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
             }
-            // If path doesn't match known patterns, assume it's relative to public
-            return asset($path);
+            // If path starts with image/loker/, try to find in local
+            if (strpos($path, 'image/loker/') === 0) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Helper function to delete image from public directory
-     */
-    private function deleteImage($path)
-    {
-        try {
-            if (empty($path)) {
-                return false;
-            }
-            
-            // New path: image/loker/...
-            if (strpos($path, 'image/loker/') === 0) {
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            // Handle old paths
-            if (strpos($path, 'assets/upload/image/loker/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return File::delete($oldPath);
-                }
-            } else {
-                // Assume it's relative to public
-                $filePath = public_path($path);
-                if (File::exists($filePath)) {
-                    return File::delete($filePath);
-                }
-            }
-            
-            return false;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: ' . $e->getMessage());
-            return false;
         }
     }
 }

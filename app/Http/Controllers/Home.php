@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Berita_model;
 use App\Models\HomeContent;
 use App\Models\ProgramMasaDepan;
@@ -61,24 +62,55 @@ class Home extends Controller
 
         // Load data program masa depan dengan limit
         $program_masa_depan = cache()->remember('home_program_masa_depan', 3600, function() {
-            return ProgramMasaDepan::publish()->ordered()->limit(8)->get();
+            $programs = ProgramMasaDepan::publish()->ordered()->limit(8)->get();
+            // Add S3 URLs
+            foreach ($programs as $program) {
+                if ($program->gambar) {
+                    $program->gambar_url = $this->getImageUrl($program->gambar);
+                }
+            }
+            return $programs;
         });
         
         // Load data industri dengan limit
         $industri = cache()->remember('home_industri', 3600, function() {
-            return Industri::publish()->ordered()->limit(10)->get();
+            $industries = Industri::publish()->ordered()->limit(10)->get();
+            // Add S3 URLs
+            foreach ($industries as $item) {
+                if ($item->gambar) {
+                    $item->gambar_url = $this->getImageUrl($item->gambar);
+                }
+            }
+            return $industries;
         });
         
         // Load data kisah sukses dengan limit
         $kisah_sukses = cache()->remember('home_kisah_sukses', 3600, function() {
-            return KisahSukses::publish()->ordered()->limit(6)->get();
+            $kisahs = KisahSukses::publish()->ordered()->limit(6)->get();
+            // Add S3 URLs
+            foreach ($kisahs as $kisah) {
+                if ($kisah->foto) {
+                    $kisah->foto_url = $this->getImageUrl($kisah->foto);
+                }
+            }
+            return $kisahs;
         });
 
         // Load hero sliders - INI YANG DIGUNAKAN di home.blade.php untuk slider homepage
         // Data diambil dari tabel 'hero_sliders', BUKAN dari tabel 'galeri'
         $hero_sliders = cache()->remember('home_hero_sliders', 3600, function() {
             if (Schema::hasTable('hero_sliders')) {
-                return HeroSlider::publish()->ordered()->get();
+                $sliders = HeroSlider::publish()->ordered()->get();
+                // Add S3 URLs
+                foreach ($sliders as $slider) {
+                    if ($slider->person_image) {
+                        $slider->person_image_url = $this->getImageUrl($slider->person_image);
+                    }
+                    if ($slider->background_image) {
+                        $slider->background_image_url = $this->getImageUrl($slider->background_image);
+                    }
+                }
+                return $sliders;
             }
             return collect();
         });
@@ -189,5 +221,41 @@ class Home extends Controller
         ]);
 
         return back()->with('success', 'Pesan berhasil dikirim.');
+    }
+
+    /**
+     * Helper function to get image URL from S3
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
+            }
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
+            if (strpos($path, 'assets/upload/image/') === 0 || 
+                strpos($path, 'uploads/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (file_exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path starts with image/, try to find in local
+            if (strpos($path, 'image/') === 0) {
+                $localPath = public_path($path);
+                if (file_exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
