@@ -115,6 +115,9 @@ class KisahSuksesV2Controller extends Controller
         // Add image URL safely
         $kisah->image_url = $kisah->foto ? $this->getImageUrl($kisah->foto) : null;
         
+        // Add video file URL safely
+        $kisah->video_file_url = $kisah->video_file ? $this->getVideoUrl($kisah->video_file) : null;
+        
         $data = [
             'title' => 'Edit Kisah Sukses - ' . $site->namaweb,
             'site' => $site,
@@ -410,6 +413,95 @@ class KisahSuksesV2Controller extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage() . ' - Path: ' . $path);
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to get video URL from S3
+     */
+    private function getVideoUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            
+            // Handle old paths that might still be in database (for backward compatibility)
+            // If path starts with image/kisah-sukses/videos/, it's old local path - try local first
+            if (strpos($path, 'image/kisah-sukses/videos/') === 0) {
+                $localPath = public_path($path);
+                if (File::exists($localPath)) {
+                    return asset($path);
+                }
+                // If not found locally, try to construct S3 URL anyway (might be migrated)
+                // Convert old path to new S3 path format
+                $s3Path = 'assets/upload/image/hero/videos/' . basename($path);
+                try {
+                    if (Storage::disk('s3')->exists($s3Path)) {
+                        return Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore S3 check error for old paths
+                }
+                // Try direct S3 URL with old path (in case file was uploaded with old path)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                return null;
+            }
+            
+            // Handle old uploads/kisah-sukses/videos/ path
+            if (strpos($path, 'uploads/kisah-sukses/videos/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                // Try S3 with new path format
+                $s3Path = 'assets/upload/image/hero/videos/' . basename($path);
+                try {
+                    return Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+            }
+            
+            // For new S3 paths (assets/upload/image/hero/videos/)
+            if (strpos($path, 'assets/upload/image/hero/videos/') === 0) {
+                try {
+                    // Try to check if exists in S3
+                    if (Storage::disk('s3')->exists($path)) {
+                        return Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // If check fails, still try to return URL (file might exist but check failed)
+                    Log::warning('Error checking S3 video file existence: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Return S3 URL anyway (file might exist even if check failed)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    Log::error('Error getting S3 video URL: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Fallback to local storage check
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                return null;
+            }
+            
+            // For any other path, try S3 first
+            try {
+                return Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                Log::warning('Error getting S3 video URL for path: ' . $path . ' - ' . $e->getMessage());
+                return null;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error getting video URL: ' . $e->getMessage() . ' - Path: ' . $path);
             return null;
         }
     }
