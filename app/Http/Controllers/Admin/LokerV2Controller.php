@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\Loker;
 use Illuminate\Support\Str;
 
@@ -54,6 +56,16 @@ class LokerV2Controller extends Controller
         
         $lokers = $query->paginate($perPage)->withQueryString();
         
+        // Add image URL to each loker
+        $lokers->getCollection()->transform(function ($loker) {
+            if ($loker->gambar) {
+                $loker->image_url = $this->getImageUrl($loker->gambar);
+            } else {
+                $loker->image_url = null;
+            }
+            return $loker;
+        });
+        
         $data = [
             'title' => 'Kelola Lowongan Pekerjaan - ' . $site->namaweb,
             'site' => $site,
@@ -97,6 +109,9 @@ class LokerV2Controller extends Controller
             return redirect('admin/v2/loker')->with(['warning' => 'Lowongan pekerjaan tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $loker->image_url = $loker->gambar ? $this->getImageUrl($loker->gambar) : null;
+        
         $data = [
             'title' => 'Edit Lowongan Pekerjaan - ' . $site->namaweb,
             'site' => $site,
@@ -125,7 +140,7 @@ class LokerV2Controller extends Controller
             'tanggung_jawab' => 'nullable|string',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'urutan' => 'nullable|integer|min:0',
             'status_loker' => 'required|in:Publish,Draft,Tutup'
         ]);
@@ -143,11 +158,21 @@ class LokerV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'assets/upload/image/loker/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/loker');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/loker/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -177,7 +202,7 @@ class LokerV2Controller extends Controller
             'tanggung_jawab' => 'nullable|string',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'urutan' => 'nullable|integer|min:0',
             'status_loker' => 'required|in:Publish,Draft,Tutup'
         ]);
@@ -203,15 +228,25 @@ class LokerV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/' . $loker->gambar)) {
-                Storage::disk('public')->delete('assets/upload/image/loker/' . $loker->gambar);
+            if ($loker->gambar) {
+                $this->deleteImage($loker->gambar);
             }
 
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'assets/upload/image/loker/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/loker');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/loker/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $loker->urutan;
@@ -235,12 +270,80 @@ class LokerV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($loker->gambar && Storage::disk('public')->exists('assets/upload/image/loker/' . $loker->gambar)) {
-            Storage::disk('public')->delete('assets/upload/image/loker/' . $loker->gambar);
+        if ($loker->gambar) {
+            $this->deleteImage($loker->gambar);
         }
         
         $loker->delete();
 
         return redirect('admin/v2/loker')->with(['sukses' => 'Lowongan pekerjaan berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/loker/...
+            if (strpos($path, 'image/loker/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'assets/upload/image/loker/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/loker/...
+            if (strpos($path, 'image/loker/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'assets/upload/image/loker/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }
