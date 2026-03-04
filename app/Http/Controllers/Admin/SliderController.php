@@ -56,8 +56,11 @@ class SliderController extends Controller
         // Add image URLs to each slider safely
         // Use getCollection() to modify items in paginated result
         $sliders->getCollection()->transform(function ($slider) {
+            // Use background_image if available, otherwise use person_image as fallback
             if ($slider->background_image) {
                 $slider->image_url = $this->getImageUrl($slider->background_image);
+            } elseif ($slider->person_image) {
+                $slider->image_url = $this->getImageUrl($slider->person_image);
             } else {
                 $slider->image_url = null;
             }
@@ -408,6 +411,10 @@ class SliderController extends Controller
             if (empty($path)) {
                 return null;
             }
+            // New path: image/slider/...
+            if (strpos($path, 'image/slider/') === 0) {
+                return asset($path);
+            }
             // Handle old paths that might still be in database
             if (strpos($path, 'assets/upload/image/hero/') === 0) {
                 // Try to find in old location first, then return asset path
@@ -415,12 +422,10 @@ class SliderController extends Controller
                 if (File::exists($oldPath)) {
                     return asset('storage/' . $path);
                 }
+                // If old file doesn't exist, return null
+                return null;
             }
-            // New path: image/slider/...
-            if (strpos($path, 'image/slider/') === 0) {
-                return asset($path);
-            }
-            // If path doesn't start with image/slider/, assume it's relative to public
+            // If path doesn't match known patterns, try as direct asset
             return asset($path);
         } catch (\Exception $e) {
             Log::error('Error getting image URL: ' . $e->getMessage());

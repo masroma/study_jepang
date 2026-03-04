@@ -137,7 +137,7 @@ $content = $translations[$language] ?? $translations['id'];
 
         <div class="hero-person-container relative w-full md:h-full flex items-center justify-center md:justify-end mt-2 sm:mt-4 md:mt-0 order-1 md:order-2 min-h-[200px] sm:min-h-[250px] md:min-h-0">
           <div class="hero-person-frame relative w-full flex items-center justify-center md:justify-end">
-            <img src="{{ asset('storage/'.$slide->person_image) }}" class="hero-person-image relative z-20 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" onerror="this.onerror=null; this.src='{{asset('storage/'.$slide->person_image)}}';" />
+            <img src="{{ asset($slide->person_image) }}" class="hero-person-image relative z-20 w-[60%] sm:w-[70%] md:w-[90%] max-w-xs sm:max-w-md md:max-w-none object-contain drop-shadow-2xl rounded-b-none mask-image-b transition-all duration-1500 ease-in-out transform" alt="Student" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" style="mask-image: linear-gradient(to bottom, black 80%, transparent 100%)" onerror="this.onerror=null; this.src='{{asset($slide->person_image)}}';" />
 
             <div class="hero-mascot-orbit pointer-events-none" aria-hidden="true">
               <div class="hero-mascot-item mascot-orbit-1">
