@@ -30,8 +30,8 @@
 
   <header class="relative w-full min-h-[400px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
     <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-      @if($loker->gambar)
-      <img src="{{ asset('assets/upload/image/loker/'.$loker->gambar) }}" class="w-full h-full object-cover opacity-40" alt="{{ $loker->judul_loker }}" />
+      @if($loker->gambar_url)
+      <img src="{{ $loker->gambar_url }}" class="w-full h-full object-cover opacity-40" alt="{{ $loker->judul_loker }}" />
       @else
       <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="Lowongan Kerja" />
       @endif

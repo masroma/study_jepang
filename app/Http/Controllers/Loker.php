@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Loker_model;
-use App\Models\PendaftaranLoker_model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
+use App\Models\Loker_model;
+use App\Models\PendaftaranLoker_model;
 
 class Loker extends Controller
 {
@@ -30,6 +30,13 @@ class Loker extends Controller
             ->orderBy('urutan', 'ASC')
             ->orderBy('id_loker', 'DESC')
             ->get();
+
+        // Add S3 URLs to each loker
+        foreach ($loker as $item) {
+            if ($item->gambar) {
+                $item->gambar_url = $this->getImageUrl($item->gambar);
+            }
+        }
 
         $data = [
             'title'         => 'Lowongan Kerja - Instruktur - ' . $site_config->namaweb,
@@ -61,6 +68,11 @@ class Loker extends Controller
             return redirect('loker')->with(['warning' => 'Lowongan kerja tidak ditemukan']);
         }
 
+        // Add S3 URL
+        if ($loker->gambar) {
+            $loker->gambar_url = $this->getImageUrl($loker->gambar);
+        }
+
         // Ambil lowongan lain untuk rekomendasi
         $loker_lain = DB::table('loker')
             ->where('status_loker', 'Publish')
@@ -76,6 +88,13 @@ class Loker extends Controller
             ->orderBy('id_loker', 'DESC')
             ->limit(5)
             ->get();
+
+        // Add S3 URLs to each loker_lain
+        foreach ($loker_lain as $item) {
+            if ($item->gambar) {
+                $item->gambar_url = $this->getImageUrl($item->gambar);
+            }
+        }
 
         $data = [
             'title'         => $loker->judul_loker . ' - ' . $site_config->namaweb,
@@ -149,5 +168,40 @@ class Loker extends Controller
         DB::table('pendaftaran_loker')->insert($data);
 
         return redirect('loker/detail/'.$loker->slug_loker)->with(['sukses' => 'Pendaftaran berhasil dikirim. Terima kasih atas minat Anda untuk bergabung dengan kami.']);
+    }
+
+    /**
+     * Helper function to get image URL from S3
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // Check if file exists in S3
+            if (Storage::disk('s3')->exists($path)) {
+                return Storage::disk('s3')->url($path);
+            }
+            // Handle old paths that might still be in database (for backward compatibility)
+            // Try to find in old local storage
+            if (strpos($path, 'assets/upload/image/loker/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (file_exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path starts with image/loker/, try to find in local
+            if (strpos($path, 'image/loker/') === 0) {
+                $localPath = public_path($path);
+                if (file_exists($localPath)) {
+                    return asset($path);
+                }
+            }
+            // Return null if file doesn't exist
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

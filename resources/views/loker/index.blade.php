@@ -86,9 +86,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       @forelse($loker as $loker_item)
       <div class="bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
-        @if($loker_item->gambar)
+        @if($loker_item->gambar_url)
         <div class="h-48 overflow-hidden">
-          <img src="{{ asset('assets/upload/image/loker/'.$loker_item->gambar) }}" class="w-full h-full object-cover hover:scale-110 transition duration-500" alt="{{ $loker_item->judul_loker }}" />
+          <img src="{{ $loker_item->gambar_url }}" class="w-full h-full object-cover hover:scale-110 transition duration-500" alt="{{ $loker_item->judul_loker }}" />
         </div>
         @endif
         <div class="p-6">

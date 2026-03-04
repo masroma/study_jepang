@@ -57,7 +57,7 @@
       @forelse($berita as $item)
       <article class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100 overflow-hidden cursor-pointer">
         <div class="h-48 overflow-hidden bg-gray-50">
-          <img src="{{ asset('assets/upload/image/thumbs/'.$item->gambar) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="{{ $item->judul_berita }}" loading="lazy" />
+          <img src="{{ $item->thumbnail_url ?? $item->gambar_url ?? asset('template/img/image6.png') }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="{{ $item->judul_berita }}" loading="lazy" />
         </div>
         <div class="p-6">
           <div class="flex items-center text-xs text-gray-400 mb-3">

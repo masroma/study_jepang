@@ -72,8 +72,8 @@
       <div class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-2 group">
         <div class="w-full relative overflow-hidden h-56 md:h-64">
           <div class="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-yellow-500/10 mix-blend-overlay z-10"></div>
-          @if($kisah->foto)
-            <img src="{{ asset($kisah->foto) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-100" />
+          @if($kisah->foto_url)
+            <img src="{{ $kisah->foto_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-100" />
           @else
             <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-gray-100" alt="Testimonial" />
           @endif
@@ -318,13 +318,13 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
       @forelse($kisah_sukses->take(3) as $kisah)
-        @if($kisah->video_url || $kisah->video_file)
+        @if($kisah->video_url || $kisah->video_file_url)
         <div class="group bg-white rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer" 
-             onclick="openVideoModal('{{ $kisah->video_url ?? $kisah->video_file ?? '#' }}')"
+             onclick="openVideoModal('{{ $kisah->video_url ?? $kisah->video_file_url ?? '#' }}')"
         >
           <div class="h-48 relative overflow-hidden">
-            @if($kisah->foto)
-              <img src="{{ asset($kisah->foto) }}" class="w-full h-full object-contain bg-gray-50 group-hover:scale-110 transition duration-500" />
+            @if($kisah->foto_url)
+              <img src="{{ $kisah->foto_url }}" class="w-full h-full object-contain bg-gray-50 group-hover:scale-110 transition duration-500" />
             @else
               <img src="{{ asset('template/img/ChatGPT Image 18 Jan 2026, 07.02.36.png') }}" class="w-full h-full object-contain bg-gray-50 group-hover:scale-110 transition duration-500" alt="Testimonial" />
             @endif
@@ -340,7 +340,7 @@
             @if($kisah->video_url)
               <p class="text-xs text-blue-500 mt-2"><i class="fas fa-external-link-alt"></i> YouTube Video</p>
             @endif
-            @if($kisah->video_file)
+            @if($kisah->video_file_url)
               <p class="text-xs text-green-500 mt-2"><i class="fas fa-video"></i> Video File</p>
             @endif
           </div>

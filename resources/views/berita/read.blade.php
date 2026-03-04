@@ -7,8 +7,8 @@
 @section('hero')
 <header class="relative w-full min-h-[500px] md:min-h-[600px] hero-bg flex items-center pt-24 md:pt-20 overflow-hidden">
   <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-    @if($read->gambar)
-      <img src="{{ asset($read->gambar) }}" class="w-full h-full object-cover opacity-60" alt="{{ $title }}" />
+    @if($read->gambar_url)
+      <img src="{{ $read->gambar_url }}" class="w-full h-full object-cover opacity-60" alt="{{ $title }}" />
     @else
       <img src="{{ asset('template/img/image6.png') }}" class="w-full h-full object-cover opacity-60" alt="{{ $title }}" />
     @endif
