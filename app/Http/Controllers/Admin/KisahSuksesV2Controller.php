@@ -134,6 +134,8 @@ class KisahSuksesV2Controller extends Controller
             return redirect('login')->with(['warning' => 'Mohon maaf, Anda belum login']);
         }
         
+        // NOTE: Table `kisah_sukses` uses single-language columns (nama, pekerjaan, lokasi, testimoni, dll).
+        // Views `admin/v2/kisah_sukses/tambah|edit.blade.php` also post these fields.
         $request->validate([
             'nama' => 'required|string|max:255',
             'pekerjaan' => 'required|string|max:255',
