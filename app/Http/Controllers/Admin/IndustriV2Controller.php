@@ -127,6 +127,8 @@ class IndustriV2Controller extends Controller
             return redirect('login')->with(['warning' => 'Mohon maaf, Anda belum login']);
         }
         
+        // NOTE: Table `industri` uses single-language columns (nama, deskripsi, dll).
+        // Views `admin/v2/industri/tambah|edit.blade.php` also post these fields.
         $request->validate([
             'nama' => 'required|string|max:255',
             'sub_nama' => 'nullable|string|max:255',
