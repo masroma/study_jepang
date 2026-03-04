@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use App\Models\Layanan;
 use Illuminate\Support\Str;
 
@@ -49,6 +51,16 @@ class LayananV2Controller extends Controller
         }
         
         $layanans = $query->paginate($perPage)->withQueryString();
+        
+        // Add image URL to each layanan
+        $layanans->getCollection()->transform(function ($layanan) {
+            if ($layanan->gambar) {
+                $layanan->image_url = $this->getImageUrl($layanan->gambar);
+            } else {
+                $layanan->image_url = null;
+            }
+            return $layanan;
+        });
         
         $data = [
             'title' => 'Kelola Layanan - ' . $site->namaweb,
@@ -93,6 +105,9 @@ class LayananV2Controller extends Controller
             return redirect('admin/v2/layanan')->with(['warning' => 'Layanan tidak ditemukan']);
         }
         
+        // Add image URL safely
+        $layanan->image_url = $layanan->gambar ? $this->getImageUrl($layanan->gambar) : null;
+        
         $data = [
             'title' => 'Edit Layanan - ' . $site->namaweb,
             'site' => $site,
@@ -115,7 +130,7 @@ class LayananV2Controller extends Controller
             'deskripsi' => 'nullable|string',
             'fitur' => 'nullable|string',
             'lokasi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'urutan' => 'nullable|integer|min:0',
             'status' => 'required|in:Publish,Draft'
         ]);
@@ -133,11 +148,21 @@ class LayananV2Controller extends Controller
 
         // Upload gambar
         if ($request->hasFile('gambar')) {
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/layanan/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/layanan');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/layanan/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -161,7 +186,7 @@ class LayananV2Controller extends Controller
             'deskripsi' => 'nullable|string',
             'fitur' => 'nullable|string',
             'lokasi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
             'urutan' => 'nullable|integer|min:0',
             'status' => 'required|in:Publish,Draft'
         ]);
@@ -187,15 +212,25 @@ class LayananV2Controller extends Controller
         // Upload gambar baru
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama
-            if ($layanan->gambar && Storage::disk('public')->exists('uploads/layanan/' . $layanan->gambar)) {
-                Storage::disk('public')->delete('uploads/layanan/' . $layanan->gambar);
+            if ($layanan->gambar) {
+                $this->deleteImage($layanan->gambar);
             }
 
-            $image = $request->file('gambar');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $s3Path = 'uploads/layanan/' . $imageName;
-            Storage::disk('public')->put($s3Path, file_get_contents($image->getRealPath()), 'public');
-            $data['gambar'] = $imageName;
+            $file = $request->file('gambar');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('image/layanan');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($file->move($uploadPath, $filename)) {
+                $data['gambar'] = 'image/layanan/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload gambar']);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $layanan->urutan;
@@ -219,12 +254,80 @@ class LayananV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($layanan->gambar && Storage::disk('public')->exists('uploads/layanan/' . $layanan->gambar)) {
-            Storage::disk('public')->delete('uploads/layanan/' . $layanan->gambar);
+        if ($layanan->gambar) {
+            $this->deleteImage($layanan->gambar);
         }
         
         $layanan->delete();
 
         return redirect('admin/v2/layanan')->with(['sukses' => 'Layanan berhasil dihapus']);
+    }
+
+    /**
+     * Helper function to get image URL from public directory
+     */
+    private function getImageUrl($path)
+    {
+        try {
+            if (empty($path)) {
+                return null;
+            }
+            // New path: image/layanan/...
+            if (strpos($path, 'image/layanan/') === 0) {
+                return asset($path);
+            }
+            // Handle old paths that might still be in database
+            if (strpos($path, 'uploads/layanan/') === 0) {
+                // Try to find in old location first, then return asset path
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+            }
+            // If path doesn't match known patterns, assume it's relative to public
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Error getting image URL: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Helper function to delete image from public directory
+     */
+    private function deleteImage($path)
+    {
+        try {
+            if (empty($path)) {
+                return false;
+            }
+            
+            // New path: image/layanan/...
+            if (strpos($path, 'image/layanan/') === 0) {
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            // Handle old paths
+            if (strpos($path, 'uploads/layanan/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return File::delete($oldPath);
+                }
+            } else {
+                // Assume it's relative to public
+                $filePath = public_path($path);
+                if (File::exists($filePath)) {
+                    return File::delete($filePath);
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error deleting file: ' . $e->getMessage());
+            return false;
+        }
     }
 }

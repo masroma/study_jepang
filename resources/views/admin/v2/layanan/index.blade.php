@@ -38,8 +38,8 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($layanan->gambar)
-                                <img src="{{ asset('storage/uploads/layanan/' . $layanan->gambar) }}" alt="Layanan" class="w-16 h-16 object-cover rounded-lg">
+                            @if($layanan->image_url)
+                                <img src="{{ $layanan->image_url }}" alt="Layanan" class="w-16 h-16 object-cover rounded-lg">
                             @elseif($layanan->icon)
                                 <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
                                     {{ $layanan->icon }}
