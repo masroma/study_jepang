@@ -145,10 +145,16 @@ class IndustriV2Controller extends Controller
             if ($file->getSize() > 5242880) {
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $s3Path = 'uploads/industri/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $data['gambar'] = $s3Path;
+            try {
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $data['gambar'] = $s3Path;
+                Log::info('Industri gambar uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading industri gambar to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload gambar: ' . $e->getMessage()]);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? 0;
@@ -191,13 +197,26 @@ class IndustriV2Controller extends Controller
                 return redirect()->back()->withInput()->with(['warning' => 'Ukuran file gambar terlalu besar. Maksimal 5MB']);
             }
             // Hapus gambar lama
-            if ($industry->gambar && Storage::disk('s3')->exists($industry->gambar)) {
-                Storage::disk('s3')->delete($industry->gambar);
+            if ($industry->gambar) {
+                try {
+                    if (Storage::disk('s3')->exists($industry->gambar)) {
+                        Storage::disk('s3')->delete($industry->gambar);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but continue - file might not exist in S3
+                    Log::warning('Error checking/deleting industri gambar from S3: ' . $e->getMessage() . ' - Path: ' . $industry->gambar);
+                }
             }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $s3Path = 'uploads/industri/' . $filename;
-            Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-            $data['gambar'] = $s3Path;
+            try {
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $s3Path = 'assets/upload/image/hero/' . $filename;
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $data['gambar'] = $s3Path;
+                Log::info('Industri gambar (edit) uploaded to S3: ' . $s3Path);
+            } catch (\Exception $e) {
+                Log::error('Error uploading industri gambar (edit) to S3: ' . $e->getMessage());
+                return redirect()->back()->withInput()->with(['warning' => 'Error mengupload gambar: ' . $e->getMessage()]);
+            }
         }
 
         $data['urutan'] = $request->urutan ?? $industry->urutan;
@@ -221,8 +240,14 @@ class IndustriV2Controller extends Controller
         }
 
         // Hapus gambar
-        if ($industry->gambar && Storage::disk('s3')->exists($industry->gambar)) {
-            Storage::disk('s3')->delete($industry->gambar);
+        if ($industry->gambar) {
+            try {
+                if (Storage::disk('s3')->exists($industry->gambar)) {
+                    Storage::disk('s3')->delete($industry->gambar);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error checking/deleting industri gambar from S3: ' . $e->getMessage() . ' - Path: ' . $industry->gambar);
+            }
         }
         
         $industry->delete();
@@ -239,29 +264,82 @@ class IndustriV2Controller extends Controller
             if (empty($path)) {
                 return null;
             }
-            // Check if file exists in S3
-            if (Storage::disk('s3')->exists($path)) {
-                return Storage::disk('s3')->url($path);
-            }
+            
             // Handle old paths that might still be in database (for backward compatibility)
-            // Try to find in old local storage
-            if (strpos($path, 'uploads/industri/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (File::exists($oldPath)) {
-                    return asset('storage/' . $path);
-                }
-            }
-            // If path starts with image/industri/, try to find in local
+            // If path starts with image/industri/, it's old local path - try local first
             if (strpos($path, 'image/industri/') === 0) {
                 $localPath = public_path($path);
                 if (File::exists($localPath)) {
                     return asset($path);
                 }
+                // If not found locally, try to construct S3 URL anyway (might be migrated)
+                // Convert old path to new S3 path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    if (Storage::disk('s3')->exists($s3Path)) {
+                        return Storage::disk('s3')->url($s3Path);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore S3 check error for old paths
+                }
+                // Try direct S3 URL with old path (in case file was uploaded with old path)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+                return null;
             }
-            // Return null if file doesn't exist
-            return null;
+            
+            // Handle old uploads/industri/ path
+            if (strpos($path, 'uploads/industri/') === 0) {
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                // Try S3 with new path format
+                $s3Path = 'assets/upload/image/hero/' . basename($path);
+                try {
+                    return Storage::disk('s3')->url($s3Path);
+                } catch (\Exception $e) {
+                    // Ignore if fails
+                }
+            }
+            
+            // For new S3 paths (assets/upload/image/hero/)
+            if (strpos($path, 'assets/upload/image/hero/') === 0) {
+                try {
+                    // Try to check if exists in S3
+                    if (Storage::disk('s3')->exists($path)) {
+                        return Storage::disk('s3')->url($path);
+                    }
+                } catch (\Exception $e) {
+                    // If check fails, still try to return URL (file might exist but check failed)
+                    Log::warning('Error checking S3 file existence: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Return S3 URL anyway (file might exist even if check failed)
+                try {
+                    return Storage::disk('s3')->url($path);
+                } catch (\Exception $e) {
+                    Log::error('Error getting S3 URL: ' . $e->getMessage() . ' - Path: ' . $path);
+                }
+                // Fallback to local storage check
+                $oldPath = public_path('storage/' . $path);
+                if (File::exists($oldPath)) {
+                    return asset('storage/' . $path);
+                }
+                return null;
+            }
+            
+            // For any other path, try S3 first
+            try {
+                return Storage::disk('s3')->url($path);
+            } catch (\Exception $e) {
+                Log::warning('Error getting S3 URL for path: ' . $path . ' - ' . $e->getMessage());
+                return null;
+            }
         } catch (\Exception $e) {
-            Log::error('Error getting image URL: ' . $e->getMessage());
+            Log::error('Error getting image URL: ' . $e->getMessage() . ' - Path: ' . $path);
             return null;
         }
     }
