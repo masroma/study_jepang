@@ -170,14 +170,9 @@ class SliderController extends Controller
             try {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                if ($uploaded) {
-                    $background_image = $s3Path;
-                    Log::info('Background image uploaded to S3: ' . $s3Path);
-                } else {
-                    Log::error('Failed to upload background image to S3: ' . $s3Path);
-                    return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image ke S3']);
-                }
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $background_image = $s3Path;
+                Log::info('Background image uploaded to S3: ' . $s3Path);
             } catch (\Exception $e) {
                 Log::error('Error uploading background image to S3: ' . $e->getMessage());
                 return redirect()->back()->withInput()->with(['warning' => 'Error mengupload background image: ' . $e->getMessage()]);
@@ -195,14 +190,9 @@ class SliderController extends Controller
             try {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                if ($uploaded) {
-                    $person_image = $s3Path;
-                    Log::info('Person image uploaded to S3: ' . $s3Path);
-                } else {
-                    Log::error('Failed to upload person image to S3: ' . $s3Path);
-                    return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image ke S3']);
-                }
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $person_image = $s3Path;
+                Log::info('Person image uploaded to S3: ' . $s3Path);
             } catch (\Exception $e) {
                 Log::error('Error uploading person image to S3: ' . $e->getMessage());
                 return redirect()->back()->withInput()->with(['warning' => 'Error mengupload person image: ' . $e->getMessage()]);
@@ -220,13 +210,9 @@ class SliderController extends Controller
                 try {
                     $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                     $s3Path = 'assets/upload/image/hero/' . $filename;
-                    $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                    if ($uploaded) {
-                        $person_images[] = $s3Path;
-                        Log::info('Person image (multiple) uploaded to S3: ' . $s3Path);
-                    } else {
-                        Log::error('Failed to upload person image (multiple) to S3: ' . $s3Path);
-                    }
+                    Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                    $person_images[] = $s3Path;
+                    Log::info('Person image (multiple) uploaded to S3: ' . $s3Path);
                 } catch (\Exception $e) {
                     Log::error('Error uploading person image (multiple) to S3: ' . $e->getMessage());
                 }
@@ -312,14 +298,9 @@ class SliderController extends Controller
             try {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                if ($uploaded) {
-                    $background_image = $s3Path;
-                    Log::info('Background image (edit) uploaded to S3: ' . $s3Path);
-                } else {
-                    Log::error('Failed to upload background image (edit) to S3: ' . $s3Path);
-                    return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image ke S3']);
-                }
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $background_image = $s3Path;
+                Log::info('Background image (edit) uploaded to S3: ' . $s3Path);
             } catch (\Exception $e) {
                 Log::error('Error uploading background image (edit) to S3: ' . $e->getMessage());
                 return redirect()->back()->withInput()->with(['warning' => 'Error mengupload background image: ' . $e->getMessage()]);
@@ -348,14 +329,9 @@ class SliderController extends Controller
             try {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/' . $filename;
-                $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                if ($uploaded) {
-                    $person_image = $s3Path;
-                    Log::info('Person image (edit) uploaded to S3: ' . $s3Path);
-                } else {
-                    Log::error('Failed to upload person image (edit) to S3: ' . $s3Path);
-                    return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image ke S3']);
-                }
+                Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                $person_image = $s3Path;
+                Log::info('Person image (edit) uploaded to S3: ' . $s3Path);
             } catch (\Exception $e) {
                 Log::error('Error uploading person image (edit) to S3: ' . $e->getMessage());
                 return redirect()->back()->withInput()->with(['warning' => 'Error mengupload person image: ' . $e->getMessage()]);
@@ -399,13 +375,9 @@ class SliderController extends Controller
                 try {
                     $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                     $s3Path = 'assets/upload/image/hero/' . $filename;
-                    $uploaded = Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
-                    if ($uploaded) {
-                        $person_images[] = $s3Path;
-                        Log::info('Person image (multiple, edit) uploaded to S3: ' . $s3Path);
-                    } else {
-                        Log::error('Failed to upload person image (multiple, edit) to S3: ' . $s3Path);
-                    }
+                    Storage::disk('s3')->put($s3Path, file_get_contents($file->getRealPath()), 'public');
+                    $person_images[] = $s3Path;
+                    Log::info('Person image (multiple, edit) uploaded to S3: ' . $s3Path);
                 } catch (\Exception $e) {
                     Log::error('Error uploading person image (multiple, edit) to S3: ' . $e->getMessage());
                 }
