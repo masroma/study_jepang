@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\KisahSukses;
 
 class KisahSuksesController extends Controller
@@ -91,13 +92,23 @@ class KisahSuksesController extends Controller
     }
 
     /**
-     * Helper function to get image URL from S3
+     * Helper function to get image URL from S3 or local storage
      */
     private function getImageUrl($path)
     {
         try {
             if (empty($path)) {
                 return null;
+            }
+            
+            // Handle S3 paths (starts with assets/)
+            if (strpos($path, 'assets/') === 0) {
+                // Check if S3 is configured
+                if (config('filesystems.disks.s3.key')) {
+                    return Storage::disk('s3')->url($path);
+                }
+                // Fallback to local if S3 not configured
+                return asset($path);
             }
             
             // Handle old paths that might still be in database
@@ -108,19 +119,39 @@ class KisahSuksesController extends Controller
                 }
             }
             
-            // For uploads/ paths
+            // For uploads/ paths (full path)
             if (strpos($path, 'uploads/') === 0) {
-                $oldPath = public_path('storage/' . $path);
-                if (file_exists($oldPath)) {
+                // Try storage path first
+                $storagePath = public_path('storage/' . $path);
+                if (file_exists($storagePath)) {
                     return asset('storage/' . $path);
                 }
-                // Try direct asset path
+                // Try direct public path
+                $publicPath = public_path($path);
+                if (file_exists($publicPath)) {
+                    return asset($path);
+                }
+                // Return asset path anyway (might be symlinked)
                 return asset('storage/' . $path);
             }
             
-            // Try direct asset path
+            // If it's just a filename, try different locations
+            // Try storage/uploads/kisah-sukses/
+            $storagePath = public_path('storage/uploads/kisah-sukses/' . $path);
+            if (file_exists($storagePath)) {
+                return asset('storage/uploads/kisah-sukses/' . $path);
+            }
+            
+            // Try public/uploads/kisah-sukses/
+            $publicPath = public_path('uploads/kisah-sukses/' . $path);
+            if (file_exists($publicPath)) {
+                return asset('uploads/kisah-sukses/' . $path);
+            }
+            
+            // Last resort: try asset paths (might be symlinked)
             return asset('storage/uploads/kisah-sukses/' . $path);
         } catch (\Exception $e) {
+            \Log::warning('Error getting image URL for path: ' . $path . ' - ' . $e->getMessage());
             return null;
         }
     }
