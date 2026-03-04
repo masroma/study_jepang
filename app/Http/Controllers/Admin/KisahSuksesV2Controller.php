@@ -174,8 +174,12 @@ class KisahSuksesV2Controller extends Controller
 
         // Upload video
         if ($request->hasFile('video_file')) {
+            $video = $request->file('video_file');
+            // Validate file size (10MB = 10485760 bytes)
+            if ($video->getSize() > 10485760) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file video terlalu besar. Maksimal 10MB']);
+            }
             try {
-                $video = $request->file('video_file');
                 $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/videos/' . $videoName;
                 Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
@@ -258,6 +262,11 @@ class KisahSuksesV2Controller extends Controller
 
         // Upload video baru
         if ($request->hasFile('video_file')) {
+            $video = $request->file('video_file');
+            // Validate file size (10MB = 10485760 bytes)
+            if ($video->getSize() > 10485760) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file video terlalu besar. Maksimal 10MB']);
+            }
             // Hapus video lama
             if ($kisah->video_file) {
                 try {
@@ -270,7 +279,6 @@ class KisahSuksesV2Controller extends Controller
                 }
             }
             try {
-                $video = $request->file('video_file');
                 $videoName = time() . '_video_' . uniqid() . '.' . $video->getClientOriginalExtension();
                 $s3Path = 'assets/upload/image/hero/videos/' . $videoName;
                 Storage::disk('s3')->put($s3Path, file_get_contents($video->getRealPath()), 'public');
