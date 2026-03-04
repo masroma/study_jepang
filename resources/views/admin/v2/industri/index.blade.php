@@ -38,8 +38,8 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $no++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($industri->gambar)
-                                <img src="{{ asset('storage/uploads/industri/' . $industri->gambar) }}" alt="Industri" class="w-16 h-16 object-cover rounded-lg">
+                            @if($industri->image_url)
+                                <img src="{{ $industri->image_url }}" alt="Industri" class="w-16 h-16 object-cover rounded-lg">
                             @else
                                 <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-building text-gray-400"></i>
