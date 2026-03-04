@@ -156,20 +156,28 @@ class SliderController extends Controller
         $request->validate([
             'title_id' => 'required',
             'urutan' => 'nullable|integer',
+            'background_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
+            'person_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
+            'person_images.*' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB per file
         ]);
 
         // Upload background image
         $background_image = null;
         if ($request->hasFile('background_image')) {
             $file = $request->file('background_image');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file background image terlalu besar. Maksimal 5MB']);
+            }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $uploadPath = public_path('image/slider');
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
             }
-            $filePath = $uploadPath . '/' . $filename;
             if ($file->move($uploadPath, $filename)) {
                 $background_image = 'image/slider/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image']);
             }
         }
 
@@ -177,14 +185,19 @@ class SliderController extends Controller
         $person_image = null;
         if ($request->hasFile('person_image')) {
             $file = $request->file('person_image');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file person image terlalu besar. Maksimal 5MB']);
+            }
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $uploadPath = public_path('image/slider');
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
             }
-            $filePath = $uploadPath . '/' . $filename;
             if ($file->move($uploadPath, $filename)) {
                 $person_image = 'image/slider/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image']);
             }
         }
 
@@ -196,6 +209,10 @@ class SliderController extends Controller
                 File::makeDirectory($uploadPath, 0755, true);
             }
             foreach ($request->file('person_images') as $file) {
+                // Validate file size (5MB = 5242880 bytes)
+                if ($file->getSize() > 5242880) {
+                    return redirect()->back()->withInput()->with(['warning' => 'Salah satu file person images terlalu besar. Maksimal 5MB per file']);
+                }
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 if ($file->move($uploadPath, $filename)) {
                     $person_images[] = 'image/slider/' . $filename;
@@ -249,6 +266,9 @@ class SliderController extends Controller
             'id_hero' => 'required|exists:hero_sliders,id_hero',
             'title_id' => 'required',
             'urutan' => 'nullable|integer',
+            'background_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
+            'person_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB
+            'person_images.*' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // Max 5MB per file
         ]);
 
         $slider = HeroSlider::find($request->id_hero);
@@ -260,11 +280,15 @@ class SliderController extends Controller
         // Update background image
         $background_image = $slider->background_image;
         if ($request->hasFile('background_image')) {
+            $file = $request->file('background_image');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file background image terlalu besar. Maksimal 5MB']);
+            }
             // Delete old image
             if ($slider->background_image) {
                 $this->deleteImage($slider->background_image);
             }
-            $file = $request->file('background_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $uploadPath = public_path('image/slider');
             if (!File::exists($uploadPath)) {
@@ -272,17 +296,23 @@ class SliderController extends Controller
             }
             if ($file->move($uploadPath, $filename)) {
                 $background_image = 'image/slider/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload background image']);
             }
         }
 
         // Handle person_image (single image)
         $person_image = $slider->person_image;
         if ($request->hasFile('person_image')) {
+            $file = $request->file('person_image');
+            // Validate file size (5MB = 5242880 bytes)
+            if ($file->getSize() > 5242880) {
+                return redirect()->back()->withInput()->with(['warning' => 'Ukuran file person image terlalu besar. Maksimal 5MB']);
+            }
             // Delete old image
             if ($slider->person_image) {
                 $this->deleteImage($slider->person_image);
             }
-            $file = $request->file('person_image');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $uploadPath = public_path('image/slider');
             if (!File::exists($uploadPath)) {
@@ -290,6 +320,8 @@ class SliderController extends Controller
             }
             if ($file->move($uploadPath, $filename)) {
                 $person_image = 'image/slider/' . $filename;
+            } else {
+                return redirect()->back()->withInput()->with(['warning' => 'Gagal mengupload person image']);
             }
         }
 
@@ -320,6 +352,10 @@ class SliderController extends Controller
             }
             $person_images = [];
             foreach ($request->file('person_images') as $file) {
+                // Validate file size (5MB = 5242880 bytes)
+                if ($file->getSize() > 5242880) {
+                    return redirect()->back()->withInput()->with(['warning' => 'Salah satu file person images terlalu besar. Maksimal 5MB per file']);
+                }
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 if ($file->move($uploadPath, $filename)) {
                     $person_images[] = 'image/slider/' . $filename;
