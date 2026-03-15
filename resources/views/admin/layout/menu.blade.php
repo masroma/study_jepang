@@ -200,6 +200,13 @@
               <p>Header Gambar</p>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a href="{{ url('admin/dokumentasi') }}" class="nav-link">
+              <i class="nav-icon fas fa-book"></i>
+              <p>Dokumentasi</p>
+            </a>
+          </li>
           
           <!-- MENU -->
           <li class="nav-item has-treeview">

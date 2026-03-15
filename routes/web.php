@@ -262,6 +262,8 @@ Route::get('admin/v2/mitra/komisi/{id_mitra}', 'App\Http\Controllers\Admin\Mitra
 // dasbor
 Route::get('admin/dasbor', 'App\Http\Controllers\Admin\Dasbor@index');
 Route::get('admin/dasbor/konfigurasi', 'App\Http\Controllers\Admin\Dasbor@konfigurasi');
+// dokumentasi
+Route::get('admin/dokumentasi', 'App\Http\Controllers\Admin\Dokumentasi@index');
 // pemesanan
 // Route::get('admin/pemesanan', 'App\Http\Controllers\Admin\Pemesanan@index');
 // Route::get('admin/pemesanan/tambah', 'App\Http\Controllers\Admin\Pemesanan@tambah');
