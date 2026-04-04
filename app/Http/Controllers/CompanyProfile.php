@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -26,25 +27,39 @@ class CompanyProfile extends Controller
     }
 
     /**
-     * Visi & misi dari tabel konfigurasi (admin Tentang Kami); misi = satu poin per baris.
+     * Visi & misi dari tabel konfigurasi (admin Tentang Kami).
+     * Jika kolom visi/misi sudah ada di DB, hanya tampilkan isi admin (tanpa teks default) —
+     * teks default hanya dipakai bila kolom belum ada (DB lama sebelum migrasi).
+     * Misi: satu poin per baris; mendukung tag br HTML dan pemisah titik koma.
      */
     private function visiMisiFromConfig(object $site_config): array
     {
-        $defaults = $this->defaultVisiMisi();
+        $hasVisiCol = Schema::hasColumn('konfigurasi', 'visi');
+        $hasMisiCol = Schema::hasColumn('konfigurasi', 'misi');
+
+        if (!$hasVisiCol || !$hasMisiCol) {
+            return $this->defaultVisiMisi();
+        }
 
         $visi = data_get($site_config, 'visi');
         $visi = is_string($visi) ? trim($visi) : '';
-        if ($visi === '') {
-            $visi = $defaults['visi'];
-        }
 
         $misiRaw = data_get($site_config, 'misi');
         $misiList = [];
         if (is_string($misiRaw) && trim($misiRaw) !== '') {
-            $misiList = $this->linesFromText($misiRaw);
-        }
-        if ($misiList === []) {
-            $misiList = $defaults['misi'];
+            $normalized = preg_replace('#<br\s*/?>#i', "\n", $misiRaw);
+            $plain = trim(strip_tags($normalized));
+            $misiList = $this->linesFromText($plain);
+            if ($misiList === [] && $plain !== '') {
+                $misiList = [$plain];
+            }
+            if (count($misiList) === 1 && str_contains($misiList[0], ';')) {
+                $misiList = collect(explode(';', $misiList[0]))
+                    ->map(fn ($line) => trim($line))
+                    ->filter()
+                    ->values()
+                    ->all();
+            }
         }
 
         return [

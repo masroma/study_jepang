@@ -109,7 +109,11 @@
           <span class="text-3xl">👁️</span>
         </div>
         <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Visi</h3>
-        <p class="text-gray-700 leading-relaxed text-center font-medium">{{ $visi_misi['visi'] }}</p>
+        @if(($visi_misi['visi'] ?? '') !== '')
+        <p class="text-gray-700 leading-relaxed text-center font-medium">{!! nl2br(e($visi_misi['visi'])) !!}</p>
+        @else
+        <p class="text-gray-400 text-center text-sm italic">Belum diisi. Tambahkan di Admin → Tentang Kami.</p>
+        @endif
       </div>
 
       <!-- Misi -->
@@ -118,6 +122,7 @@
           <span class="text-3xl">🎯</span>
         </div>
         <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Misi</h3>
+        @if(!empty($visi_misi['misi']))
         <ul class="space-y-4">
           @foreach($visi_misi['misi'] as $misi)
           <li class="flex items-start">
@@ -126,6 +131,9 @@
           </li>
           @endforeach
         </ul>
+        @else
+        <p class="text-gray-400 text-center text-sm italic">Belum diisi. Tambahkan di Admin → Tentang Kami (satu poin per baris).</p>
+        @endif
       </div>
     </div>
   </div>
