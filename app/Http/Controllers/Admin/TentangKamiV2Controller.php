@@ -109,23 +109,23 @@ class TentangKamiV2Controller extends Controller
         // Update field tambahan jika ada di database
         // Cek apakah kolom visi, misi, sejarah, nilai_perusahaan ada
         $columns = DB::select("SHOW COLUMNS FROM konfigurasi LIKE 'visi'");
-        if (count($columns) > 0 && $request->visi) {
-            $updateData['visi'] = $request->visi;
+        if (count($columns) > 0 && $request->has('visi')) {
+            $updateData['visi'] = $request->input('visi');
         }
 
         $columns = DB::select("SHOW COLUMNS FROM konfigurasi LIKE 'misi'");
-        if (count($columns) > 0 && $request->misi) {
-            $updateData['misi'] = $request->misi;
+        if (count($columns) > 0 && $request->has('misi')) {
+            $updateData['misi'] = $request->input('misi');
         }
 
         $columns = DB::select("SHOW COLUMNS FROM konfigurasi LIKE 'sejarah'");
-        if (count($columns) > 0 && $request->sejarah) {
-            $updateData['sejarah'] = $request->sejarah;
+        if (count($columns) > 0 && $request->has('sejarah')) {
+            $updateData['sejarah'] = $request->input('sejarah');
         }
 
         $columns = DB::select("SHOW COLUMNS FROM konfigurasi LIKE 'nilai_perusahaan'");
-        if (count($columns) > 0 && $request->nilai_perusahaan) {
-            $updateData['nilai_perusahaan'] = $request->nilai_perusahaan;
+        if (count($columns) > 0 && $request->has('nilai_perusahaan')) {
+            $updateData['nilai_perusahaan'] = $request->input('nilai_perusahaan');
         }
 
         DB::table('konfigurasi')

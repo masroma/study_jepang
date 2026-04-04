@@ -19,10 +19,10 @@
           Tentang Kami
         </span>
         <br />
-        <span class="text-brand-pink">Company Profile</span>
+        <span class="text-brand-pink">{{ $nama_display ?? 'Company Profile' }}</span>
       </h1>
       <p class="text-gray-500 mb-8 max-w-2xl leading-relaxed text-sm md:text-base font-medium">
-        Profil perusahaan, visi-misi, dan pengalaman kami dalam menghubungkan Indonesia dengan pasar global.
+        {{ $hero_subtitle ?? '' }}
       </p>
     </div>
 
@@ -36,6 +36,31 @@
 @endsection
 
 @section('content')
+@if(($tentang ?? '') !== '' || !empty($tentang_gambar_url))
+<!-- Tentang Perusahaan (dari admin) -->
+<section class="py-16 md:py-20 max-w-7xl mx-auto px-6 border-b border-gray-100">
+  <div class="flex flex-col md:flex-row items-start gap-10 md:gap-14">
+    <div class="md:w-2/5 shrink-0 w-full">
+      <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+      <h2 class="text-3xl md:text-4xl font-bold text-brand-pink leading-tight mb-2">Tentang Perusahaan</h2>
+      <p class="text-gray-500 text-sm font-medium">Mengenal lebih dekat lewat narasi resmi kami</p>
+    </div>
+    <div class="md:flex-1 w-full space-y-6">
+      @if(!empty($tentang_gambar_url))
+      <div class="rounded-2xl overflow-hidden shadow-soft border border-gray-100 bg-gray-50">
+        <img src="{{ $tentang_gambar_url }}" alt="Gambar {{ $nama_display ?? 'perusahaan' }}" class="w-full h-auto max-h-[420px] object-cover" loading="lazy" />
+      </div>
+      @endif
+      @if(($tentang ?? '') !== '')
+      <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed font-medium text-sm md:text-base">
+        {!! nl2br(e($tentang)) !!}
+      </div>
+      @endif
+    </div>
+  </div>
+</section>
+@endif
+
 <!-- Legalitas Section -->
 <section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
   <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 mb-16">
@@ -74,7 +99,7 @@
     <div class="text-center mb-12 md:mb-16">
       <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm mx-auto"></div>
       <h2 class="text-2xl md:text-3xl font-bold text-brand-pink mb-3">Visi & Misi</h2>
-      <p class="text-gray-600 text-sm font-medium">Komitmen kami untuk menjadi mitra terpercaya dalam perdagangan internasional</p>
+      <p class="text-gray-600 text-sm font-medium">{{ $visi_misi_intro ?? '' }}</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -105,6 +130,44 @@
     </div>
   </div>
 </section>
+
+@if(($sejarah ?? '') !== '')
+<!-- Sejarah -->
+<section class="py-16 md:py-20 bg-gray-50/80">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row gap-10 md:gap-14">
+      <div class="md:w-1/3">
+        <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm"></div>
+        <h2 class="text-2xl md:text-3xl font-bold text-brand-pink leading-tight">Sejarah<br />Perusahaan</h2>
+      </div>
+      <div class="md:flex-1 bg-white rounded-2xl shadow-soft p-8 border border-gray-100">
+        <div class="text-gray-700 leading-relaxed font-medium text-sm md:text-base">
+          {!! nl2br(e($sejarah)) !!}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+@endif
+
+@if(!empty($nilai_perusahaan))
+<!-- Nilai-nilai -->
+<section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
+  <div class="text-center mb-12 md:mb-16">
+    <div class="w-6 h-6 bg-red-600 rounded-full mb-4 shadow-sm mx-auto"></div>
+    <h2 class="text-2xl md:text-3xl font-bold text-brand-pink mb-3">Nilai-Nilai Perusahaan</h2>
+    <p class="text-gray-600 text-sm font-medium">Prinsip yang kami junjung dalam setiap langkah</p>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @foreach($nilai_perusahaan as $nilai)
+    <div class="bg-gradient-to-br from-pink-50 to-white rounded-2xl p-6 shadow-soft border border-gray-100 text-left">
+      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-brand-pink/10 text-brand-pink font-bold mb-3">{{ $loop->iteration }}</span>
+      <p class="text-gray-800 font-medium leading-relaxed">{{ $nilai }}</p>
+    </div>
+    @endforeach
+  </div>
+</section>
+@endif
 
 <!-- Pengalaman & Partner Section -->
 <section class="py-16 md:py-20">
