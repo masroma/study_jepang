@@ -2,11 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CompanyProfile extends Controller
 {
+    /** Fallback jika kolom kosong / belum diisi di admin */
+    private function defaultVisiMisi(): array
+    {
+        return [
+            'visi' => 'Menjadi perusahaan ekspor-impor terdepan yang menghubungkan Indonesia dengan pasar global, khususnya Jepang, dengan komitmen pada kualitas, keandalan, dan kepuasan pelanggan.',
+            'misi' => [
+                'Menyediakan produk berkualitas tinggi dengan standar internasional',
+                'Membangun jaringan bisnis yang kuat dengan partner di berbagai negara',
+                'Memberikan layanan ekspor-impor yang profesional dan terpercaya',
+                'Mengembangkan SDM yang kompeten dan berintegritas',
+                'Berkontribusi pada pertumbuhan ekonomi nasional melalui perdagangan internasional',
+            ],
+        ];
+    }
+
+    /**
+     * Visi & misi dari tabel konfigurasi (admin Tentang Kami); misi = satu poin per baris.
+     */
+    private function visiMisiFromConfig(object $site_config): array
+    {
+        $defaults = $this->defaultVisiMisi();
+
+        $visi = data_get($site_config, 'visi');
+        $visi = is_string($visi) ? trim($visi) : '';
+        if ($visi === '') {
+            $visi = $defaults['visi'];
+        }
+
+        $misiRaw = data_get($site_config, 'misi');
+        $misiList = [];
+        if (is_string($misiRaw) && trim($misiRaw) !== '') {
+            $misiList = collect(preg_split("/\r\n|\r|\n/", $misiRaw))
+                ->map(fn ($line) => trim($line))
+                ->filter()
+                ->values()
+                ->all();
+        }
+        if ($misiList === []) {
+            $misiList = $defaults['misi'];
+        }
+
+        return [
+            'visi' => $visi,
+            'misi' => $misiList,
+        ];
+    }
+
     // Halaman Company Profile / About Us
     public function index()
     {
@@ -29,17 +75,7 @@ class CompanyProfile extends Controller
             'alamat' => 'Jl. Contoh No. 123, Jakarta, Indonesia'
         ];
 
-        // Data visi-misi
-        $visi_misi = [
-            'visi' => 'Menjadi perusahaan ekspor-impor terdepan yang menghubungkan Indonesia dengan pasar global, khususnya Jepang, dengan komitmen pada kualitas, keandalan, dan kepuasan pelanggan.',
-            'misi' => [
-                'Menyediakan produk berkualitas tinggi dengan standar internasional',
-                'Membangun jaringan bisnis yang kuat dengan partner di berbagai negara',
-                'Memberikan layanan ekspor-impor yang profesional dan terpercaya',
-                'Mengembangkan SDM yang kompeten dan berintegritas',
-                'Berkontribusi pada pertumbuhan ekonomi nasional melalui perdagangan internasional'
-            ]
-        ];
+        $visi_misi = $this->visiMisiFromConfig($site_config);
 
         // Data pengalaman & partner negara
         $pengalaman = [
