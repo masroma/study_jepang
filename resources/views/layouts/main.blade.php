@@ -95,6 +95,8 @@
     </style>
   </head>
   <body class="font-sans text-gray-700 overflow-x-hidden">
+    <canvas id="sakura-canvas" class="fixed inset-0 pointer-events-none z-[1]" width="1920" height="1080" aria-hidden="true"></canvas>
+    <div class="relative z-10">
     <nav class="absolute top-0 left-0 w-full z-50 pt-4 px-4 md:pt-6 md:px-12">
       <div class="flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center space-x-3">
@@ -362,10 +364,100 @@
     </a>
     @endif
 
+    </div>
+
     @stack('scripts')
   </body>
   
   <script>
+  (function () {
+    var canvas = document.getElementById('sakura-canvas');
+    if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (canvas) canvas.style.display = 'none';
+      return;
+    }
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0;
+    var petals = [];
+    var colors = ['#fbcfe8', '#f9a8d4', '#fce7f3', '#fda4af', '#fbc4d4'];
+
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function Petal() {
+      this.reset(true);
+    }
+    Petal.prototype.reset = function (initial) {
+      this.x = Math.random() * w;
+      this.y = initial ? Math.random() * h : -30 - Math.random() * 80;
+      this.size = 6 + Math.random() * 10;
+      this.vy = 0.4 + Math.random() * 1.2;
+      this.vx = -0.35 + Math.random() * 0.7;
+      this.swing = Math.random() * Math.PI * 2;
+      this.swingSpeed = 0.008 + Math.random() * 0.02;
+      this.rot = Math.random() * Math.PI * 2;
+      this.rotSpeed = -0.03 + Math.random() * 0.06;
+      this.color = colors[(Math.random() * colors.length) | 0];
+      this.alpha = 0.45 + Math.random() * 0.35;
+    };
+    Petal.prototype.step = function () {
+      this.swing += this.swingSpeed;
+      this.x += this.vx + Math.sin(this.swing) * 0.6;
+      this.y += this.vy;
+      this.rot += this.rotSpeed;
+      if (this.y > h + 40 || this.x < -40 || this.x > w + 40) this.reset(false);
+    };
+    Petal.prototype.draw = function () {
+      var s = this.size;
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot);
+      ctx.fillStyle = this.color;
+      for (var i = 0; i < 5; i++) {
+        ctx.rotate((Math.PI * 2) / 5);
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.55, s * 0.32, s * 0.52, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.beginPath();
+      ctx.arc(0, 0, s * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    function init() {
+      resize();
+      var count = Math.min(55, Math.max(24, Math.floor(w / 28)));
+      petals.length = 0;
+      for (var i = 0; i < count; i++) petals.push(new Petal());
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < petals.length; i++) {
+        petals[i].step();
+        petals[i].draw();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('resize', function () {
+      resize();
+    });
+    init();
+    requestAnimationFrame(tick);
+  })();
+
   function changeLanguage(lang) {
     console.log('Language changed to:', lang);
     

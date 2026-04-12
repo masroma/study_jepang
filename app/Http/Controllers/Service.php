@@ -23,32 +23,6 @@ class Service extends Controller
 
         // Data layanan
         $layanan = [
-            'export_service' => [
-                'judul' => 'Export Service',
-                'icon' => '📤',
-                'deskripsi' => 'Layanan ekspor lengkap untuk produk Anda ke berbagai negara tujuan',
-                'fitur' => [
-                    'Dokumentasi ekspor lengkap',
-                    'Pengurusan izin ekspor',
-                    'Quality control & inspection',
-                    'Packing & labeling sesuai standar internasional',
-                    'Negosiasi dengan buyer internasional',
-                    'Follow-up dan after sales service'
-                ]
-            ],
-            'import_service' => [
-                'judul' => 'Import Service',
-                'icon' => '📥',
-                'deskripsi' => 'Layanan impor terpercaya untuk kebutuhan bisnis Anda',
-                'fitur' => [
-                    'Pengurusan izin impor',
-                    'Dokumentasi impor lengkap',
-                    'Quality inspection di negara asal',
-                    'Negosiasi harga dengan supplier',
-                    'Pengurusan bea cukai',
-                    'Delivery sampai gudang'
-                ]
-            ],
             'customs_clearance' => [
                 'judul' => 'Customs Clearance',
                 'icon' => '📋',
@@ -110,8 +84,8 @@ class Service extends Controller
 
         $data = [
             'title'         => 'Layanan - ' . $site_config->namaweb,
-            'deskripsi'     => 'Layanan ekspor-impor, customs clearance, freight, dan warehousing',
-            'keywords'      => 'layanan, export, import, freight, warehousing, ' . $site_config->namaweb,
+            'deskripsi'     => 'Layanan customs clearance, freight, dan warehousing',
+            'keywords'      => 'layanan, customs, freight, warehousing, ' . $site_config->namaweb,
             'site_config'   => $site_config,
             'layanan'        => $layanan
         ];

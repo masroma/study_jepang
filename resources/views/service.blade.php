@@ -22,7 +22,7 @@
         <span class="text-brand-pink">Solusi Lengkap</span>
       </h1>
       <p class="text-gray-500 mb-8 max-w-2xl leading-relaxed text-sm md:text-base font-medium">
-        Layanan ekspor-impor profesional dengan dukungan customs clearance, freight, dan warehousing terintegrasi.
+        Layanan profesional dengan dukungan customs clearance, freight, dan warehousing terintegrasi.
       </p>
     </div>
 
@@ -36,54 +36,6 @@
 @endsection
 
 @section('content')
-<!-- Export Service -->
-<section class="py-16 md:py-20 max-w-7xl mx-auto px-6">
-  <div class="bg-white rounded-2xl shadow-soft p-8 md:p-12 border border-gray-100 mb-12">
-    <div class="flex items-start gap-6">
-      <div class="w-20 h-20 bg-gradient-to-br from-brand-pink to-pink-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-        <span class="text-4xl">{{ $layanan['export_service']['icon'] }}</span>
-      </div>
-      <div class="flex-1">
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ $layanan['export_service']['judul'] }}</h2>
-        <p class="text-gray-600 mb-6 font-medium">{{ $layanan['export_service']['deskripsi'] }}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          @foreach($layanan['export_service']['fitur'] as $fitur)
-          <div class="flex items-start">
-            <span class="text-brand-pink mr-3 mt-1">✓</span>
-            <span class="text-gray-700">{{ $fitur }}</span>
-          </div>
-          @endforeach
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Import Service -->
-<section class="py-16 bg-white">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="bg-gradient-to-br from-blue-50 to-pink-50 rounded-2xl shadow-soft p-8 md:p-12 border border-gray-100 mb-12">
-      <div class="flex items-start gap-6">
-        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <span class="text-4xl">{{ $layanan['import_service']['icon'] }}</span>
-        </div>
-        <div class="flex-1">
-          <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ $layanan['import_service']['judul'] }}</h2>
-          <p class="text-gray-600 mb-6 font-medium">{{ $layanan['import_service']['deskripsi'] }}</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($layanan['import_service']['fitur'] as $fitur)
-            <div class="flex items-start">
-              <span class="text-blue-600 mr-3 mt-1">✓</span>
-              <span class="text-gray-700">{{ $fitur }}</span>
-            </div>
-            @endforeach
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- Customs Clearance -->
 <section class="py-16 md:py-20">
   <div class="max-w-7xl mx-auto px-6">
@@ -199,7 +151,7 @@
       <div class="w-8 h-8 bg-red-600 rounded-full mb-4 shadow-sm mx-auto"></div>
       <h2 class="text-3xl md:text-4xl font-bold text-brand-pink mb-4">Butuh Bantuan dengan Layanan Kami?</h2>
       <p class="text-gray-600 mb-8 font-medium text-sm md:text-base max-w-2xl mx-auto">
-        Konsultasikan kebutuhan ekspor-impor Anda dengan tim profesional kami. Kami siap membantu dari awal hingga akhir proses.
+        Konsultasikan kebutuhan logistik dan layanan kami dengan tim profesional. Kami siap membantu dari awal hingga akhir proses.
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
         <a href="{{ url('kontak') }}" class="bg-brand-pink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-pink-600 transition w-full sm:w-auto">

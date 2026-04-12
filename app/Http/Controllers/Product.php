@@ -132,7 +132,7 @@ class Product extends Controller
         $data = [
             'title'         => 'Produk & Komoditas - ' . $site_config->namaweb,
             'deskripsi'     => 'Produk dan komoditas yang kami tawarkan',
-            'keywords'      => 'produk, komoditas, ekspor, ' . $site_config->namaweb,
+            'keywords'      => 'produk, komoditas, ' . $site_config->namaweb,
             'site_config'   => $site_config,
             'produk'        => $produk
         ];

@@ -682,9 +682,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="p-4 sm:p-6">
           <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-2 group-hover:text-brand-pink transition">{{ $item->judul ?? 'Program Title' }}</h3>
           <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{{ $item->deskripsi ?? 'Program description' }}</p>
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-brand-pink font-semibold">{{ $item->lokasi ?? 'Location' }}</span>
-            <span class="text-xs text-gray-500">{{ $item->durasi ?? 'Duration' }}</span>
+          <div class="flex gap-2 sm:gap-3 items-start">
+            <span class="text-xs text-brand-pink font-semibold shrink-0">{{ $item->lokasi ?? 'Location' }}</span>
+            <span class="text-xs text-gray-500 flex-1 min-w-0 text-right break-words leading-snug">{{ $item->durasi ?? 'Duration' }}</span>
           </div>
         </div>
       </a>
